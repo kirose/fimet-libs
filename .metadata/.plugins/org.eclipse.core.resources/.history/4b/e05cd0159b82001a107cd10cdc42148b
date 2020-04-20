@@ -1,9 +1,0 @@
-package com.fimet.core.stress.exe;
-
-import java.util.List;
-
-import com.fimet.core.stress.StressInjector;
-
-public class StressExecutor {
-	private List<StressInjector> injerctors;
-}

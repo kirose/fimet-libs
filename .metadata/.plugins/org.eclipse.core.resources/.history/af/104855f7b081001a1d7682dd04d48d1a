@@ -1,6 +1,0 @@
-package com.fimet.core.usecase;
-
-public interface IExecutorManager {
-	IExecutor getSyncExecutor();
-	IExecutor getAsyncExecutor();
-}

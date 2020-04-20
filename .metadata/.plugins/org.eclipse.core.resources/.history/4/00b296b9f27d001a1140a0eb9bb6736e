@@ -1,9 +1,0 @@
-package com.fimet.parser.impl;
-
-import com.fimet.parser.AbstractMessageParser;
-
-public class NacionalParser extends AbstractMessageParser {
-	public NacionalParser(com.fimet.core.entity.sqlite.Parser entity) {
-		super(entity);
-	}
-}

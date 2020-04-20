@@ -1,8 +1,0 @@
-1586839038366	Rename type 'SocketConnection'
-1586839048449	Rename type 'SocketConnectionClient'
-1586839057194	Rename type 'SocketConnectionServer'
-1586839157642	Rename type 'AdapterSocket'
-1586839162203	Rename type 'AdapterSocketClient'
-1586839166848	Rename type 'AdapterSocketServer'
-1586842288223	Delete elements
-1586927911282	Move compilation units

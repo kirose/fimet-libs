@@ -1,7 +1,0 @@
-package com.fimet.usecase;
-
-public interface IExecutor {
-	void startExecutor();
-	void stopExecutor();
-	void execute(IUseCase useCase);
-}

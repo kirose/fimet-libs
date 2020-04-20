@@ -1,8 +1,0 @@
-package com.fimet.core.stress;
-
-public interface IInjectorListener {
-	//void read();
-	//boolean canRead();
-	void stopRead();
-	void startRead();
-}

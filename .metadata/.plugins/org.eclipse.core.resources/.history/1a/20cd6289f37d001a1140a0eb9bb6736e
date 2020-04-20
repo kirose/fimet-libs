@@ -1,9 +1,0 @@
-package com.fimet.parser.mx;
-
-import com.fimet.parser.AbstractMessageExtractParser;
-
-public class ExtractParser extends AbstractMessageExtractParser {
-	public ExtractParser(com.fimet.core.entity.sqlite.Parser entity) {
-		super(entity);
-	}
-}

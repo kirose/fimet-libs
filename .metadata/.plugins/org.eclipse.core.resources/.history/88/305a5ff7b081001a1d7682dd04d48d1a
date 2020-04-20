@@ -1,8 +1,0 @@
-package com.fimet.core.usecase;
-
-import com.fimet.core.usecase.IExecutor;
-
-public interface IExecutorManager {
-	IExecutor getSyncExecutor();
-	IExecutor getAsyncExecutor();
-}

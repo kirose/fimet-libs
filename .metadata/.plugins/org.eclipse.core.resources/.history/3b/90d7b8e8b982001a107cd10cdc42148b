@@ -1,8 +1,0 @@
-package com.fimet.core.stress;
-
-public interface IReadListener {
-	void read();
-	boolean canRead();
-	void stopRead();
-	void startRead();
-}

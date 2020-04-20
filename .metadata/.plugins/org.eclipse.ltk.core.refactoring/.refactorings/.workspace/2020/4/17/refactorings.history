@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;fimet-usecase&apos;" deleteContents="true" description="Delete resource &apos;fimet-usecase&apos;" element1="/fimet-usecase" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1587396842990"/>&#x0A;<refactoring comment="Delete resource &apos;fimet-compiler&apos;" deleteContents="true" description="Delete resource &apos;fimet-compiler&apos;" element1="/fimet-compiler" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1587396889462"/>
-</session>

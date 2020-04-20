@@ -1,8 +1,0 @@
-package com.fimet.core.stress;
-
-public class Snippet {
-	public static void main(String[] args) {
-		IUseCase
-	}
-}
-

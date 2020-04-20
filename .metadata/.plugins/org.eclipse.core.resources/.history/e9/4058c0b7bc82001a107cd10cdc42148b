@@ -1,6 +1,0 @@
-package com.fimet.core.stress;
-
-public interface IInjectorListener {
-	void onInjectorStartInject();
-	void onInjectorFinishInject();
-}

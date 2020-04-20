@@ -1,7 +1,0 @@
-package com.fimet.core.stress;
-
-import java.nio.ByteBuffer;
-
-public class StressFileReader {
-	ByteBuffer buffer = ByteBuffer.allocate(1024);
-}

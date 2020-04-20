@@ -1,9 +1,0 @@
-package com.fimet.core.usecase;
-
-public interface IExecutor {
-	void removeMonitor();
-	void setMonitor(IExecutorMonitor monitor);
-	void startExecutor();
-	void stopExecutor();
-	void execute(IUseCase useCase);
-}

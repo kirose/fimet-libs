@@ -1,8 +1,0 @@
-			listener.onMessengerReadMessage(this, bytes);
-			Message message = (Message)iSocket.getParser().parseMessage(bytes);
-			message.setAdapter(iSocket.getAdapter());
-			listener.onMessengerParseMessage(this, message);
-			Message response = simulator.simulateResponse(message);
-			if (response == null) {
-				return;
-			}
