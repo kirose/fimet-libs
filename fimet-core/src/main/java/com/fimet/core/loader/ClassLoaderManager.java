@@ -1,0 +1,86 @@
+package com.fimet.core.loader;
+
+import java.io.File;
+
+import com.fimet.core.IClassLoaderManager;
+
+
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
+public class ClassLoaderManager implements IClassLoaderManager {
+	
+	private ClassLoaderBin classLoaderBin = new ClassLoaderBin();
+	private ClassLoaderLib classLoaderLib = new ClassLoaderLib();
+	@Override
+	public Class<?> loadClass(String className) throws ClassNotFoundException {
+		try {
+			return loadClassBin(className);
+		} catch (Exception e) {
+			try {
+			return loadClassLib(className);
+			} catch (Exception ex) {
+				return Class.forName(className);
+			}
+		}
+	}	
+	public Class<?> loadClassBin(String className) throws ClassNotFoundException {
+		return classLoaderBin.loadClass(className);
+	}
+	public Class<?> loadClassLib(String className) throws ClassNotFoundException {
+		return classLoaderLib.loadClass(className);
+	}
+	@Override
+	public ClassLoader getClassLoaderBin() {
+		return classLoaderBin;
+	}
+	@Override
+	public ClassLoader getClassLoaderLib() {
+		return classLoaderLib;
+	}
+	/**
+	 * If the class was loaded previously classLoader will reload the class
+	 */
+	@Override
+	public void installClass(String className, byte[] contents) {
+		if (wasInstalled(className)) {
+			reloadClassLoader();
+		}
+		classLoaderBin.installClass(className, contents);
+	}
+	@Override
+	public void installClass(String className, byte[] clazz, boolean override) {
+		classLoaderBin.installClass(className, clazz, override);
+	}
+	private boolean wasInstalled(String className) {
+		return new File(BIN_PATH, className.replace('.', File.separatorChar) + ".class").exists();
+	}
+	/**
+	 * If you want reload a class you to must do:
+	 * IClassLoaderManager.reloadClassLoader().loadClass(className);
+	 * this code will affect all classes loaded for the previus ClassLoader
+	 */
+	@Override
+	public void reloadClassLoader() {
+		classLoaderBin = new ClassLoaderBin();
+		//classLoaderLib = new ClassLoaderLib();
+	}
+	@Override
+	public void uninstallClasses() {
+		classLoaderBin.uninstallClasses();
+	}
+	@Override
+	public void free() {
+		classLoaderBin.uninstallClasses();
+	}
+	@Override
+	public void saveState() {
+		
+	}
+	@Override
+	public boolean isInstalled(String className) {
+		return classLoaderBin.isInstalled(className);
+	}
+}

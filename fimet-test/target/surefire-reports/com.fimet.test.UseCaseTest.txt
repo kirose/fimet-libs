@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: com.fimet.test.UseCaseTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.716 sec <<< FAILURE!
+testApp(com.fimet.test.UseCaseTest)  Time elapsed: 0.711 sec  <<< ERROR!
+java.lang.NullPointerException
+	at com.fimet.core.Manager.init(Manager.java:38)
+	at com.fimet.core.Manager.getInstance(Manager.java:30)
+	at com.fimet.core.Manager.get(Manager.java:97)
+	at com.fimet.test.UseCaseTest.testApp(UseCaseTest.java:47)
+

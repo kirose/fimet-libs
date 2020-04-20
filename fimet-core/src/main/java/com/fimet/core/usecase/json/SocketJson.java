@@ -1,0 +1,105 @@
+package com.fimet.core.usecase.json;
+
+import java.util.List;
+
+public class SocketJson {
+	private String address;
+	private Integer port;
+	private boolean isServer;
+	private String parser;
+	private String simulator;
+	private String adapter;
+	private Boolean timeout;
+	private Integer delay;
+	private List<String> inValidations;
+	private List<String> outValidations;
+	public SocketJson() {
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Integer getPort() {
+		return port;
+	}
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+	public boolean isServer() {
+		return isServer;
+	}
+	public void setServer(boolean isServer) {
+		this.isServer = isServer;
+	}
+	public String getParser() {
+		return parser;
+	}
+	public void setParser(String parser) {
+		this.parser = parser;
+	}
+	public String getSimulator() {
+		return simulator;
+	}
+	public void setSimulator(String simulator) {
+		this.simulator = simulator;
+	}
+	public String getAdapter() {
+		return adapter;
+	}
+	public void setAdapter(String adapter) {
+		this.adapter = adapter;
+	}
+	public List<String> getInValidations() {
+		return inValidations;
+	}
+	public void setInValidations(List<String> inValidations) {
+		this.inValidations = inValidations;
+	}
+	public List<String> getOutValidations() {
+		return outValidations;
+	}
+	public void setOutValidations(List<String> outValidations) {
+		this.outValidations = outValidations;
+	}
+	public Boolean getTimeout() {
+		return timeout;
+	}
+	public void setTimeout(Boolean timeout) {
+		this.timeout = timeout;
+	}
+	public Integer getDelay() {
+		return delay;
+	}
+	public void setDelay(Integer delay) {
+		this.delay = delay;
+	}
+	public int hashInValidations() {
+		final int prime = 31;
+		int result = 1;
+		if (inValidations != null && !inValidations.isEmpty()) {
+			for (String s : inValidations) {
+				result = prime * result + ((s == null) ? 0 : s.hashCode());
+			}
+		}
+		return result;
+	}
+	public int hashOutValidations() {
+		final int prime = 31;
+		int result = 1;
+		if (outValidations != null && !outValidations.isEmpty()) {
+			for (String s : outValidations) {
+				result = prime * result + ((s == null) ? 0 : s.hashCode());
+			}
+		}
+		return result;
+	}
+	public int hashValidations() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + hashInValidations();
+		result = prime * result + hashOutValidations();
+		return result;
+	}
+}

@@ -1,0 +1,21 @@
+package com.fimet.core.net;
+
+import com.fimet.core.iso8583.adapter.IStreamAdapter;
+
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
+public interface IAdaptedSocket {
+	void connect();
+	void disconnect();
+	boolean isConnected();
+	boolean isConnecting();
+	boolean isDisconnected();
+	void write(byte[] message);
+	void write(byte[] message, boolean adapt);
+	void setAutoReconnect(boolean reconnect);
+	IStreamAdapter getAdapter();
+	ISocket getConnection();
+}

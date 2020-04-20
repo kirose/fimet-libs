@@ -1,0 +1,19 @@
+package com.fimet.core;
+
+import com.fimet.core.net.IAdaptedSocket;
+import com.fimet.core.net.ISocket;
+import com.fimet.core.net.ISocketMonitor;
+import com.fimet.core.net.IAdaptedSocketListener;
+
+public interface ISocketManager extends IManager {
+	boolean isConnected(ISocket socket);
+	boolean isDisconnected(ISocket socket);
+	boolean isConnecting(ISocket socket);
+	IAdaptedSocket getSocket(ISocket socket, IAdaptedSocketListener listener);
+	IAdaptedSocket connect(ISocket socket, IAdaptedSocketListener listener);
+	void disconnect(ISocket socket);
+	void disconnectAll();
+	void setSocketTimeReconnect(int sec);
+	void addMonitor(ISocketMonitor monitor);
+	void removeMonitor(ISocketMonitor monitor);
+}
