@@ -1,0 +1,37 @@
+package com.fimet.core.stress;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import com.fimet.core.net.ISocket;
+
+public class Stress implements IStress {
+	private String name;
+	private Map<ISocket, File> stressSockets;
+	public Stress() {
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Map<ISocket, File> getStressSockets() {
+		return stressSockets;
+	}
+	public void setStressSockets(Map<ISocket, File> stressSockets) {
+		this.stressSockets = stressSockets;
+	}
+	public List<ISocket> getConnections(){
+		List<ISocket> connecitons = new ArrayList<>(stressSockets.size());
+		Set<Entry<ISocket, File>> entrySet = stressSockets.entrySet();
+		for (Entry<ISocket, File> e : entrySet) {
+			connecitons.add(e.getKey());
+		}
+		return connecitons;
+	}
+}

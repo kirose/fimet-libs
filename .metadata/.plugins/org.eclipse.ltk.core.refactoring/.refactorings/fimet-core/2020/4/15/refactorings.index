@@ -1,0 +1,71 @@
+1586655650177	Move packages
+1586658312863	Rename package 'com.fimet.core.commons'
+1586658318856	Rename package 'com.fimet.core.commons.cache'
+1586658337712	Rename package 'com.fimet.core.commons.converter'
+1586658539165	Rename package 'com.fimet.core.commons.data.reader'
+1586658546522	Rename package 'com.fimet.core.commons.data.reader.impl'
+1586658561375	Rename package 'com.fimet.core.commons.data.writer'
+1586658571061	Rename package 'com.fimet.core.commons.exception'
+1586658579580	Rename package 'com.fimet.core.commons.history'
+1586658588056	Rename package 'com.fimet.core.commons.console'
+1586658596408	Rename package 'com.fimet.core.commons.messages'
+1586658610937	Rename package 'com.fimet.core.commons.numericparser'
+1586658618269	Rename package 'com.fimet.core.commons.preference'
+1586658646937	Rename package 'com.fimet.core.commons.utils'
+1586658667674	Rename package 'com.fimet.core.ISO8583.adapter'
+1586658688770	Rename package 'com.fimet.core.ISO8583.parser'
+1586658703104	Rename package 'com.fimet.core.ISO8583.rawcom'
+1586658758093	Rename package 'com.fimet.core.simulator'
+1586658811413	Move packages
+1586658845299	Move packages
+1586658859068	Move packages
+1586659194858	Rename package 'com.fimet.core.iso8583'
+1586666195817	Move compilation units
+1586667277652	Delete element
+1586670157658	Delete element
+1586670161165	Delete element
+1586670166509	Delete element
+1586670172699	Delete element
+1586711077916	Delete elements
+1586711081746	Delete element
+1586711090872	Delete elements
+1586711100642	Delete element
+1586711105987	Delete elements
+1586711109600	Delete elements
+1586711150926	Delete elements
+1586711297244	Delete elements
+1586711304197	Delete elements
+1586711317857	Delete elements
+1586711379799	Delete element
+1586711395589	Delete elements
+1586711409684	Delete element
+1586711418411	Delete element
+1586711902012	Delete element
+1586711904912	Delete element
+1586713694638	Delete element
+1586716255723	Delete elements
+1586717278582	Delete element
+1586717301883	Delete element
+1586717307429	Delete element
+1586717319113	Delete element
+1586717464131	Delete element
+1586717504183	Delete elements
+1586717790889	Move compilation unit
+1586719984429	Copy compilation unit
+1586720160173	Rename type 'FimetXml'
+1586720263540	Rename type 'FimetCfg'
+1586720271131	Rename type 'Manager'
+1586720276703	Rename type 'Managers'
+1586720281499	Rename type 'Source'
+1586720510960	Move compilation unit
+1586722738529	Delete element
+1586723268809	Delete elements
+1586723271318	Delete element
+1586723306980	Delete elements
+1586723370463	Rename package 'com.fimet.fimet_core'
+1586723418967	Rename type 'AppTest'
+1586731181581	Delete element
+1586731270086	Move compilation units
+1586731352175	Move compilation units
+1586731359347	Delete elements
+1586735508756	Copy compilation unit

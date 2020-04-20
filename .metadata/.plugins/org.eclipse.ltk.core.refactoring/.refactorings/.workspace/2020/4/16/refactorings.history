@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;fimet-iso8583&apos; to &apos;fimet-parser&apos;" description="Rename resource &apos;fimet-iso8583&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/fimet-iso8583" name="fimet-parser" stamp="1586828722460" updateReferences="true"/>
+</session>

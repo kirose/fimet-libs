@@ -1,0 +1,56 @@
+package com.fimet.core.utils;
+
+import com.fimet.core.IParserManager;
+import com.fimet.core.Manager;
+import com.fimet.core.iso8583.parser.IParser;
+import com.fimet.core.iso8583.parser.Message;
+
+public class MessageBuilder {
+	Message message;
+	public MessageBuilder() {
+		this.message = new Message();
+	}
+	public MessageBuilder(Message message) {
+		this.message = message;
+	}
+	public MessageBuilder setMti(String mti) {
+		message.setMti(mti);
+		return this;
+	}
+	public MessageBuilder setHeader(String header) {
+		message.setHeader(header);
+		return this;
+	}
+	public MessageBuilder setParser(int idParser) {
+		message.setParser(Manager.get(IParserManager.class).getParser(idParser));
+		return this;
+	}
+	public MessageBuilder setParser(String parser) {
+		message.setParser(Manager.get(IParserManager.class).getParser(parser));
+		return this;
+	}
+	public MessageBuilder setParser(IParser parser) {
+		message.setParser(parser);
+		return this;
+	}
+	public MessageBuilder setValue(int idField, String value) {
+		message.setValue(idField, value);
+		return this;
+	}
+	public MessageBuilder setValue(String idField, String value) {
+		message.setValue(idField, value);
+		return this;
+	}
+	public MessageBuilder removeValue(int idField) {
+		message.remove(idField);
+		message.remove(idField);
+		return this;
+	}
+	public MessageBuilder removeValue(String idField) {
+		message.remove(idField);
+		return this;
+	}
+	public Message build() {
+		return message;
+	}
+}

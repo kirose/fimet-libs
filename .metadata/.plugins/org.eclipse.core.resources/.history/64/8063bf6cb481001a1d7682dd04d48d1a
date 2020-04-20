@@ -1,0 +1,30 @@
+package com.fimet.test;
+
+import com.fimet.core.IParserManager;
+import com.fimet.core.ISimulatorManager;
+import com.fimet.core.Manager;
+import com.fimet.core.iso8583.adapter.IAdapterManager;
+import com.fimet.core.iso8583.parser.IParser;
+import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.net.Socket;
+import com.fimet.core.simulator.ISimulator;
+import com.fimet.core.usecase.TestBuilder;
+
+public class ConnectionTest {
+	public static void main(String[] args) throws Exception {
+    	IParser national = Manager.get(IParserManager.class).getParser("National");
+    	ISimulator simulatorAcq = Manager.get(ISimulatorManager.class).getSimulator("National Acquirer");
+    	ISimulator simulatorIss = Manager.get(ISimulatorManager.class).getSimulator("National Issuer");
+    	Socket socketAcq = new Socket("127.0.0.1", 8583, false, true, national, simulatorAcq, IAdapterManager.MLI_EXCLISIVE);
+    	Socket socketIss = new Socket("127.0.0.1", 8583, true, false, national, simulatorIss, IAdapterManager.MLI_EXCLISIVE);
+
+    	new TestBuilder(socketAcq)
+    	.mti("0200")
+    	.header("ISO858300000")
+    	.value(2, "1234567890123456")
+    	.value(3, "000000")
+    	.value(4, "000000012300")
+    	.value(11, "123456")
+    	.execute();
+	}
+}

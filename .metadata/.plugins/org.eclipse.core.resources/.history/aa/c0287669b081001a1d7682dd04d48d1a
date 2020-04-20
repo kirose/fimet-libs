@@ -1,0 +1,29 @@
+package com.fimet.usecase.sync;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.fimet.core.net.ISocket;
+
+public class ExecutionResult {
+	private ExecutionStatus status;
+	private Map<ISocket, SocketData> path;
+	public ExecutionResult() {
+		this.path = new LinkedHashMap<ISocket, SocketData>();
+	}
+	public ExecutionStatus getStatus() {
+		return status;
+	}
+	public void setStatus(ExecutionStatus status) {
+		this.status = status;
+	}
+	public SocketData getOrPutSocketData(ISocket socket) {
+		if (!path.containsKey(socket)) {
+			path.put(socket, null);
+		}
+		return path.get(socket);
+	}
+	public SocketData getSocketData(ISocket socket) {
+		return path.get(socket);
+	}
+}

@@ -1,0 +1,15 @@
+package com.fimet.core.iso8583;
+
+import com.fimet.core.iso8583.parser.Message;
+
+public class NullValidator implements IValidator {
+
+	@Override
+	public void onRequest(Message msg) {
+	}
+
+	@Override
+	public void onResponse(Message msg) {
+	}
+
+}

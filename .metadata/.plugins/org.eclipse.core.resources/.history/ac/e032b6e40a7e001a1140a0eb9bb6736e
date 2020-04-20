@@ -1,0 +1,19 @@
+package com.fimet.core.net;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
+public interface ISocketConnection {
+	void connect();
+	void disconnect();
+	boolean isConncted();
+	void writeMessage(byte[] message);
+	void writeMessage(byte[] message, boolean adapt);
+	void setAutoReconnect(boolean reconnect);
+	InputStream getInputStream() throws IOException;
+}

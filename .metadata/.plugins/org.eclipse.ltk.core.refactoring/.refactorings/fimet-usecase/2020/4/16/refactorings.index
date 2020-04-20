@@ -1,0 +1,39 @@
+1586931704185	Rename type 'IValidator'
+1586931717028	Rename type 'IValidatorManager'
+1586931735365	Rename type 'Validation'
+1586931756148	Rename type 'ValidationAdapter'
+1586931782913	Rename type 'ValidationsAdapter'
+1586931808296	Rename type 'UseCaseValidationsAdapter'
+1586931814220	Rename type 'UseCaseValidationAdapter'
+1586931822340	Rename type 'ValidatorManager'
+1586931868736	Copy compilation unit
+1587013287886	Delete elements
+1587101558742	Rename type 'SocketExecutionData'
+1587101565136	Rename type 'SocketExecutionStatus'
+1587173463730	Delete element
+1587188861354	Rename type 'ITimerMonitor'
+1587189029503	Delete element
+1587190215138	Rename type 'ExecutionData'
+1587193041261	Copy compilation unit
+1587193050328	Rename type 'IUseCaseValidator2'
+1587193932101	Rename type 'SequencialExecutor'
+1587193939792	Rename package 'com.fimet.usecase.seq'
+1587232663020	Move compilation unit
+1587234184273	Move compilation units
+1587234239541	Move compilation unit
+1587234242937	Delete element
+1587239167866	Move compilation unit
+1587239182308	Move compilation unit
+1587240027531	Delete elements
+1587240470914	Move compilation units
+1587240527286	Move compilation units
+1587240579788	Delete element
+1587241428389	Delete element
+1587241781485	Move compilation units
+1587272974942	Rename type 'Authorization'
+1587273136795	Delete element
+1587273475773	Delete element
+1587328511071	Move compilation unit
+1587328570065	Move compilation units
+1587328656181	Move compilation units
+1587328727403	Copy file

@@ -1,0 +1,7 @@
+package com.fimet.core;
+
+import com.fimet.core.validator.IValidator;
+
+public interface ICompilerManager extends IManager {
+	Class<IValidator> compileValidator(String className, String source);
+}

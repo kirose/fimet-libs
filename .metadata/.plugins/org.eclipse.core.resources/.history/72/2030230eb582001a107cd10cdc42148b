@@ -1,0 +1,61 @@
+package com.fimet.core.stress;
+
+import java.io.File;
+import java.sql.Timestamp;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import com.fimet.commons.FimetLogger;
+import com.fimet.core.net.IAdaptedSocket;
+
+public class StressInjector extends Thread implements IQueueable {
+	public static final int MAX_QUEUED = 20;
+	IAdaptedSocket socket;
+	private boolean alive;
+	private LinkedBlockingQueue<byte[]> queue;
+	private IReadable readable;
+	public StressInjector(IAdaptedSocket socket, File stressFile) {
+		this.socket = socket;
+		this.queue = new LinkedBlockingQueue<byte[]>();
+		this.alive = false;
+		this.readable = new StressFileReader(this, stressFile, socket.getAdapter());
+		this.readable.startRead();
+	}
+	public void startInjector() {
+		this.alive = true;
+		this.start();
+	}
+	synchronized public void stopInjector() {
+		this.alive = true;
+		if (currentThread().getState() == Thread.State.WAITING) {
+			this.notify();
+		}
+	}
+	public void run() {
+		try {
+			while (alive) {
+				byte[] next = queue.take();
+				if (queue.size() < MAX_QUEUED / 2) {
+					if (readable.canRead()) {
+						readable.read();
+					}
+				}
+				if (next != null)
+					socket.write(next);
+			}
+		} catch (Exception e) {
+			FimetLogger.error("Thread error", e);
+		}
+		FimetLogger.debug(StressInjector.class, "Finish at "+new Timestamp(System.currentTimeMillis()));
+	}
+	synchronized public void initilized() {
+		FimetLogger.debug(StressInjector.class, "Started at "+new Timestamp(System.currentTimeMillis()));
+	}
+	@Override
+	synchronized public void enqueue(byte[] message) {
+		queue.add(message);
+	}
+	@Override
+	synchronized public boolean canEnqueue() {
+		return queue.size() < MAX_QUEUED;
+	}
+}

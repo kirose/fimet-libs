@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fimet>
+	<source name="fimet" path="resources/fimet.db" />
+	<properties>
+		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/>
+	</properties> 
+	<managers>
+		<manager id="com.fimet.core.IExecutorManager" class="com.fimet.core.usecase.ExecutorManager"/>
+	</managers>
+</fimet>

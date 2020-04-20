@@ -1,0 +1,25 @@
+private class Connector extends Thread {
+	IUseCase useCase;
+	Set<ISocket> toConnect = new HashSet<ISocket>();
+	public Connector(IUseCase useCase) {
+		this.useCase = useCase;
+		this.toConnect.addAll(useCase.getConnections());
+	}
+	public void onConnected(ISocket socket) {
+		toConnect.remove(socket);
+		if(toConnect.isEmpty()) {
+			SyncExecutor.this.queue.add(useCase);
+		}
+	}
+	public void run() {
+		for (ISocket iSocket : useCase.getConnections()) {
+			IMessenger messenger = messengerManager.getMessenger(iSocket);
+			messenger.setListener(SyncExecutor.this);
+			if (messenger.isDisconnected()) {
+				messenger.connect();
+			} else if (messenger.isConnected()) {
+				onConnected(messenger.getConnection());
+			}
+		}
+	}
+}

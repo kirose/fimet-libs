@@ -1,0 +1,31 @@
+package com.fimet.core.stress;
+
+import java.util.List;
+
+import com.fimet.core.net.ISocket;
+
+public class Stress implements IStress {
+	private String name;
+	private List<StressSocket> stressSockets;
+	private List<ISocket> connections;
+	public Stress() {
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public List<StressSocket> getStressSockets() {
+		return stressSockets;
+	}
+	public void setStressSockets(List<StressSocket> stressSockets) {
+		this.stressSockets = stressSockets;
+	}
+	public List<ISocket> getConnections() {
+		return connections;
+	}
+	public void setConnections(List<ISocket> connections) {
+		this.connections = connections;
+	}
+}

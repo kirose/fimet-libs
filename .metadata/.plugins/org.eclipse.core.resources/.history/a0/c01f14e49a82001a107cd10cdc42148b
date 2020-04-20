@@ -1,0 +1,7 @@
+package com.fimet.core.stress.creator;
+
+import com.fimet.core.stress.IFileCreator;
+
+public class CartesianCreator implements IFileCreator {
+
+}

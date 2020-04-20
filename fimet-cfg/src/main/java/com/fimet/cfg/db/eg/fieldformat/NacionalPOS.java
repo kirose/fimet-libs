@@ -1,0 +1,141 @@
+package com.fimet.cfg.db.eg.fieldformat;
+
+import static com.fimet.commons.converter.Converter.ASCII_TO_HEX;
+import static com.fimet.commons.converter.Converter.HEX_TO_ASCII;
+import static com.fimet.commons.converter.Converter.NONE;
+import static com.fimet.commons.numericparser.NumericParser.DEC;
+
+import com.fimet.cfg.FieldFormatBuilder;
+import com.fimet.cfg.enums.FieldFormatGroup;
+import com.fimet.core.entity.sqlite.FieldFormat;
+import com.fimet.core.persistence.dao.FieldFormatDAO;
+import com.fimet.parser.field.FixedFieldParser;
+import com.fimet.parser.field.VarFieldParser;
+import com.fimet.parser.field.mx.NatTokenEZVarFieldParser;
+import com.fimet.parser.field.mx.NatTokenR1VarFieldParser;
+import com.fimet.parser.field.mx.NatTokenVarFieldParser;
+import com.fimet.parser.field.mx.NatTokensVarFieldParser;
+
+public class NacionalPOS {
+	FieldFormatDAO dao;
+	int idGroup = FieldFormatGroup.NACIONAL_POS.getId();
+	public NacionalPOS(FieldFormatDAO dao) {
+		this.dao = dao;
+	}
+	public void insert() {
+		dao.insertOrUpdate(new FieldFormat(idGroup,"002","2",NONE.getId(),NONE.getId(),DEC.getId(),"[0-9]+",2,19,"Primary account number (PAN)",VarFieldParser.class));
+		dao.insertOrUpdate(new FieldFormat(idGroup,"035","35",NONE.getId(),NONE.getId(),DEC.getId(),"[0-9]{8,19}(=|D).+",2,37,"Track 2 data",VarFieldParser.class));
+		dao.insertOrUpdate(new FieldFormat(idGroup,"048","48",NONE.getId(),NONE.getId(),DEC.getId(),".*",3,999,"Additional data (private)",VarFieldParser.class));
+//		new FieldFormatBuilder(new FieldFormat(idGroup,"048","48",NONE.getId(),NONE.getId(),DEC.getId(),".*",3,999,"Additional data (private)",VarFieldParser.class))
+//			.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",19,null,"Afiliacion",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"002","2",NONE.getId(),null,null,"(?s).+",4,null,"Indicador de Cadena",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"003","3",NONE.getId(),null,null,"(?s).+",4,null,"Indicador de Cadena",FixedFieldParser.class))
+//		.insertOrUpdate(dao);
+		new FieldFormatBuilder(new FieldFormat(idGroup,"063","63",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).*",3,999,"Reserved (private)",NatTokensVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"001","01",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token 01",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"002","04",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token 04",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"003","17",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n Autorizaci�n VISA",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"004","20",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n Autorizaci�n MasterCard",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"005","B0",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B0",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"006","B1",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B1",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"007","B2",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B2",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"008","B3",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B3",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"009","B4",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B4",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"010","B5",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token B4",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"011","C0",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"C�digo de Validaci�n 2 e Identificadores de Comercio Electr�nico",NatTokenVarFieldParser.class))
+		.add(new FieldFormatBuilder(new FieldFormat(idGroup,"011","C0",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"C�digo de Validaci�n 2 e Identificadores de Comercio Electr�nico",NatTokenVarFieldParser.class))
+				.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",4,null,"CV (C�digo de validaci�n)",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"002","2",NONE.getId(),null,null,"(?s).+",1,null,"Status de retransmisi�n",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"003","3",NONE.getId(),null,null,"(?s).+",3,null,"Contador de retransmisiones",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"004","4",NONE.getId(),null,null,"(?s).+",10,null,"C�digo Postal de la Terminal",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"005","5",NONE.getId(),null,null,"(?s).+",1,null,"ECI Indicador de Comercio Electr�nico",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"006","6",NONE.getId(),null,null,"(?s).+",1,null,"Tipo de tarjeta",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"007","7",NONE.getId(),null,null,"(?s).+",1,null,"Indicador de informaci�n adicional",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"008","8",NONE.getId(),null,null,"(?s).+",1,null,"Indicador de CV2 (C�digo de validaci�n 2) presente",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"009","9",NONE.getId(),null,null,"(?s).+",1,null,"Transacci�n forzada o SAF",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"010","10",NONE.getId(),null,null,"(?s).+",1,null,"Authentication Collector Indicator",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"011","11",NONE.getId(),null,null,"(?s).+",1,null,"Bandera de propensi�n de fraude del comercio",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"012","12",NONE.getId(),null,null,"(?s).+",1,null,"Resultado del CAVV",FixedFieldParser.class))
+		)
+		.add(new FieldFormat(idGroup,"012","C4",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Datos del Punto de Servicio",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"013","C5",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n de Multipagos",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"014","C6",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Datos UCAF ECommerce",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"015","CA",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token CA",NatTokenVarFieldParser.class))
+		.add(new FieldFormatBuilder(new FieldFormat(idGroup,"016","CE",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token CE",NatTokenVarFieldParser.class))
+				.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",2,null,"Indicador de Atencion",FixedFieldParser.class))
+				.add(new FieldFormat(idGroup,"002","2",ASCII_TO_HEX.getId(),null,null,"(?s).+",200,null,"Datos de autenticaci�n del tarjetahabiente",FixedFieldParser.class))
+		)
+		.add(new FieldFormat(idGroup,"017","CZ",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Form Facctor Indicator",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"018","ER",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Resultado de Cifrado",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"019","ES",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Terminal Status",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"020","ET",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Tabla de BINES que no Cifran",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"021","EW",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Requerimiento Nueva Llave",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"022","EX",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Respuesta Nueva Llave",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"023","EY",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Cifrado del Track1",NatTokenVarFieldParser.class))
+		.add(new FieldFormatBuilder(new FieldFormat(idGroup,"024","EZ",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Banderas y Datos Sensitivos Cifrados",NatTokenEZVarFieldParser.class))
+			.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",20,null,"Key Serial Number",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"002","2",NONE.getId(),null,null,"(?s).+",7,null,"Contador Real de Cifrados ",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"003","3",NONE.getId(),null,null,"(?s).+",2,null,"Contador de Cifrados Fallidos Consecutivos",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"004","4",NONE.getId(),null,null,"(?s).+",1,null,"Bandera de TRACK2",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"005","5",NONE.getId(),null,null,"(?s).+",2,null,"Modo de Lectura de la Tarjeta",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"006","6",NONE.getId(),null,null,"(?s).+",2,null,"Longitud de TRACK2",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"007","7",NONE.getId(),null,null,"(?s).+",1,null,"Bandera de CVV2",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"008","8",NONE.getId(),null,null,"(?s).+",2,null,"Longitud de cvv2 en claro",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"009","9",NONE.getId(),null,null,"(?s).+",1,null,"Bandera de TRACK1",FixedFieldParser.class))
+			.add(new FieldFormatBuilder(new FieldFormat(idGroup,"010","10",NONE.getId(),null,null,"(?s).+",48,null,"Datos Sensitivos Cifrados",FixedFieldParser.class))
+					.add(new FieldFormat(idGroup,"001","track2",NONE.getId(),null,null,"(?s).+",38,null,"Track2 Cifrado",FixedFieldParser.class))
+					.add(new FieldFormat(idGroup,"002","cvv2",NONE.getId(),null,null,"(?s).+",10,null,"CVV2 Cifrado",FixedFieldParser.class))
+			)
+			.add(new FieldFormat(idGroup,"011","11",NONE.getId(),null,null,"(?s).+",4,null,"4 Ultimos Digitos del PAN",FixedFieldParser.class))
+			.add(new FieldFormat(idGroup,"012","12",NONE.getId(),null,null,"(?s).+",8,null,"CRC32 sobre Datos Sensitivos",FixedFieldParser.class))
+		)
+		.add(new FieldFormat(idGroup,"025","Q1",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Identificador del Modo de Autorizaci�n",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"026","Q2",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Identificador del Medio de Acceso",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"027","Q3",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token Q3",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"028","Q4",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token Q4",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"029","Q6",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n de Cargos Parciales",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"030","QC",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token QC",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"031","QF",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"ID de agregador y subafiliado",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"032","QM",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token QM",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"033","QN",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Modulo Extranjero",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"034","QO",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Montos Acumulados DCC POS",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"035","QP",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Montos y Folio de DCC POS",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"036","QR",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n de DCC POS",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"037","QS",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Informaci�n del Emisor",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"038","QU",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token QU",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"039","R0",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token R0",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"040","R1",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"PAN del Corresponsal en el PIN PAD",NatTokenVarFieldParser.class))
+//		.add(new FieldFormatBuilder(new FieldFormat(idGroup,"040","R1",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"PAN del Corresponsal en el PIN PAD",NatTokenR1VarFieldParser.class))
+//			.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",20,null,"Key Serial Number",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"002","2",NONE.getId(),null,null,"(?s).+",7,null,"Contador real de cifrados",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"003","3",NONE.getId(),null,null,"(?s).+",2,null,"Contador de Cifrados Fallidos Consecutivos",FixedFieldParser.class))
+//			.add(new FieldFormatBuilder(new FieldFormat(idGroup,"004","4",HEX_TO_ASCII.getId(),null,null,"(?s).+",224,null,"Datos cifrados del corresponsal",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"001","1",NONE.getId(),null,null,"(?s).+",8,null,"Date",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"002","2",NONE.getId(),null,null,"(?s).+",6,null,"Time",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"003","3",NONE.getId(),null,null,"(?s).+",12,null,"Amount",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"004","4",NONE.getId(),null,null,"(?s).+",16,null,"PAN",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"005","5",NONE.getId(),null,null,"(?s).+",25,null,"Name",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"006","6",NONE.getId(),null,null,"(?s).+",20,null,"Referencia",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"007","7",NONE.getId(),null,null,"(?s).+",12,null,"Id Tienda",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"008","8",NONE.getId(),null,null,"(?s).+",12,null,"Id Caja",FixedFieldParser.class))
+//				.add(new FieldFormat(idGroup,"009","9",NONE.getId(),null,null,"(?s).+",1,null,"Numero de Serie de la PIN PAD",FixedFieldParser.class))
+//			)
+//			.add(new FieldFormat(idGroup,"005","5",NONE.getId(),null,null,"(?s).+",1,null,"USER-FLD3",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"006","6",NONE.getId(),null,null,"(?s).+",4,null,"4 �ltimos D�gitos del PAN",FixedFieldParser.class))
+//			.add(new FieldFormat(idGroup,"007","7",NONE.getId(),null,null,"(?s).+",8,null,"CRC32 sobre Datos Sensitivos",FixedFieldParser.class))
+//		)
+		.add(new FieldFormat(idGroup,"041","R2",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token R2",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"042","R3",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token R3",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"043","R4",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"N�mero de Contrato en Transacciones de Cargos Recurrentes",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"044","R7",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Indicador Bonus Merchant y Numero de Referencia de Campa�as",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"045","R8",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"L�nea de Acci�n CRM",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"046","RC",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Indicadores de Riesgo RiskCenter",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"047","RD",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Indicadores de Riesgo Emisor",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"048","S3",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Conversi�n Din�mica de Moneda",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"049","TM",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token TM",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"050","TV",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token TV",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"051","PO",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token PO",NatTokenVarFieldParser.class))
+		.add(new FieldFormat(idGroup,"052","PY",NONE.getId(),NONE.getId(),DEC.getId(),"(?s).+",5,999,"Token PY",NatTokenVarFieldParser.class))
+		.insertOrUpdate(dao);
+	}
+}

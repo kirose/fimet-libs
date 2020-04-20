@@ -1,0 +1,24 @@
+package com.fimet.iso8583.parser.field.tpv;
+
+import com.fimet.commons.data.reader.IReader;
+import com.fimet.commons.data.writer.IWriter;
+import com.fimet.core.entity.sqlite.FieldFormat;
+import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.parser.VarFieldParser;
+
+public class TpvTag55VarFieldParser extends VarFieldParser {
+
+	public TpvTag55VarFieldParser(FieldFormat fieldFormat) {
+		super(fieldFormat);
+	}
+	@Override
+	public byte[] parse(IReader reader, IMessage message) {
+		reader.move(key.length());
+		return super.parse(reader, message);
+	}
+	@Override
+	public byte[] format(IWriter writer, IMessage message) {
+		writer.append(converterValue.deconvert(key.getBytes()));
+		return super.format(writer, message);
+	}
+}

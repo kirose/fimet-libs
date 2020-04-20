@@ -1,0 +1,9 @@
+package com.fimet.net;
+
+import com.fimet.core.net.IAdaptedSocket;
+
+public interface ISocketMonitor {
+	void onSocketDisconnected(IAdaptedSocket socket);
+	void onSocketConnecting(IAdaptedSocket socket);
+	void onSocketConnected(IAdaptedSocket socket);
+}

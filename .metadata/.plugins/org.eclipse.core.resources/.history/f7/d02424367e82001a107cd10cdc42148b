@@ -1,0 +1,7 @@
+package com.fimet.core.usecase.sync;
+
+import com.fimet.core.usecase.IUseCase;
+
+interface IUseCaseTimerListener {
+	void timeout(IUseCase useCase);
+}

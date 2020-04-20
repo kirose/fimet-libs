@@ -1,0 +1,32 @@
+package com.fimet.net;
+
+import java.io.IOException;
+import java.net.Socket;
+
+import com.fimet.core.iso8583.adapter.IAdapter;
+import com.fimet.core.net.ISocketConnectionListener;
+
+/**
+ * @author Marco A. Salazar
+ * @email marcoasb99@ciencias.unam.mx
+ *
+ */
+public class SocketConnectionClient extends SocketConnection {
+
+	public SocketConnectionClient(String address, int port, IAdapter adapter, ISocketConnectionListener listener) {
+		super(address, port, adapter, listener);
+	}
+	@Override
+	protected Socket newSocket() throws IOException {
+		return socket = new Socket(address, port);
+	}
+	@Override
+	void close() {
+		if (socket != null)  {
+			try {
+				socket.close();
+			} catch (Throwable e) {/*Activator.getInstance().warning("socket.close()", e);*/}
+			socket = null;
+		}
+	}
+}

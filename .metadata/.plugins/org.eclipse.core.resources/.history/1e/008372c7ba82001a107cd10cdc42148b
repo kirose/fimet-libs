@@ -1,0 +1,97 @@
+package com.fimet.core.stress;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fimet.commons.FimetLogger;
+import com.fimet.commons.exception.StressException;
+import com.fimet.core.iso8583.adapter.IStreamAdapter;
+
+public class StressFileReader extends Thread implements IReaderListener {
+	private boolean alive;
+	private InputStream in = null;
+	private IStreamAdapter adapter;
+	private IInjectorListener injector;
+	private byte[] message;
+	public StressFileReader(IInjectorListener injector, File stressFile, IStreamAdapter adapter) {
+		super("StressFileReader-Thread");
+		this.injector = injector;
+		this.adapter = adapter;
+		try {
+			in = new FileInputStream(stressFile);
+		} catch (FileNotFoundException e) {
+			throw new StressException(e);
+		}
+	}
+	public void setQueueable(IInjectorListener injector) {
+		this.injector = injector;
+	}
+	@Override
+	synchronized public void read() {
+		this.notify();
+	}
+	@Override
+	synchronized public boolean canRead() {
+		return alive;
+	}
+	@Override
+	synchronized public void startRead() {
+		this.alive = true;
+		this.start();
+	}
+	@Override
+	synchronized public void stopRead() {
+		this.notify();
+		this.alive = false;
+	}
+	private void initialize() {
+		List<byte[]> queue = new ArrayList<>();
+		try {
+			for (int i = 0; i < StressInjector.MAX_QUEUED; i++) {
+				message = adapter.readStream(in);
+				if (message != null && message.length > 0) {
+					queue.add(message);
+				} else {
+					alive = false;
+				}				
+			}
+		} catch (Exception e) {
+			FimetLogger.error("Thread error", e);
+			alive = false;
+		}
+		injector.onInitilized();
+		for (byte[] message : queue) {
+			injector.enqueue(message);
+		}
+	}
+	synchronized public void run() {
+		initialize();
+		try { 
+			while (alive) {
+				message = adapter.readStream(in);
+				if (message != null && message.length > 0) {
+					if (!injector.canEnqueue()) {
+						this.wait();
+					}
+					injector.enqueue(message);
+				} else {
+					alive = false;
+				}
+			}
+		} catch (Exception e) {
+			FimetLogger.error("Thread error", e);
+		}
+		if (in != null) {
+			try {
+				in.close();
+			} catch (IOException e) {}
+		}
+		injector.onFinishRead();
+		FimetLogger.debug(StressFileReader.class, "Finish "+this);
+	}
+}

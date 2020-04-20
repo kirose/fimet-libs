@@ -1,0 +1,8 @@
+package com.fimet.core.usecase;
+
+import com.fimet.core.usecase.IUseCase;
+
+public interface IExecutorMonitor {
+	void onStart(IUseCase useCase);
+	void onFinish(IUseCase useCase, ExecutionResult data);
+}

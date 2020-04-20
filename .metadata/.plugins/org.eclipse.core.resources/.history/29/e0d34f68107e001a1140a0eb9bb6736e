@@ -1,0 +1,132 @@
+package com.fimet.net;
+
+import java.util.concurrent.TimeUnit;
+
+import com.fimet.commons.console.Console;
+import com.fimet.core.Activator;
+import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.net.IMessenger;
+import com.fimet.core.net.IMessengerListener;
+import com.fimet.core.net.ISocket;
+import com.fimet.core.simulator.ISimulator;
+import com.fimet.core.net.IAdaptedSocket;
+import com.fimet.core.net.IAdaptedSocketListener;
+
+/**
+ * @author Marco A. Salazar
+ * @email marcoasb99@ciencias.unam.mx
+ * Messenger
+ */
+	
+public class Messenger implements IMessenger, IAdaptedSocketListener {
+	static IMessengerListener NULL_LISTENER = new NullMessengerListener();
+	AdaptedSocket socket;
+	IMessengerListener listener;
+	ISocket iSocket;
+	int status;
+	boolean reconnect = false;
+	ISimulator simulator;
+
+	public Messenger(ISocket iSocket) {
+		super();
+		if (iSocket == null)
+			throw new NullPointerException("Socket model is null");
+		if (iSocket.getSimulator() == null) {
+			throw new NullPointerException("Simulator is null for "+socket);
+		}
+		this.iSocket = iSocket;
+		this.simulator = iSocket.getSimulator();
+		this.listener = NULL_LISTENER;
+	}
+	private AdaptedSocket newSocketConnection() {
+		if (iSocket.isServer()) {
+			return socket = new AdaptedSocketServer(iSocket.getAddress(),iSocket.getPort(), iSocket.getAdapter(), this);
+		} else {
+			return  socket = new AdaptedSocketClient(iSocket.getAddress(),iSocket.getPort(), iSocket.getAdapter(), this);
+		} 
+	}
+	public void wirteMessage(Message msg) {
+		try {
+			msg = simulator.simulateRequest(msg);
+			listener.onMessengerSimulateRequest(this, msg);
+			byte[] iso = iSocket.getParser().formatMessage(msg);
+			listener.onMessengerWriteMessage(this, iso);
+			socket.write(iso);
+		} catch (Exception e) {
+			Activator.getInstance().error("Format Exception: "+e.getMessage(), e);
+		}
+	}
+	public void onSocketRead(byte[] bytes) {
+		try {
+			listener.onMessengerReadMessage(this, bytes);
+			Message message = (Message)iSocket.getParser().parseMessage(bytes);
+			message.setAdapter(iSocket.getAdapter());
+			listener.onMessengerParseMessage(this, message);
+			Message response = simulator.simulateResponse(message);
+			listener.onMessengerSimulateResponse(this, response);
+			if (response != null) {
+				byte[] iso = response.getParser().formatMessage(response);
+				listener.onMessengerWriteMessage(this, iso);
+				socket.write(iso);
+			}
+		} catch (Exception e) { 
+			Activator.getInstance().warning("Error On Socket Read incoming message",e);
+		}
+	}
+	/**
+	 * Attempt to connect the iSocket
+	 */
+	public void connect() {
+		if (isDisconnected()) {// Maybe socket is in CONNECTED or CONNECTING status
+			newSocketConnection().connect();
+		}
+	}
+	public void disconnect() {
+		if (socket != null) {
+			socket.disconnect();
+			socket = null;
+		}
+	}
+	public IAdaptedSocket getSocket() {
+		return socket;
+	}
+	public void setSocket(AdaptedSocketClient socket) {
+		this.socket = socket;
+	}
+	@Override
+	public ISocket getConnection() {
+		return iSocket;
+	}
+	public synchronized boolean isConnected() {
+		return socket != null && socket.isConncted();
+	}
+	public synchronized boolean isDisconnected() {
+		return socket == null || socket.isDisconnected();
+	}
+	public synchronized boolean isConnecting() {
+		return socket != null && socket.isConnecting();
+	}
+	
+	@Override
+	public void onSocketConnecting() {
+		listener.onMessengerConnecting(this);
+	}
+	@Override
+	public void onSocketConnected() {
+		listener.onMessengerConnected(this);
+	}
+	@Override
+	public void onSocketDisconnected() {
+		listener.onMessengerDisconnected(this);
+	}
+	@Override
+	public boolean getSocketReconnect() {
+		return reconnect;		
+	}
+	public void setListener(IMessengerListener listener) {
+		this.listener = listener != null ? listener : NULL_LISTENER;
+	}
+	public String toString() {
+		return iSocket.toString();
+	}
+}

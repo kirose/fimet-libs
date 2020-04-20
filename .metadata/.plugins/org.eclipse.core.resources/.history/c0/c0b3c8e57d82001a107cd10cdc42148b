@@ -1,0 +1,13 @@
+package com.fimet.core.usecase;
+
+public class NullExecutorMonitor implements IExecutorMonitor {
+	public static IExecutorMonitor INSTANCE = new NullExecutorMonitor();
+	@Override
+	public void onStart(IUseCase useCase) {
+	}
+
+	@Override
+	public void onFinish(IUseCase useCase, ExecutionResult data) {
+	}
+
+}

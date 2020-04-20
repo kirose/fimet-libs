@@ -1,0 +1,34 @@
+package com.fimet.usecase;
+
+import com.fimet.core.IExecutorManager;
+import com.fimet.usecase.sync.SyncExecutor;
+
+public class ExecutorManager implements IExecutorManager {
+
+	private IExecutor syncExecutor;
+	private IExecutor asyncExecutor;
+	public ExecutorManager() {
+		syncExecutor = new SyncExecutor();
+		syncExecutor.startExecutor();
+		asyncExecutor = null;
+	}
+	
+	@Override
+	public IExecutor getSyncExecutor() {
+		return syncExecutor;
+	}
+
+	@Override
+	public IExecutor getAsyncExecutor() {
+		return asyncExecutor;
+	}
+
+	@Override
+	public void free() {
+	}
+
+	@Override
+	public void saveState() {
+	}
+
+}

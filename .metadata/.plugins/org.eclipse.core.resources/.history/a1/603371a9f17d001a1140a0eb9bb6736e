@@ -1,0 +1,36 @@
+package com.fimet.iso8583.parser.field.mx;
+
+import com.fimet.commons.converter.Converter;
+import com.fimet.commons.converter.IConverter;
+import com.fimet.commons.data.reader.IReader;
+import com.fimet.commons.data.writer.IWriter;
+import com.fimet.commons.numericparser.INumericParser;
+import com.fimet.commons.numericparser.NumericParser;
+import com.fimet.core.entity.sqlite.FieldFormat;
+import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.parser.FixedFieldParser;
+
+public class NatTagFixedFieldParser extends FixedFieldParser {
+
+	protected final IConverter  converterLength;
+	protected final INumericParser parserLength;
+	public NatTagFixedFieldParser(FieldFormat fieldFormat) {
+		super(fieldFormat);
+		this.converterLength = Converter.get(fieldFormat.getIdConverterLength());
+		this.parserLength = NumericParser.get(fieldFormat.getIdParserLength());
+	}
+	@Override
+	public byte[] parse(IReader reader, IMessage message) {
+		reader.move(converterLength.deconvert(key.getBytes()).length+2);
+		return super.parse(reader, message);
+	}
+	@Override
+	public byte[] format(IWriter writer, IMessage message) {
+		writer.append(converterLength.deconvert(key.getBytes()));
+		int index = writer.length();
+		writer.move(2);
+		byte[] value = super.format(writer, message);
+		writer.replace(index, converterLength.deconvert(parserLength.format(value.length, 2)));
+		return value;
+	}
+}

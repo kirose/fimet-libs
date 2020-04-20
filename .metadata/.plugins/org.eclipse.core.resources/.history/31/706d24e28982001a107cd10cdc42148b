@@ -1,0 +1,22 @@
+package com.fimet.core.stress;
+
+import java.io.File;
+
+import com.fimet.core.net.ISocket;
+
+public class StressAcquirer {
+	private File stressFile;
+	private ISocket stressSocket;
+	public File getStressFile() {
+		return stressFile;
+	}
+	public void setStressFile(File stressFile) {
+		this.stressFile = stressFile;
+	}
+	public ISocket getStressSocket() {
+		return stressSocket;
+	}
+	public void setStressSocket(ISocket stressSocket) {
+		this.stressSocket = stressSocket;
+	}
+	

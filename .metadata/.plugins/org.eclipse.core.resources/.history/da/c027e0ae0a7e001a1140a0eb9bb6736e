@@ -1,0 +1,14 @@
+package com.fimet.core.net;
+
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
+public interface ISocketConnectionListener {
+	void onSocketRead(byte[] bytes);
+	void onSocketDisconnected();
+	void onSocketConnecting();
+	void onSocketConnected();
+	boolean getSocketReconnect();
+}

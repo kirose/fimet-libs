@@ -1,0 +1,8 @@
+package com.fimet.core.stress;
+
+public interface IReadable {
+	void read();
+	boolean canRead();
+	void stopRead();
+	void startRead();
+}

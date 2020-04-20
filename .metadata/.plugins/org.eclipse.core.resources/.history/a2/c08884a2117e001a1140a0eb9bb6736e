@@ -1,0 +1,64 @@
+package com.fimet.core.net;
+
+import com.fimet.core.iso8583.adapter.IAdapter;
+import com.fimet.core.iso8583.parser.IParser;
+import com.fimet.core.simulator.ISimulator;
+
+public class Socket implements ISocket {
+	private String address;
+	private Integer port;
+	private boolean isServer;
+	private IParser parser;
+	private ISimulator simulator;
+	private IAdapter adapter;
+	
+	public Socket(String address, Integer port, boolean isServer, boolean isAcquirer, IParser parser,
+			ISimulator simulator, IAdapter adapter) {
+		super();
+		this.address = address;
+		this.port = port;
+		this.isServer = isServer;
+		this.parser = parser;
+		this.simulator = simulator;
+		this.adapter = adapter;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public Integer getPort() {
+		return port;
+	}
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+	public boolean isServer() {
+		return isServer;
+	}
+	public void setIsServer(boolean isServer) {
+		this.isServer = isServer;
+	}
+	public IParser getParser() {
+		return parser;
+	}
+	public void setParser(IParser parser) {
+		this.parser = parser;
+	}
+	public ISimulator getSimulator() {
+		return simulator;
+	}
+	public void setSimulator(ISimulator simulator) {
+		this.simulator = simulator;
+	}
+	public IAdapter getAdapter() {
+		return adapter;
+	}
+	public void setAdapter(IAdapter adapter) {
+		this.adapter = adapter;
+	}
+	public String toString() {
+		return (isServer?"Server":"Client")+" "+address+" "+port;
+	}
+}

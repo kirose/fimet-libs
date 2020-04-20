@@ -1,0 +1,11 @@
+package com.fimet.net;
+
+import com.fimet.core.net.IAdaptedSocktListener;
+
+public class NullSocketListener implements IAdaptedSocktListener {
+
+	@Override
+	public void onSocketRead(byte[] bytes) {
+	}
+
+}

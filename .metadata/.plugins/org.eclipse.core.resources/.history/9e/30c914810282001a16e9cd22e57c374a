@@ -1,0 +1,28 @@
+package com.fimet.core.validator;
+
+import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.usecase.ExecutionResult;
+import com.fimet.core.usecase.IUseCase;
+
+public abstract class AbrstactValidator implements IValidator {
+	private IUseCase useCase;
+	private ExecutionResult result;
+	public IUseCase getUseCase() {
+		return useCase;
+	}
+	public void setUseCase(IUseCase useCase) {
+		this.useCase = useCase;
+	}
+	public ExecutionResult getResult() {
+		return result;
+	}
+	public void setResult(ExecutionResult result) {
+		this.result = result;
+	}
+	protected Message getInMsg(int indexSocket) {
+		return result.getSocketData(useCase.getConnections().get(indexSocket)).getInMessage();
+	}
+	protected Message getOutMsg(int indexSocket) {
+		return result.getSocketData(useCase.getConnections().get(indexSocket)).getOutMessage();
+	}
+}

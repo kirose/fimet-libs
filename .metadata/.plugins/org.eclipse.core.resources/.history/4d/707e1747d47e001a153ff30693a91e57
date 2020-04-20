@@ -1,0 +1,67 @@
+package com.fimet.net;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fimet.core.net.IAdaptedSocket;
+import com.fimet.core.net.IAdaptedSocketListener;
+import com.fimet.core.net.ISocket;
+
+public class SocketManager implements ISocketManager {
+	private Map<Integer, IAdaptedSocket> connections = new HashMap<>();
+	private List<ISocketMonitor> monitors = new ArrayList<>();
+	public SocketManager() {
+	}
+	@Override
+	public boolean isConnected(ISocket socket) {
+		return connections.containsKey(socket.hashCode()) && connections.get(socket.hashCode()).isConnected();
+	}
+	@Override
+	public boolean isDisconnected(ISocket socket) {
+		return !connections.containsKey(socket.hashCode()) || connections.get(socket.hashCode()).isDisconnected();
+	}
+	@Override
+	public boolean isConnecting(ISocket socket) {
+		return connections.containsKey(socket.hashCode()) && connections.get(socket.hashCode()).isConnecting();
+	}
+	@Override
+	public IAdaptedSocket getSocket(ISocket socket, IAdaptedSocketListener listener) {
+		if (!connections.containsKey(socket.hashCode())) {
+			if (socket.isServer()) {
+				connections.put(socket.hashCode(), new AdaptedSocketServer(socket.getAddress(),socket.getPort(), socket.getAdapter(), listener));
+			} else {
+				connections.put(socket.hashCode(), new AdaptedSocketClient(socket.getAddress(),socket.getPort(), socket.getAdapter(), listener));
+			} 
+		}
+		return connections.get(socket.hashCode());
+	}
+	@Override
+	public IAdaptedSocket connect(ISocket socket, IAdaptedSocketListener listener) {
+		IAdaptedSocket messenger = getSocket(socket, listener);
+		messenger.connect();
+		return messenger;
+	}
+	@Override
+	public void disconnect(ISocket socket) {
+		if (connections.containsKey(socket.hashCode())) {
+			connections.get(socket.hashCode()).disconnect();
+			connections.remove(socket.hashCode());
+		}
+	}
+	@Override
+	public void disconnectAll() {
+		for (Map.Entry<Integer, IAdaptedSocket> e : connections.entrySet()) {
+			e.getValue().disconnect();
+		}
+		connections.clear();
+	}
+	@Override
+	public void free() {}
+	@Override
+	public void saveState() {}
+	public void setSocketTimeReconnect(int sec) {
+		AdaptedSocket.RECONNECTION_TIME = sec*1000;
+	}
+}

@@ -1,0 +1,5 @@
+package com.fimet.net;
+
+public interface ISocketMonitor {
+
+}

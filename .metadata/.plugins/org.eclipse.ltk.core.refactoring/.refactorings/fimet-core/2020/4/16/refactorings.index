@@ -1,0 +1,48 @@
+1586738016376	Copy file
+1586739773239	Copy folder
+1586739849255	Move compilation units
+1586753239180	Delete element
+1586753313553	Rename type 'UseCaseExecutor'
+1586753325835	Rename type 'UseCaseExecutorAuthorization'
+1586753340690	Rename type 'UseCaseJob'
+1586753349117	Rename type 'UseCaseJobListener'
+1586753442676	Delete element
+1586753657051	Rename type 'IUseCaseJob'
+1586753735464	Delete element
+1586755813287	Copy compilation unit
+1586829803605	Delete element
+1586830186098	Rename type 'MessageExtract'
+1586830200785	Rename type 'MessageExtractAdapter'
+1586839493741	Rename type 'ISocketConnectionListener'
+1586839584041	Rename type 'ISocketConnection'
+1586842630323	Move compilation units
+1586842881921	Move compilation units
+1586842892435	Copy compilation unit
+1586843058579	Move compilation units
+1586843093596	Delete element
+1586843095049	Delete element
+1586927950403	Move compilation unit
+1586931587959	Rename type 'ISOTestBuilder'
+1586931875799	Rename type 'IUseCaseValidator'
+1587097766008	Rename type 'ISocketReadListener'
+1587097775053	Rename type 'IAdaptedSocktListener'
+1587232606075	Delete element
+1587240765515	Move compilation unit
+1587241733527	Move compilation unit
+1587241748530	Delete element
+1587249166263	Delete element
+1587254175613	Copy compilation unit
+1587272465461	Move compilation units
+1587272482123	Delete element
+1587272520521	Move compilation unit
+1587275785569	Rename type 'AbrstactValidator'
+1587323236742	Delete element
+1587323242642	Delete element
+1587328783411	Move compilation units
+1587328881938	Rename type 'SocketData'
+1587328896954	Rename type 'SocketResult'
+1587328917486	Rename package 'com.fimet.core.usecase.sync'
+1587332969160	Rename type 'StressSocketInjector'
+1587333545874	Rename type 'StressTest'
+1587333615079	Delete element
+1587333619372	Delete element

@@ -1,0 +1,79 @@
+package com.fimet.core.usecase;
+
+import java.util.List;
+
+import com.fimet.core.entity.sqlite.pojo.Validation;
+import com.fimet.core.iso8583.parser.Message;
+
+public class SocketData {
+	private Data in;
+	private Data out;
+	public class Data {
+		private long time;
+		private byte[] bytes;
+		private Message message;
+		private List<Validation> validations;
+	}
+	public Data getIn(){
+		return in;
+	}
+	public Data getOut(){
+		return out;
+	}
+	private Data getInOrNew(){
+		if (in == null) {in = new Data();}
+		return in;
+	}
+	private Data getOutOrNew(){
+		if (out == null) {out = new Data();}
+		return out;
+	}
+	public long getInTime() {
+		return getInOrNew().time;
+	}
+	public void setInTime(long time) {
+		getInOrNew().time = time;
+	}
+	public byte[] getInBytes() {
+		return getInOrNew().bytes;
+	}
+	public void setInBytes(byte[] bytes) {
+		getInOrNew().bytes = bytes;
+	}
+	public Message getInMessage() {
+		return getInOrNew().message;
+	}
+	public void setInMessage(Message message) {
+		getInOrNew().message = message;
+	}
+	public List<Validation> getInValidations() {
+		return getInOrNew().validations;
+	}
+	public void setInValidations(List<Validation> validations) {
+		getInOrNew().validations = validations;
+	}
+	public long getOutTime() {
+		return getOutOrNew().time;
+	}
+	public void setOutTime(long time) {
+		getOutOrNew().time = time;
+	}
+	public byte[] getOutBytes() {
+		return getOutOrNew().bytes;
+	}
+	public void setOutBytes(byte[] bytes) {
+		getOutOrNew().bytes = bytes;
+	}
+	public Message getOutMessage() {
+		return getOutOrNew().message;
+	}
+	public void setOutMessage(Message message) {
+		getOutOrNew().message = message;
+	}
+	public List<Validation> getOutValidations() {
+		return getOutOrNew().validations;
+	}
+	public void setOutValidations(List<Validation> validations) {
+		getOutOrNew().validations = validations;
+	}
+}

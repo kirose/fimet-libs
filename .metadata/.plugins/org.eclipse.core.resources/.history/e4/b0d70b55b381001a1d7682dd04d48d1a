@@ -1,0 +1,50 @@
+package com.fimet.usecase;
+
+import com.fimet.core.IExecutorManager;
+import com.fimet.core.Manager;
+import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.net.ISocket;
+import com.fimet.core.validator.IValidator;
+import com.fimet.core.validator.NullValidator;
+
+public class TestBuilder {
+	UseCase useCase;
+	IExecutor executor;
+	public TestBuilder(ISocket acquirer) {
+		useCase = new UseCase();
+		useCase.addConnection(acquirer);
+		useCase.setMessage(new Message());
+		useCase.getMessage().setParser(acquirer.getParser());
+		executor = Manager.get(IExecutorManager.class).getSyncExecutor();
+		
+	}
+	TestBuilder message(Message message) {
+		useCase.setMessage(message);
+		return this;
+	}
+	TestBuilder setValue(int idField, String value) {
+		useCase.getMessage().setValue(idField, value);
+		return this;
+	}
+	TestBuilder removeValue(int idField) {
+		useCase.getMessage().remove(idField);
+		useCase.getMessage().remove(idField);
+		return this;
+	}
+	TestBuilder setValue(String idField, String value) {
+		useCase.getMessage().setValue(idField, value);
+		return this;
+	}
+	TestBuilder removeValue(String idField) {
+		useCase.getMessage().remove(idField);
+		return this;
+	}
+	TestBuilder setValidator(IValidator validator) {
+		useCase.setValidator(validator != null ? validator : NullValidator.INSTANCE);
+		return this;
+	}
+	TestBuilder execute() {
+		executor.execute(useCase);
+		return this;
+	}
+}

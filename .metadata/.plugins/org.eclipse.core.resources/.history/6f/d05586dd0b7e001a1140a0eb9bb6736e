@@ -1,0 +1,45 @@
+package com.fimet.net;
+
+import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.net.IMessenger;
+import com.fimet.core.net.IMessengerListener;
+
+public class NullMessengerListener implements IMessengerListener {
+
+	@Override
+	public void onMessengerWriteResponse(IMessenger messenger, byte[] message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onMessengerWriteRequest(IMessenger messenger, byte[] message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onMessengerReadResponse(IMessenger messenger, byte[] message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onMessengerReadRequest(IMessenger messenger, byte[] message) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onMessengerSimulateResponse(IMessenger messenger, Message response) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onMessengerSimulateRequest(IMessenger messenger, Message response) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

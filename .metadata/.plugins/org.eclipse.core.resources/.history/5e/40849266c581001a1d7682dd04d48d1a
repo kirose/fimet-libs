@@ -1,0 +1,170 @@
+package com.fimet.core;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.log4j.Logger;
+
+import com.fimet.commons.console.Console;
+import com.fimet.commons.exception.FimetException;
+import com.fimet.core.xml.FimetXml;
+import com.fimet.core.xml.ManagerXml;
+
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
+public class Manager {
+	private Map<Class<?>, Class<?>> managers = new HashMap<>();
+	private Map<Class<?>, Object> instances = new HashMap<>();
+	private static Manager instance;
+	private FimetXml cfg;
+	public static Manager getInstance() {
+		if (instance == null) {
+			instance = new Manager();
+			instance.init();
+		}
+		return instance;
+	}
+	public Manager() {
+		loadConfiguration();
+	}
+	private void init() {
+		int level = Manager.get(IPreferencesManager.class).getInt(IPreferencesManager.CONSOLE_LEVEL, Console.INFO | Console.WARNING | Console.ERROR);
+		Console.setLevel(level);
+	}
+	void loadConfiguration() {
+		loadDefaultManagers();
+		try {
+			//InputStream xmlFile = Manager.class.getClass().getResourceAsStream("resources/fimet.xml");
+			java.io.File xmlFile = new java.io.File("resources/fimet.xml");
+			JAXBContext jaxbContext = JAXBContext.newInstance(FimetXml.class);              
+		    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		    cfg = (FimetXml) jaxbUnmarshaller.unmarshal(xmlFile);
+		    if (cfg.getManagers() != null && cfg.getManagers().getManagers() != null && !cfg.getManagers().getManagers().isEmpty()) {
+		    	List<ManagerXml> managers = cfg.getManagers().getManagers();
+		    	for (ManagerXml mgr : managers) {
+		    		loadManager(mgr);
+				}
+		    }
+		} catch (Exception e) {
+			Logger.getLogger(Manager.class).error("Loading fimet.xml",e);
+		}
+	}
+	private void loadDefaultManagers() {
+		loadManager(com.fimet.core.IMessengerManager.class, "com.fimet.net.MessengerManager");
+		loadManager(com.fimet.core.ISocketManager.class, "com.fimet.net.SocketManager");
+		loadManager(com.fimet.core.ISimulatorManager.class, "com.fimet.simulator.SimulatorManager");
+		loadManager(com.fimet.core.IFieldFormatManager.class, "com.fimet.parser.FieldFormatManager");
+		loadManager(com.fimet.core.IFieldParserManager.class, "com.fimet.parser.FieldParserManager");
+		loadManager(com.fimet.core.IParserManager.class, "com.fimet.parser.ParserManager");
+		loadManager(com.fimet.core.IPreferencesManager.class, "com.fimet.core.PreferencesManager");
+		loadManager(com.fimet.core.IExecutorManager.class, "com.fimet.usecase.ExecutorManager");
+	}
+	private void loadManager(Class<?> extension, String className) {
+		try {
+			Class<?> clazz = Class.forName(className);			
+			if (clazz == null) {
+				warning("Cannot found class "+className);
+			} else if (!IManager.class.isAssignableFrom(extension)) {
+				warning("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
+			} else if (!extension.isAssignableFrom(clazz)) {
+				warning("Class "+clazz.getName()+" is not assignable from "+extension.getName());
+			} else {
+				managers.put(extension, clazz);
+			}
+		} catch (Throwable ex) {
+			warning("Error Manager load extensions", ex);
+		}
+	}
+	private void loadManager(ManagerXml mgr) {
+		try {
+			Class<?> extension = Class.forName(mgr.getId());
+			Class<?> clazz = Class.forName(mgr.getClassName());
+			if (extension == null) {
+				warning("Cannot found extension "+mgr.getId());
+			} else if (clazz == null) {
+				warning("Cannot found class "+mgr.getClassName());
+			} else if (!IManager.class.isAssignableFrom(extension)) {
+				warning("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
+			} else if (!extension.isAssignableFrom(clazz)) {
+				warning("Class "+clazz.getName()+" is not assignable from "+extension.getName());
+			} else {
+				managers.put(extension, clazz);
+			}
+		} catch (Throwable ex) {
+			warning("Error Manager load extensions", ex);
+		}
+	}
+	private void warning(String message) {
+		System.err.println(message);
+		Logger.getLogger(Manager.class).warn(message);
+	}
+	private void warning(String message, Throwable e) {
+		e.printStackTrace();
+		Logger.getLogger(Manager.class).warn(message, e);
+	}
+	public static <I extends IManager,C> void manage(Class<I> i, Class<C> c) {
+		getInstance().managers.put(i,c);
+	}
+	public static <I extends IManager,C> void manageIfNotExists(Class<I> i, Class<C> c) {
+		if (!getInstance().managers.containsKey(i))
+			getInstance().managers.put(i,c);
+	}
+	public static boolean isLoaded(Class<?> clazz) {
+		return getInstance().instances.containsKey(clazz);
+	}
+	public static boolean isManaged(Class<?> clazz) {
+		return getInstance().managers.containsKey(clazz);
+	}
+	public static <T> T get(Class<T> clazz) {
+		if (getInstance().instances.containsKey(clazz)) {
+			return clazz.cast(getInstance().instances.get(clazz));
+		} else {
+			if (!getInstance().managers.containsKey(clazz)) {
+				//FimetLogger.error("Unregistred Manager "+clazz.getName());
+				//System.err.println("Unregistred Manager "+clazz.getName());
+				return null;
+			} else {
+				try {
+					Object newInstance = getInstance().managers.get(clazz).newInstance();
+					getInstance().instances.put(clazz, newInstance);
+					if (newInstance instanceof IStartable) {
+						((IStartable)newInstance).start();
+					}
+					return clazz.cast(newInstance);
+				} catch (InstantiationException e) {
+					throw new FimetException(e);
+				} catch (IllegalAccessException e) {
+					throw new FimetException(e);
+				}
+			}
+		}
+	}
+	public static void saveAll() {
+		for(Map.Entry<Class<?>, Object> e : getInstance().instances.entrySet()) {
+			try {
+				((IManager)e.getValue()).saveState();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	public static void freeAll() {
+		for(Map.Entry<Class<?>, Object> e : getInstance().instances.entrySet()) {
+			try {
+				((IManager)e.getValue()).free();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	public static FimetXml getCfg() {
+		return getInstance().cfg;
+	}
+}

@@ -1,0 +1,43 @@
+package com.fimet.commons;
+
+import org.apache.log4j.Logger;
+
+public class FimetLogger {
+	static Logger logger = Logger.getLogger(FimetLogger.class);
+	private static void write(String level, String message) {
+		logger.debug(message);
+	}
+	private static void write(String level, String message, Throwable e) {
+		logger.debug(message);
+	}
+	public static void debug(String message) {
+		write("DEBUG", message);
+	}
+	public static void debug(Class<?> clazz, String message, Throwable e) {
+		write("DEBUG", message, e);
+	}
+	public static void debug(String message, Throwable e) {
+		write("DEBUG", message, e);
+	}
+	public static void info(String message) {
+		write("INFO", message);
+	}
+	public static void info(String message, Throwable e) {
+		write("INFO", message, e);
+	}
+	public static void warning(String message) {
+		write("WARNING", message);
+	}
+	public static void warning(String message, Throwable e) {
+		write("WARNING", message, e);
+	}
+	public static void error(String message) {
+		write("ERROR", message);
+	}
+	public static void error(String message, Throwable e) {
+		write("ERROR", message, e);
+	}
+	public static boolean isEnabledDebug() {
+		return true;
+	}
+}

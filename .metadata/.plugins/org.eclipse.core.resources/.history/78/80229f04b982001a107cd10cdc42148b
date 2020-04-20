@@ -1,0 +1,8 @@
+package com.fimet.core.stress;
+
+public interface IQueueable {
+	void enqueue(byte[] message);
+	boolean canEnqueue();
+	void onInitilized();
+	void onFinishRead();
+}

@@ -1,0 +1,26 @@
+package com.fimet.core.stress;
+
+import java.nio.ByteBuffer;
+
+public class StressFileReader extends Thread implements IReadable {
+	ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+	@Override
+	synchronized public void read() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	synchronized public boolean canRead() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	synchronized public void stopReading() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

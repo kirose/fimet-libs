@@ -1,0 +1,30 @@
+package com.fimet.core.stress;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fimet.core.net.ISocket;
+import com.fimet.core.stress.exe.StressExecutor;
+
+public class TestBuilder {
+	private Map<ISocket, File> stressFiles;
+	public TestBuilder() {
+		stressFiles = new HashMap<>();
+	}
+	public TestBuilder addConnection(ISocket socket) {
+		stressFiles.put(socket, null);
+		return this;
+	}
+	public TestBuilder addSocketStress(ISocket socket, File stressFile) {
+		stressFiles.put(socket, stressFile);
+		return this;
+	}
+	public void execute() {
+		Stress stress = new Stress();
+		stress.setStressFiles(stressFiles);
+		new StressExecutor(stress).execute();
+	}
+}

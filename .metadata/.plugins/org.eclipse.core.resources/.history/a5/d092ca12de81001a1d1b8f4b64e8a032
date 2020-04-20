@@ -1,0 +1,29 @@
+package com.fimet.core.xml;
+
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="properties")
+@XmlAccessorType(XmlAccessType.NONE)
+public class PropertiesXml {
+	@XmlElement(name="property")
+	private List<PropertyXml> managers;
+	public PropertiesXml() {
+		super();
+	}
+	public PropertiesXml(List<PropertyXml> managers) {
+		super();
+		this.managers = managers;
+	}
+	public List<PropertyXml> getManagers() {
+		return managers;
+	}
+	public void setManagers(List<PropertyXml> managers) {
+		this.managers = managers;
+	}
+}

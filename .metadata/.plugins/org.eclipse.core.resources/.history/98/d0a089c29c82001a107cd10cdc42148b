@@ -1,0 +1,13 @@
+package com.fimet.core.stress.creator;
+
+import java.io.File;
+
+import com.fimet.core.stress.IFileCreator;
+
+public class CartesianCreator implements IFileCreator {
+
+	@Override
+	public File create() {
+		return null;
+	}
+}

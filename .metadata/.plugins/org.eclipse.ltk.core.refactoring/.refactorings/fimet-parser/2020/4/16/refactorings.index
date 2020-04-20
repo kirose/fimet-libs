@@ -1,0 +1,11 @@
+1586753618212	Rename type 'ParserUtils'
+1586828748137	Rename package 'com.fimet.iso8583.parser'
+1586829190739	Rename type 'AbstractMessageFormater'
+1586829203914	Rename type 'AbstractMessageParser'
+1586829219732	Rename package 'com.fimet.parser.impl'
+1586829264329	Move compilation units
+1586829276872	Delete element
+1586829552430	Rename type 'ExtractParser'
+1586830582628	Rename type 'AbstractBaseParser'
+1586830596223	Rename type 'AbstractMessageExtractFormater'
+1586830604314	Rename type 'AbstractMessageExtractParser'

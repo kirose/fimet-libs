@@ -1,0 +1,7 @@
+package com.fimet.core.stress;
+
+public interface IInjectorListener {
+	void enqueue(byte[] message);
+	boolean canEnqueue();
+	void onInitilized();
+}

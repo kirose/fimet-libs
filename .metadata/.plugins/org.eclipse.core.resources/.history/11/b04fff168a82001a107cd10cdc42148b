@@ -1,0 +1,11 @@
+package com.fimet.core.stress;
+
+import java.util.List;
+
+import com.fimet.core.net.ISocket;
+
+public interface IStress {
+	public String getName();
+	public List<StressAcquirer> getAcquirers();
+	public List<ISocket> getConnections();
+}
