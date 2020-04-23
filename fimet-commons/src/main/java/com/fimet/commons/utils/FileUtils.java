@@ -59,6 +59,22 @@ public final class FileUtils {
 			return new byte[0];
 		}
 	}
+	public static void appendContents(File file, byte[] contents) {
+		if (file == null)
+			return;
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(file,true);
+			out.write(contents);
+		} catch (IOException e) {
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {}
+			}
+		}
+	}
 	public static void writeContents(File file, byte[] contents) {
 		if (file == null)
 			return;

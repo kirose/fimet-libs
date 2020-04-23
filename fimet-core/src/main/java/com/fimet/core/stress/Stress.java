@@ -11,6 +11,9 @@ import com.fimet.core.net.ISocket;
 
 public class Stress implements IStress {
 	private String name;
+	private int cycleTime;
+	private int messagesPerCycle;
+	private long maxExecutionTime = 1000L*30;
 	private Map<ISocket, File> stressFiles;
 	public Stress() {
 	}
@@ -36,5 +39,24 @@ public class Stress implements IStress {
 			connecitons.add(e.getKey());
 		}
 		return connecitons;
+	}
+	public void setMaxExecutionTime(long maxExecutionTime) {
+		this.maxExecutionTime = maxExecutionTime;
+	}
+	@Override
+	public long getMaxExecutionTime() {
+		return maxExecutionTime;
+	}
+	public int getCycleTime() {
+		return cycleTime;
+	}
+	public void setCycleTime(int cycleTime) {
+		this.cycleTime = cycleTime;
+	}
+	public int getMessagesPerCycle() {
+		return messagesPerCycle;
+	}
+	public void setMessagesPerCycle(int messagesPerCycle) {
+		this.messagesPerCycle = messagesPerCycle;
 	}
 }

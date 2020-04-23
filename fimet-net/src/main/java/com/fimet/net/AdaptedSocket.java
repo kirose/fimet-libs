@@ -3,6 +3,7 @@ package com.fimet.net;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.commons.exception.SocketException;
@@ -24,6 +25,9 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 	public static enum Status {
 		DISCONNECTED, CONNECTING, CONNECTED
 	}
+	static int RECONNECTION_TIME = Manager.get(IPreferencesManager.class).getInt(IPreferencesManager.SOCKET_RECONNECT_TIME_SEC,2)*1000;// In Miliseconds
+	static final IAdaptedSocketListener NULL_SOCKET_LISTENER = new NullSocketListener();
+
 	protected ISocket iSocket;
 	protected java.net.Socket socket;
 	private boolean reconnect = true;
@@ -31,10 +35,9 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 	private IStreamAdapter adapter;
 	private IAdaptedSocketListener listener;
 	private Status status;
-	static int RECONNECTION_TIME = Manager.get(IPreferencesManager.class).getInt(IPreferencesManager.SOCKET_RECONNECT_TIME_SEC,2)*1000;// In Miliseconds
-	static final IAdaptedSocketListener NULL_SOCKET_LISTENER = new NullSocketListener();
 	static SocketManager socketManager = (SocketManager)Manager.get(ISocketManager.class);
-	
+	private AtomicLong out = new AtomicLong(0);
+	private AtomicLong in = new AtomicLong(0);
 	public AdaptedSocket(ISocket iSocket, IAdaptedSocketListener listener) {
 		super();
 		if (iSocket == null)
@@ -85,16 +88,19 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 			if (socket == null) {
 				throw new SocketException("Socket is disconnected cannot write data");
 			}
-			if (adapt) {
-				adapter.writeStream(socket.getOutputStream(), message);
-			} else {
-				socket.getOutputStream().write(message);
+			synchronized (this) {
+				if (adapt) {
+					adapter.writeStream(socket.getOutputStream(), message);
+				} else {
+					socket.getOutputStream().write(message);
+				}
 			}
+			out.incrementAndGet();
 			if (FimetLogger.isEnabledDebug()) {
-				FimetLogger.info(AdaptedSocket.class,"Written message ("+message.length+" bytes) to "+ this);
+				FimetLogger.debug(AdaptedSocket.class,"Written message ("+message.length+" bytes) to "+ this);
 			}
 		} catch (IOException e) {
-			FimetLogger.warning("Fail to write msg ("+message.length+" bytes) to "+ this, e);
+			FimetLogger.error("Fail to write message ("+message.length+" bytes) to "+ this, e);
 			close();
 			try {
 				socketManager.onSocketDisconnected(this.iSocket);
@@ -129,17 +135,18 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 				while(!sentDisconnected){
 					byte[] message = adapter.readStream(socket.getInputStream());
 					if (FimetLogger.isEnabledDebug()) {
-						FimetLogger.info(AdaptedSocket.class,"Read message ("+(message != null ? message.length : null)+" bytes) from "+ AdaptedSocket.this);
+						FimetLogger.debug(AdaptedSocket.class,"Read message ("+(message != null ? message.length : null)+" bytes) from "+ AdaptedSocket.this);
 					}
 					if (message == null || message.length == 0) {
 						FimetLogger.debug(AdaptedSocket.class, "Socket port ocuppied: "+AdaptedSocket.this);
 						disconnect();
 					} else {
+						in.incrementAndGet();
 						listener.onSocketRead(message);
 					}
 				}
 			} catch (Exception e) {// Fallo la conexion
-				//FimetLogger.error("Dissconected!!", e);
+				FimetLogger.error("Socket Read Error ... disconnecting", e);
 				close();// El servidor se desconecto no se puede leer del socket
 				status = Status.DISCONNECTED;
 				try {
@@ -170,7 +177,7 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 				try {
 					socket = newSocket();
 					status = Status.CONNECTED;
-					if (FimetLogger.isEnabledDebug()) FimetLogger.debug(AdaptedSocket.class,"Connected to "+ AdaptedSocket.this);
+					FimetLogger.debug(AdaptedSocket.class,"Connected to "+ AdaptedSocket.this);
 					new ThreadReader().start();
 				} catch (Exception e) {
 					socket = null;
@@ -196,5 +203,11 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 	}
 	public ISocket getConnection() {
 		return iSocket;
+	}
+	public long getNumOfRead() {
+		return in.get();
+	}
+	public long getNumOfWrite() {
+		return out.get();
 	}
 }

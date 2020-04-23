@@ -10,12 +10,12 @@ public class FimetLogger {
 	static Logger logger = Logger.getLogger(FimetLogger.class);
 	static int level;
 	private static void write(String level, String message) {
-		//System.out.println(message);
+//		System.out.println(message);
 		logger.debug(message);
 	}
 	private static void write(String level, String message, Throwable e) {
-		//System.out.println(message);
-		//e.printStackTrace();
+//		System.out.println(message);
+//		e.printStackTrace();
 		logger.debug(message);
 	}
 	public static void debug(String message) {
@@ -55,15 +55,21 @@ public class FimetLogger {
 		write("WARNING", message, e);
 	}
 	public static void error(Class<?> clazz, String message) {
+		System.err.println(message);
 		write("ERROR", message);
 	}
 	public static void error(Class<?> clazz, String message, Throwable e) {
+		System.err.println(message);
+		e.printStackTrace(System.err);
 		write("ERROR", message, e);
 	}
 	public static void error(String message) {
+		System.err.println(message);
 		write("ERROR", message);
 	}
 	public static void error(String message, Throwable e) {
+		System.err.println(message);
+		e.printStackTrace(System.err);
 		write("ERROR", message, e);
 	}
 	public static boolean isEnabledError() {

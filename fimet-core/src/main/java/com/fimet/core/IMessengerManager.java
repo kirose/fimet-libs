@@ -2,6 +2,7 @@ package com.fimet.core;
 
 
 import com.fimet.core.net.IMessenger;
+import com.fimet.core.net.IMessengerThread;
 import com.fimet.core.net.ISocket;
 /**
  * 
@@ -17,4 +18,5 @@ public interface IMessengerManager extends IManager {
 	void disconnect(ISocket socket);
 	void disconnectAll();
 	void setSocketTimeReconnect(int sec);
+	IMessengerThread getNextMessengerThread();
 }

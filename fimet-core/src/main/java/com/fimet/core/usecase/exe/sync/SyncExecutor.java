@@ -1,16 +1,15 @@
 package com.fimet.core.usecase.exe.sync;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fimet.commons.FimetLogger;
 import com.fimet.core.IMessengerManager;
 import com.fimet.core.ISocketManager;
 import com.fimet.core.Manager;
 import com.fimet.core.iso8583.parser.Message;
+import com.fimet.core.net.Connector;
+import com.fimet.core.net.Connector.IConnectable;
+import com.fimet.core.net.Connector.IConnectorOnConnectAll;
 import com.fimet.core.net.IMessenger;
 import com.fimet.core.net.IMessengerListener;
-import com.fimet.core.net.ISocket;
 import com.fimet.core.usecase.IUseCase;
 import com.fimet.core.usecase.exe.ExecutionResult;
 import com.fimet.core.usecase.exe.ExecutionStatus;
@@ -20,15 +19,13 @@ import com.fimet.core.usecase.exe.NullExecutorMonitor;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class SyncExecutor extends Thread implements IExecutor, IMessengerListener, IUseCaseTimerListener {
+public class SyncExecutor extends Thread implements IExecutor, IMessengerListener, IUseCaseTimerListener, IConnectorOnConnectAll {
 	static ISocketManager socketManager = Manager.get(ISocketManager.class);
 	static IMessengerManager messengerManager = Manager.get(IMessengerManager.class);
 
 	private boolean alive;
 	private LinkedBlockingQueue<IUseCase> queue;
 	private UseCaseTimer useCaseTimer;
-	private Connector connector;
-
 	private IUseCase useCase;
 	private IExecutorMonitor monitor;
 	private ExecutionResult result;
@@ -42,8 +39,11 @@ public class SyncExecutor extends Thread implements IExecutor, IMessengerListene
 		this.monitor = NullExecutorMonitor.INSTANCE;
 	}
 	public void execute(IUseCase useCase) {
-		connector = new Connector(useCase);
-		connector.start();
+		new Connector(useCase, this).connectAsync();
+	}
+	@Override
+	public void onConnectorConnectAll(IConnectable connectable) {
+		this.queue.add(useCase);		
 	}
 	public void stopExecution() {
 		queue.clear();
@@ -65,21 +65,13 @@ public class SyncExecutor extends Thread implements IExecutor, IMessengerListene
 		this.monitor = monitor != null ? monitor : NullExecutorMonitor.INSTANCE;
 	}
 	@Override
-	synchronized public void onMessengerConnected(IMessenger messenger) {
-		connector.onConnected(messenger.getConnection());
-	}
+	public void onMessengerConnected(IMessenger messenger) {}
 
 	@Override
-	public void onMessengerConnecting(IMessenger messenger) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onMessengerConnecting(IMessenger messenger) {}
 
 	@Override
-	public void onMessengerDisconnected(IMessenger messenger) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onMessengerDisconnected(IMessenger messenger) {}
 
 	@Override
 	synchronized public void onMessengerWriteMessage(IMessenger messenger, Message message) {
@@ -189,31 +181,6 @@ public class SyncExecutor extends Thread implements IExecutor, IMessengerListene
 		} catch (Exception e) {
 			FimetLogger.error("Thread error", e);
 			run();
-		}
-	}
-	private class Connector extends Thread {
-		IUseCase useCase;
-		Set<ISocket> toConnect = new HashSet<ISocket>();
-		public Connector(IUseCase useCase) {
-			this.useCase = useCase;
-			this.toConnect.addAll(useCase.getConnections());
-		}
-		public void onConnected(ISocket socket) {
-			toConnect.remove(socket);
-			if(toConnect.isEmpty()) {
-				SyncExecutor.this.queue.add(useCase);
-			}
-		}
-		public void run() {
-			for (ISocket iSocket : useCase.getConnections()) {
-				IMessenger messenger = messengerManager.getMessenger(iSocket);
-				messenger.setListener(SyncExecutor.this);
-				if (messenger.isDisconnected()) {
-					messenger.connect();
-				} else if (messenger.isConnected()) {
-					onConnected(messenger.getConnection());
-				}
-			}
 		}
 	}
 	@Override

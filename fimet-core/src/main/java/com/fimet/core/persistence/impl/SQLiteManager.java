@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fimet.commons.FimetLogger;
+import com.fimet.commons.exception.FimetException;
 import com.fimet.commons.exception.PersistenceException;
 import com.fimet.core.Manager;
 import com.fimet.core.persistence.ISQLiteManager;
-import com.fimet.core.xml.FimetXml;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -107,9 +107,9 @@ public final class SQLiteManager implements ISQLiteManager {
 		return s.toString();
 	}
 	private void loadSources() {
-		FimetXml cfg = Manager.getCfg();
-		if (cfg != null && cfg.getSource() != null) {
-			connections.put(cfg.getSource().getName(), null);
-		}
+//		if (Manager.getSource() == null) {
+//			throw new FimetException("Source cannt be null, see fimet.xml");
+//		}
+		connections.put(DB_FIMET, null);
 	}
 }

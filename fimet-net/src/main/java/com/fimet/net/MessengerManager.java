@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fimet.core.IMessengerManager;
+import com.fimet.core.Manager;
 import com.fimet.core.net.IMessenger;
+import com.fimet.core.net.IMessengerThread;
 import com.fimet.core.net.ISocket;
 
 /**
@@ -14,9 +16,28 @@ import com.fimet.core.net.ISocket;
  */
 	
 public class MessengerManager implements IMessengerManager {
-	
+	static final int NUMBER_OF_THREADS = 5;	
 	private Map<Integer, IMessenger> connections = new HashMap<>();
+	private MessengerThread next;
+	private MessengerThread head;
 	public MessengerManager() {
+		Integer numberOfThreads = Manager.getPropertyInteger("messenger.numberOfThreads");
+		if (numberOfThreads == null) {
+			numberOfThreads = NUMBER_OF_THREADS;
+		}
+		this.head = new MessengerThread(0);
+		if (numberOfThreads > 1) {
+			MessengerThread prev = head;
+			for (int i = 1; i < numberOfThreads; i++) {
+				next = new MessengerThread(i);	
+				prev.next = next;
+				prev = next;
+			}
+			next.next = head;
+		} else {
+			head.next = head;
+		}
+		next = head;
 	}
 	@Override
 	public boolean isConnected(ISocket socket) {
@@ -72,4 +93,9 @@ public class MessengerManager implements IMessengerManager {
 		result = prime * result + ((socket == null || socket.getPort() == null) ? 0 : socket.getPort().hashCode());
 		return result;
 	}
+	@Override
+	synchronized public IMessengerThread getNextMessengerThread() {
+		return next = next.next;
+	}
+
 }

@@ -13,6 +13,7 @@ import com.fimet.commons.FimetLogger;
 import com.fimet.commons.exception.FimetException;
 import com.fimet.core.xml.FimetXml;
 import com.fimet.core.xml.ManagerXml;
+import com.fimet.core.xml.PropertyXml;
 
 /**
  * 
@@ -22,21 +23,14 @@ import com.fimet.core.xml.ManagerXml;
 public class Manager {
 	private Map<Class<?>, Class<?>> managers = new HashMap<>();
 	private Map<Class<?>, Object> instances = new HashMap<>();
-	private static Manager instance;
-	private FimetXml cfg;
+	private Map<String,String> properties = new HashMap<>();
+	private String source;
+	private static Manager instance = new Manager();
 	public static Manager getInstance() {
-		if (instance == null) {
-			instance = new Manager();
-			instance.init();
-		}
 		return instance;
 	}
 	public Manager() {
 		loadConfiguration();
-	}
-	private void init() {
-		int level = Manager.get(IPreferencesManager.class).getInt(IPreferencesManager.CONSOLE_LEVEL, FimetLogger.INFO | FimetLogger.WARNING | FimetLogger.ERROR);
-		FimetLogger.setLevel(level);
 	}
 	void loadConfiguration() {
 		loadDefaultManagers();
@@ -45,15 +39,24 @@ public class Manager {
 			java.io.File xmlFile = new java.io.File("resources/fimet.xml");
 			JAXBContext jaxbContext = JAXBContext.newInstance(FimetXml.class);              
 		    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		    cfg = (FimetXml) jaxbUnmarshaller.unmarshal(xmlFile);
+		    FimetXml cfg = (FimetXml) jaxbUnmarshaller.unmarshal(xmlFile);
 		    if (cfg.getManagers() != null && cfg.getManagers().getManagers() != null && !cfg.getManagers().getManagers().isEmpty()) {
 		    	List<ManagerXml> managers = cfg.getManagers().getManagers();
 		    	for (ManagerXml mgr : managers) {
 		    		loadManager(mgr);
 				}
 		    }
+		    loadProperties(cfg);
+		    source = cfg.getSource() != null ? cfg.getSource().getPath() : null;
 		} catch (Exception e) {
 			Logger.getLogger(Manager.class).error("Loading fimet.xml",e);
+		}
+	}
+	private void loadProperties(FimetXml cfg) {
+		if (cfg != null && cfg.getProperties() != null && cfg.getProperties().getProperties()!= null) {
+			for (PropertyXml p : cfg.getProperties().getProperties()) {
+				properties.put(p.getName(), p.getValue());
+			}
 		}
 	}
 	private void loadDefaultManagers() {
@@ -72,16 +75,16 @@ public class Manager {
 		try {
 			Class<?> clazz = Class.forName(className);			
 			if (clazz == null) {
-				warning("Cannot found class "+className);
+				FimetLogger.error(Manager.class,"Cannot found class "+className);
 			} else if (!IManager.class.isAssignableFrom(extension)) {
-				warning("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
+				FimetLogger.error(Manager.class,"Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
 			} else if (!extension.isAssignableFrom(clazz)) {
-				warning("Class "+clazz.getName()+" is not assignable from "+extension.getName());
+				FimetLogger.error(Manager.class,"Class "+clazz.getName()+" is not assignable from "+extension.getName());
 			} else {
 				managers.put(extension, clazz);
 			}
 		} catch (Throwable ex) {
-			warning("Error Manager load extensions", ex);
+			FimetLogger.error(Manager.class,"Error Manager load extensions");
 		}
 	}
 	private void loadManager(ManagerXml mgr) {
@@ -89,27 +92,19 @@ public class Manager {
 			Class<?> extension = Class.forName(mgr.getId());
 			Class<?> clazz = Class.forName(mgr.getClassName());
 			if (extension == null) {
-				warning("Cannot found extension "+mgr.getId());
+				FimetLogger.error(Manager.class,"Cannot found class extension "+mgr.getId());
 			} else if (clazz == null) {
-				warning("Cannot found class "+mgr.getClassName());
+				FimetLogger.error(Manager.class,"Cannot found class "+mgr.getClassName());
 			} else if (!IManager.class.isAssignableFrom(extension)) {
-				warning("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
+				FimetLogger.error(Manager.class,"Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
 			} else if (!extension.isAssignableFrom(clazz)) {
-				warning("Class "+clazz.getName()+" is not assignable from "+extension.getName());
+				FimetLogger.error(Manager.class,"Class "+clazz.getName()+" is not assignable from "+extension.getName());
 			} else {
 				managers.put(extension, clazz);
 			}
 		} catch (Throwable ex) {
-			warning("Error Manager load extensions", ex);
+			FimetLogger.error(Manager.class,"Error Manager load extensions", ex);
 		}
-	}
-	private void warning(String message) {
-		System.err.println(message);
-		Logger.getLogger(Manager.class).warn(message);
-	}
-	private void warning(String message, Throwable e) {
-		e.printStackTrace();
-		Logger.getLogger(Manager.class).warn(message, e);
 	}
 	public static <I extends IManager,C> void manage(Class<I> i, Class<C> c) {
 		getInstance().managers.put(i,c);
@@ -166,10 +161,28 @@ public class Manager {
 			}
 		}
 	}
-	public static FimetXml getCfg() {
-		return getInstance().cfg;
+	public static String getSource() {
+		return getInstance().source;
 	}
 	public static String getProperty(String name) {
-		return getInstance().cfg.getPropertyValue(name);
+		return getInstance().properties.get(name);
+	}
+	public static Integer getPropertyInteger(String name) {
+		String value = getProperty(name);
+		if (value != null) {
+			try {
+				return Integer.valueOf(value);
+			} catch (Exception e) {}
+		}
+		return null;
+	}
+	public static Long getPropertyLong(String name) {
+		String value = getProperty(name);
+		if (value != null) {
+			try {
+				return Long.valueOf(value);
+			} catch (Exception e) {}
+		}
+		return null;
 	}
 }

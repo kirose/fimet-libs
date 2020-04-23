@@ -5,96 +5,85 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.commons.exception.StressException;
 import com.fimet.core.iso8583.adapter.IStreamAdapter;
 
 public class StressFileReader extends Thread implements IReader {
-	private boolean alive;
+	private AtomicBoolean alive = new AtomicBoolean(false);
 	private InputStream in = null;
 	private IStreamAdapter adapter;
-	private IInjector injector;
+	private StressInjector injector;
 	private byte[] message;
 	private File stressFile;
-	private long numberOfMessages;
-	private long startTime;
-	private long finishTime;
-	private long numberOfWaits;
-	public StressFileReader(IInjector injector, File stressFile, IStreamAdapter adapter) {
-		super("StressFileReader-Thread");
-		this.stressFile = stressFile;
+	private InjectorResult result;
+	private AtomicInteger numberOfMessagesToRead = new AtomicInteger(0);
+	public StressFileReader(StressInjector injector, File stressFile) {
+		super("Reader-"+stressFile.getName());
 		this.injector = injector;
-		this.adapter = adapter;
+		this.result = injector.getResult();
+		this.stressFile = stressFile;
+		this.adapter = injector.getMessenger().getSocket().getAdapter();
 		try {
 			in = new FileInputStream(stressFile);
 		} catch (FileNotFoundException e) {
 			throw new StressException(e);
 		}
 	}
-	public void setQueueable(IInjector injector) {
-		this.injector = injector;
+	@Override
+	public void read() {
+		wakeUp();
+	}
+	public boolean isWaiting() {
+		return getState() == Thread.State.WAITING;
+	}
+	private void wakeUp() {
+		synchronized (this) {
+			if (this.getState() == Thread.State.WAITING) {
+				this.notify();
+			}
+		}
 	}
 	@Override
-	synchronized public void read() {
-		this.notify();
+	public boolean canRead() {
+		return alive.get();
 	}
 	@Override
-	synchronized public boolean canRead() {
-		return alive;
-	}
-	@Override
-	synchronized public void startRead() {
-		this.alive = true;
+	public void startRead() {
+		this.alive.set(true);
 		this.start();
 	}
 	@Override
-	synchronized public void stopRead() {
-		this.notify();
-		this.alive = false;
+	public void stopRead() {
+		this.alive.set(false);
+		wakeUp();
 	}
-	private void initialize() {
-		startTime = System.currentTimeMillis();
-		List<byte[]> queue = new ArrayList<>();
-		try {
-			for (int i = 0; i < StressInjector.MAX_QUEUED; i++) {
-				message = adapter.readStream(in);
-				if (message != null && message.length > 0) {
-					numberOfMessages++;
-					queue.add(message);
-				} else {
-					alive = false;
-				}				
-			}
-		} catch (Exception e) {
-			FimetLogger.error("Thread error", e);
-			alive = false;
-		}
-		injector.onReaderInitilized(this);
-		for (byte[] message : queue) {
-			injector.enqueue(message);
-		}
-	}
-	synchronized public void run() {
-		injector.onReaderStart(this);
-		initialize();
+	public void run() {
+		FimetLogger.debug(StressFileReader.class, "Start "+this+" at "+new Timestamp(result.injectorFinishTime));
+		result.readerStartTime = System.currentTimeMillis();
 		try { 
-			while (alive) {
+			while (alive.get()) {
 				message = adapter.readStream(in);
 				if (message != null && message.length > 0) {
-					numberOfMessages++;
-					if (!injector.canEnqueue()) {
-						numberOfWaits++;
-						this.wait();
+					result.readerMessagesRead++;
+					if (numberOfMessagesToRead.get() == 0 || !injector.canEnqueue()) {
+						result.readerNumberOfWaits++;
+						synchronized (this) {
+							this.wait();
+						}
 					}
 					injector.enqueue(message);
+					numberOfMessagesToRead.decrementAndGet();
 				} else {
-					alive = false;
+					alive.set(false);
 				}
 			}
 		} catch (Exception e) {
+			alive.set(false);
 			FimetLogger.error("Thread error", e);
 		}
 		if (in != null) {
@@ -102,26 +91,19 @@ public class StressFileReader extends Thread implements IReader {
 				in.close();
 			} catch (IOException e) {}
 		}
-		finishTime = System.currentTimeMillis();
-		injector.onReaderFinish(this);
-		FimetLogger.debug(StressFileReader.class, "Finish "+this);
+		result.readerFinishTime = System.currentTimeMillis();
+		FimetLogger.debug(StressInjector.class, "Finish "+this+" at "+new Timestamp(result.injectorFinishTime));
 	}
-	public long getNumberOfWaits() {
-		return numberOfWaits;
+	@Override
+	public void read(int numberOfMessages) {
+		this.numberOfMessagesToRead.addAndGet(numberOfMessages);
+		wakeUp();
+	}
+	@Override
+	public boolean hasFinish() {
+		return !alive.get();
 	}
 	public String toString(){
 		return "Reader-"+stressFile.getName();
-	}
-	@Override
-	public long getNumberOfMessages() {
-		return numberOfMessages;
-	}
-	@Override
-	public long getStartTime() {
-		return startTime;
-	}
-	@Override
-	public long getFinishTime() {
-		return finishTime;
 	}
 }

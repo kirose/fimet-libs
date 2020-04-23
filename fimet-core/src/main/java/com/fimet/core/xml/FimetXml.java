@@ -47,6 +47,15 @@ public class FimetXml {
 	public String getPropertyValue(String name) {
 		return properties != null ? properties.getPropertyValue(name): null;
 	}
+	public Integer getPropertyInt(String name) {
+		String value = getPropertyValue(name);
+		if (value != null) {
+			try {
+				return Integer.valueOf(value);
+			} catch (Exception e) {}
+		}
+		return null;
+	}
 	public static void main(String[] args) throws Exception {
 		read();
 		write();

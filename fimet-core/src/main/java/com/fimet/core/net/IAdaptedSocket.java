@@ -18,4 +18,6 @@ public interface IAdaptedSocket {
 	void setAutoReconnect(boolean reconnect);
 	IStreamAdapter getAdapter();
 	ISocket getConnection();
+	long getNumOfRead();
+	long getNumOfWrite();
 }

@@ -3,6 +3,7 @@
 	<source name="fimet" path="resources/fimet.db" />
 	<properties>
 		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/>
+		<property name="messenger.numberOfThreads" value="5"/>
 	</properties> 
 	<managers>
 		<manager id="com.fimet.core.IExecutorManager" class="com.fimet.core.usecase.exe.ExecutorManager"/>

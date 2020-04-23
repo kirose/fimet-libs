@@ -74,7 +74,7 @@ public class SimulatorImpl implements ISimulator {
 		}
 		SimulatorMessage simulator = this.getSimulatorResponse(message.getMti());
 		if (simulator == null) {
-			FimetLogger.error("Simulator Response "+name+" not configured for message: "+message.getMti());
+			FimetLogger.warning("Simulator Response "+name+" not configured for message: "+message.getMti());
 			return null;
 		} else {
 			return simulator.simulate(message);
@@ -86,7 +86,7 @@ public class SimulatorImpl implements ISimulator {
 		}
 		SimulatorMessage simulator = this.getSimulatorRequest(message.getMti());
 		if (simulator == null) {
-			FimetLogger.error("Simulator Request "+name+" not configured for message: "+message.getMti());
+			FimetLogger.warning("Simulator Request "+name+" not configured for message: "+message.getMti());
 			return message;
 		} else {
 			return simulator.simulate(message);

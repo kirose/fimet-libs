@@ -1,7 +1,10 @@
 package com.fimet.commons.utils;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public final class StringUtils {
@@ -9,7 +12,13 @@ public final class StringUtils {
 	private static final int PAD_LIMIT = 8192;
 	public static final String EMPTY = "";
 	public static final String SPACE = " ";
-	
+	public static final DecimalFormat FORMAT_2DIGITS;
+	static {
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+		otherSymbols.setDecimalSeparator('.');
+		otherSymbols.setGroupingSeparator(','); 
+		FORMAT_2DIGITS = new DecimalFormat("#.##", otherSymbols); 
+	}
 	private StringUtils() {}
 	public static boolean isBlank(CharSequence seq) {
 		return seq == null || seq.length() == 0;

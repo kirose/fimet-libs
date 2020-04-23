@@ -1,12 +1,13 @@
 package com.fimet.net;
 
-import com.fimet.commons.FimetLogger;
+import com.fimet.core.IMessengerManager;
 import com.fimet.core.ISocketManager;
 import com.fimet.core.Manager;
 import com.fimet.core.iso8583.parser.Message;
 import com.fimet.core.net.IMessenger;
 import com.fimet.core.net.IMessengerListener;
 import com.fimet.core.net.ISocket;
+import com.fimet.core.net.NullMessengerListener;
 import com.fimet.core.simulator.ISimulator;
 import com.fimet.core.net.IAdaptedSocket;
 import com.fimet.core.net.IAdaptedSocketListener;
@@ -18,12 +19,11 @@ import com.fimet.core.net.IAdaptedSocketListener;
  */
 	
 public class Messenger implements IMessenger, IAdaptedSocketListener {
-	static IMessengerListener NULL_LISTENER = new NullMessengerListener();
 	static ISocketManager socketManager = Manager.get(ISocketManager.class);
+	static IMessengerManager messengerManager = Manager.get(IMessengerManager.class);
 	IAdaptedSocket socket;
 	IMessengerListener listener;
 	ISocket iSocket;
-	int status;
 	ISimulator simulator;
 
 	public Messenger(ISocket iSocket) {
@@ -35,35 +35,13 @@ public class Messenger implements IMessenger, IAdaptedSocketListener {
 		}
 		this.iSocket = iSocket;
 		this.simulator = iSocket.getSimulator();
-		this.listener = NULL_LISTENER;
+		this.listener = NullMessengerListener.INSTANCE;
 	}
 	public void writeMessage(Message msg) {
-		try {
-			msg = simulator.simulateRequest(msg);
-			listener.onMessengerWriteMessage(this, msg);
-			byte[] iso = iSocket.getParser().formatMessage(msg);
-			listener.onMessengerWriteToSocket(this, iso);
-			socket.write(iso);
-		} catch (Exception e) {
-			FimetLogger.error(Messenger.class,"Error On Write Message: "+e.getMessage(), e);
-		}
+		messengerManager.getNextMessengerThread().onMessengerWrite(this, msg);
 	}
 	public void onSocketRead(byte[] bytes) {
-		try {
-			listener.onMessengerReadFromSocket(this, bytes);
-			Message message = (Message)iSocket.getParser().parseMessage(bytes);
-			message.setAdapter(iSocket.getAdapter());
-			listener.onMessengerReadMessage(this, message);
-			Message response = simulator.simulateResponse(message);
-			if (response != null) {
-				listener.onMessengerWriteMessage(this, response);
-				byte[] iso = response.getParser().formatMessage(response);
-				listener.onMessengerWriteToSocket(this, iso);
-				socket.write(iso);
-			}
-		} catch (Exception e) { 
-			FimetLogger.warning(Manager.class, "Error On Socket Read incoming message",e);
-		}
+		messengerManager.getNextMessengerThread().onSocketRead(this, bytes);
 	}
 	/**
 	 * Attempt to connect the iSocket
@@ -113,7 +91,15 @@ public class Messenger implements IMessenger, IAdaptedSocketListener {
 		listener.onMessengerDisconnected(this);
 	}
 	public void setListener(IMessengerListener listener) {
-		this.listener = listener != null ? listener : NULL_LISTENER;
+		this.listener = listener != null ? listener : NullMessengerListener.INSTANCE;
+	}
+	@Override
+	public IMessengerListener getListener() {
+		return listener;
+	}
+	@Override
+	public ISimulator getSimulator() {
+		return simulator;
 	}
 	public String toString() {
 		return simulator+" "+socket;

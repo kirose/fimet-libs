@@ -1,6 +1,7 @@
 package com.fimet.core.net;
 
 import com.fimet.core.net.ISocket;
+import com.fimet.core.simulator.ISimulator;
 import com.fimet.core.net.IMessengerListener;
 import com.fimet.core.iso8583.parser.Message;
 /**
@@ -18,4 +19,6 @@ public interface IMessenger {
 	boolean isDisconnected();
 	boolean isConnecting();
 	void setListener(IMessengerListener listener);
+	IMessengerListener getListener();
+	ISimulator getSimulator();
 }

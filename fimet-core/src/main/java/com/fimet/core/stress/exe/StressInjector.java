@@ -2,105 +2,150 @@ package com.fimet.core.stress.exe;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.core.net.IAdaptedSocket;
-import com.fimet.core.net.ISocket;
-import com.fimet.core.stress.NullInjectorListener;
+import com.fimet.core.net.IMessenger;
 
 public class StressInjector extends Thread implements IInjector {
-	public static final int MAX_QUEUED = 20;
-	public static final int MIN_FOR_AWAKE_READER = 4;
-	IAdaptedSocket socket;
-	private boolean alive;
-	private LinkedBlockingQueue<byte[]> queue;
-	private IReader reader;
-	private IInjectorListener listener = NullInjectorListener.INSTANCE;
-	private long numberOfMessages;
-	private long startTime;
-	private long finishTime;
-	public StressInjector(IAdaptedSocket socket, File stressFile) {
-		super("Injector-"+socket);
-		this.socket = socket;
-		this.queue = new LinkedBlockingQueue<byte[]>();
-		this.alive = false;
-		this.reader = new StressFileReader(this, stressFile, socket.getAdapter());
-		this.reader.startRead();
-	}
-	public void setListener(IInjectorListener listener) {
-		this.listener = listener != null ? listener : NullInjectorListener.INSTANCE;
+	public static final int MAX_QUEUE_SIZE = 20;
+	public static final int MIN_SIZE_FOR_WAKE_UP_READER = 4;
+	private IAdaptedSocket socket;
+	private AtomicBoolean alive = new AtomicBoolean(false);
+	private ConcurrentLinkedQueue<byte[]> queue;
+	StressFileReader reader;
+	StressTimer timer;
+	IMessenger messenger;
+	InjectorResult result;
+	MessengerResult messengerResult;
+	AtomicInteger numberOfMessagesToInject = new AtomicInteger(0);
+	IInjectorListener listener;
+	public StressInjector(IMessenger messenger, MessengerResult messengerResult, File stressFile, int cycleTime, int messagesPerCycle) {
+		super("Injector-"+messenger.getConnection());
+		this.messengerResult = messengerResult;
+		this.messenger = messenger;
+		this.socket = messenger.getSocket();
+		this.queue = new ConcurrentLinkedQueue<byte[]>();
+		this.result = new InjectorResult("Injector-"+messenger.getConnection());
+		this.reader = new StressFileReader(this, stressFile);
+		this.timer = new StressTimer(this, reader, cycleTime, messagesPerCycle);
 	}
 	public void startInjector() {
-		this.alive = true;
+		FimetLogger.debug(StressInjector.class, "Start Thread "+this+" at "+new Timestamp(System.currentTimeMillis()));		
+		this.alive.set(true);
 		this.start();
+		this.reader.startRead();
+		this.timer.startTimer();
 	}
-	synchronized public void stopInjector() {
-		this.alive = true;
-		this.notify();
+	public void stopInjector() {
+		this.alive.set(false);
+		this.timer.stopTimer();
+		this.reader.stopRead();
+	}
+	public void inject(int numberOfMessages) {
+		this.numberOfMessagesToInject.addAndGet(numberOfMessages);
+		wakeUp();
+	}
+	private void wakeUp() {
+		synchronized (this) {
+			if (this.getState() == Thread.State.WAITING) {
+				this.notify();
+			}
+		}
 	}
 	public void run() {
+		FimetLogger.debug(StressInjector.class, "Start "+this+" at "+new Timestamp(System.currentTimeMillis()));
+		result.injectorStartTime = System.currentTimeMillis();
 		try {
-			while (alive) {
-				byte[] next = queue.take();
-				if (queue.isEmpty()) {
-					if (reader.canRead()) {
-						reader.read();
+			while (alive.get()) {
+				if(numberOfMessagesToInject.get() > 0) {
+					if (queue.isEmpty()) {
+						if (reader.canRead()) {
+							reader.read();
+						} else {
+							alive.set(false);
+						}
 					} else {
-						alive = false;
+						byte[] next = queue.poll();
+						result.injectorMessagesInjectedCycle.incrementAndGet();
+						numberOfMessagesToInject.decrementAndGet();
+						socket.write(next);
+						if (reader.isWaiting() && queue.size() <= MIN_SIZE_FOR_WAKE_UP_READER) {
+							reader.read();
+						}
+						if (numberOfMessagesToInject.get() == 0) {
+							result.injectorMessagesInjected.addAndGet(result.injectorMessagesInjectedCycle.get());
+							result.injectorFinishCycleTime.set(System.currentTimeMillis());
+							listener.onInjectorFinishCycle(this);
+							result.injectorMessagesInjectedCycle.set(0);
+							if (reader.hasFinish()) {
+								alive.set(false);
+							}
+						}
+						
 					}
-				} else if (queue.size() <= MIN_FOR_AWAKE_READER) {
-					reader.read();
+				} else {
+					synchronized (this) {
+						this.wait();
+					}
 				}
-				numberOfMessages++;
-				socket.write(next);
 			}
 		} catch (Exception e) {
 			FimetLogger.error("Thread error", e);
 		}
-		finishTime = System.currentTimeMillis();
-		FimetLogger.debug(StressInjector.class, "Finish "+this+" at "+new Timestamp(finishTime));
+		result.injectorFinishTime = System.currentTimeMillis();
+		FimetLogger.debug(StressInjector.class, "Finish "+this+" at "+new Timestamp(result.injectorFinishTime));
 		listener.onInjectorFinishInject(this);
 	}
-	@Override
-	synchronized public void onReaderStart(IReader reader) {}
-	@Override
-	synchronized public void onReaderInitilized(IReader reader) {
-		FimetLogger.debug(StressInjector.class, "Started "+this+" at "+new Timestamp(System.currentTimeMillis()));
-		startTime = System.currentTimeMillis();
-		listener.onInjectorStartInject(this);
-	}
-	@Override
-	synchronized public void onReaderFinish(IReader reader) {
-//		System.out.println("Reader "+reader
-//			+"\nNumber of waits:"+reader.getNumberOfWaits()
-//			+"\nMessages readed: "+reader.getNumberOfMessages()
-//			+"\nExecution time:"+(reader.getFinishTime()-reader.getStartTime())
-//		);
-	}
-	@Override
-	synchronized public void enqueue(byte[] message) {
+	public void enqueue(byte[] message) {
 		queue.add(message);
+		wakeUp();
+	}
+	public boolean canEnqueue() {
+		return queue.size() <= MAX_QUEUE_SIZE;
+	}
+	public IMessenger getMessenger() {
+		return messenger;
 	}
 	@Override
-	synchronized public boolean canEnqueue() {
-		return queue.size() < MAX_QUEUED;
+	public boolean isFinished() {
+		return queue.isEmpty() && !reader.canRead();
+	}
+	public void setReader(StressFileReader reader) {
+		this.reader = reader;
+	}
+	public boolean hasFinish() {
+		return queue.isEmpty();
+	}
+	public void setListener(IInjectorListener listener) {
+		this.listener = listener!= null ? listener : NullInjectorListener.INSTANCE; 
+	}
+	public InjectorResult getResult() {
+		return result;
+	}
+	public MessengerResult getMessengerResult() {
+		return messengerResult;
 	}
 	public String toString() {
 		return "Injector-"+socket;
 	}
-	@Override
-	public ISocket getConnection() {
-		return socket.getConnection();
+	public String getStatsCycle() {
+		return "[TS:"+new Timestamp(System.currentTimeMillis())
+		+",N:"+messengerResult.getNumOfCycle()
+		+",IP:"+socket.getConnection().getAddress()
+		+",P:"+socket.getConnection().getPort()
+		+","+result.getStatsCycle()
+		+","+messengerResult.getStatsCycle()+"]";
 	}
-	public long getNumberOfMessages() {
-		return numberOfMessages;
+	public String getStatsGlobal() {
+		return "[Timestamp:"+new Timestamp(System.currentTimeMillis())
+		+",NumCycle:"+messengerResult.getNumOfCycle()
+		+",IP:"+socket.getConnection().getAddress()
+		+",Port:"+socket.getConnection().getPort()
+		+","+result.getStatsCycle()
+		+","+messengerResult.getStatsCycle()+"]";
 	}
-	public long getStartTime() {
-		return startTime;
-	}
-	public long getFinishTime() {
-		return finishTime;
-	}
-	
 }
