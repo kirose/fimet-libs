@@ -18,6 +18,7 @@ public class CartesianCreator implements IFileCreator {
 	private File output;
 	private Map<String, String[]> variationParameters = new HashMap<>();
 	private boolean append;
+	private IVariator variator = DefaultVariator.INSTANCE;
 	public CartesianCreator(String outputPath) {
 		this(new File(outputPath), null, false);
 	}
@@ -40,27 +41,22 @@ public class CartesianCreator implements IFileCreator {
 		variationParameters.put(idField, variations);
 		return this;
 	}
-
+	public CartesianCreator setVariator(IVariator variator) {
+		this.variator = variator != null ? variator : DefaultVariator.INSTANCE;
+		return this;
+	}
 	@Override
 	public File create() {
 		FileOutputStream writer = null;
 		try {
 			writer = new FileOutputStream(output,append);
 			CartesianIterator iterator = new CartesianIterator(variationParameters);
-			VariationField[] next;
+			FieldVariation[] next;
 			StringBuilder errors = new StringBuilder();
 			while (iterator.hasNext()) {
 				next = iterator.next();
 				try {
-					for (VariationField v : next) {
-						if ("mti".equals(v.idField)) {
-							message.setMti(v.value);
-						} else if ("header".equals(v.idField)) {
-							message.setHeader(v.value);
-						} else {
-							message.setValue(v.idField, v.value);
-						}
-					}
+					message = variator.variate(message, next);
 					writer.write(MessageUtils.formatMessage(message));
 					//writer.write((byte)10);
 				} catch (Exception e){
@@ -72,23 +68,27 @@ public class CartesianCreator implements IFileCreator {
 			}
 		} catch (Exception e) {
 			FimetLogger.error(CartesianCreator.class,"Creator Error",e);
+		} finally {
+			if (writer != null) {
+				try {writer.close();} catch(Exception e) {}
+			}
 		}
 		return output;
 	}
 	private class CartesianIterator {
 		String[][] data;
-		VariationField[] columns;
+		FieldVariation[] columns;
 		int curr;
 		int size;
 		
 		CartesianIterator(Map<String, String[]> parameters){
 			Set<Entry<String, String[]>> set = parameters.entrySet();
 			data = new String[set.size()][];
-			columns = new VariationField[set.size()];
+			columns = new FieldVariation[set.size()];
 			int i = 0;
 			size = 1;
 			for (Entry<String, String[]> e : set) {
-				columns[i] = new VariationField();
+				columns[i] = new FieldVariation();
 				columns[i].idField = e.getKey();
 				data[i] = e.getValue();
 				columns[i].value = data[i][0];
@@ -101,7 +101,7 @@ public class CartesianCreator implements IFileCreator {
 		boolean hasNext() {
 			return curr + 1 < size;
 		}
-		VariationField[] next() {
+		FieldVariation[] next() {
 			curr++;
 			for (int i = columns.length-1; i >= 0; i--) {
 				if (columns[i].index+1 < data[i].length) {
@@ -114,15 +114,6 @@ public class CartesianCreator implements IFileCreator {
 				}
 			}
 			return columns;
-		}
-	}
-	private class VariationField {
-		String idField;
-		int index;
-		String value;
-		VariationField(){}
-		public String toString() {
-			return idField+":"+value;
 		}
 	}
 }

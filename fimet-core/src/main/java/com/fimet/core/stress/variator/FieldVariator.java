@@ -19,12 +19,9 @@ public class FieldVariator {
 		this.pad = pad;
 		return this;
 	}
-	public FieldVariator setStart(int i) {
-		start = i;
-		return this;
-	}
-	public FieldVariator setEnd(int i) {
-		end = i;
+	public FieldVariator setRange(int start, int end) {
+		this.start = start;
+		this.end = end;
 		return this;
 	}
 	public FieldVariator setLength(int length) {
@@ -43,10 +40,10 @@ public class FieldVariator {
 		return this;
 	}
 	public String[] variate() {
-		String[] out = new String[end-start+1];
+		String[] out = new String[end-start];
 		String value = null;
 		String format = "%"+pad+""+length+"d";
-		for (int i = 0, index = start; index <= end; i++, index++) {
+		for (int i = 0, index = start; index < end; i++, index++) {
 			 value = String.format(format, index);
 			 out[i] = value+append;
 		}
@@ -54,12 +51,12 @@ public class FieldVariator {
 	}
 	public static void main(String[] args) {
 		System.out.println("RRN:");
-		String[] values = new FieldVariator(12,'0').setStart(0).setEnd(10).variate();
+		String[] values = new FieldVariator(12,'0').setRange(0,10).variate();
 		for (String value : values) {
 			System.out.println(value);
 		}
 		System.out.println("AMOUNT:");
-		values = new FieldVariator(10,'0').setStart(1).setEnd(10).append("00").variate();
+		values = new FieldVariator(10,'0').setRange(1,10).append("00").variate();
 		for (String value : values) {
 			System.out.println(value);
 		}

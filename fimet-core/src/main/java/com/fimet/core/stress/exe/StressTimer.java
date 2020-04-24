@@ -14,7 +14,7 @@ public class StressTimer extends Thread implements ITimer {
 		this.injector = injector;
 		this.reader = reader;
 		this.cycleTime = cycleTime >= 0 ? cycleTime : 1000;
-		this.messagesPerCycle = messagesPerCycle > 1 ? messagesPerCycle : 10;
+		this.messagesPerCycle = messagesPerCycle > 0 ? messagesPerCycle : 10;
 	}
 	@Override
 	public void startTimer() {

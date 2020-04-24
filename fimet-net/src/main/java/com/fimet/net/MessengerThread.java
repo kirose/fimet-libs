@@ -69,7 +69,7 @@ public class MessengerThread extends Thread implements IMessengerThread {
 				m.getSocket().write(iso);
 			}
 		} catch (Throwable e) { 
-			FimetLogger.debug(Manager.class, "Error On Read message("+(bytes!= null?bytes.length:0)+"):\n"+new String(bytes)+"\n",e);
+			FimetLogger.error(Manager.class, "Error On Read message("+(bytes!= null?bytes.length:0)+"):\n"+new String(bytes)+"\n",e);
 		}			
 	}
 	private class Node {

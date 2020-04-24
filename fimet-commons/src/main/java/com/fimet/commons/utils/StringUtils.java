@@ -17,7 +17,7 @@ public final class StringUtils {
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 		otherSymbols.setDecimalSeparator('.');
 		otherSymbols.setGroupingSeparator(','); 
-		FORMAT_2DIGITS = new DecimalFormat("#.##", otherSymbols); 
+		FORMAT_2DIGITS = new DecimalFormat("0.00", otherSymbols); 
 	}
 	private StringUtils() {}
 	public static boolean isBlank(CharSequence seq) {

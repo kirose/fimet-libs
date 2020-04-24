@@ -20,16 +20,16 @@ public class StressInjector extends Thread implements IInjector {
 	StressTimer timer;
 	IMessenger messenger;
 	InjectorResult result;
-	MessengerResult messengerResult;
 	AtomicInteger numberOfMessagesToInject = new AtomicInteger(0);
 	IInjectorListener listener;
-	public StressInjector(IMessenger messenger, MessengerResult messengerResult, File stressFile, int cycleTime, int messagesPerCycle) {
+	public StressInjector(IMessenger messenger, File stressFile, int cycleTime, int messagesPerCycle) {
 		super("Injector-"+messenger.getConnection());
-		this.messengerResult = messengerResult;
 		this.messenger = messenger;
 		this.socket = messenger.getSocket();
 		this.queue = new ConcurrentLinkedQueue<byte[]>();
-		this.result = new InjectorResult("Injector-"+messenger.getConnection());
+		this.result = new InjectorResult(messenger.getConnection());
+		this.result.initialReadSocket.set(messenger.getSocket().getNumOfRead());
+		this.result.initialWriteSocket.set(messenger.getSocket().getNumOfWrite());
 		this.reader = new StressFileReader(this, stressFile);
 		this.timer = new StressTimer(this, reader, cycleTime, messagesPerCycle);
 	}
@@ -81,7 +81,7 @@ public class StressInjector extends Thread implements IInjector {
 							result.injectorFinishCycleTime.set(System.currentTimeMillis());
 							listener.onInjectorFinishCycle(this);
 							result.injectorMessagesInjectedCycle.set(0);
-							if (reader.hasFinish()) {
+							if (hasFinish()) {
 								alive.set(false);
 							}
 						}
@@ -110,15 +110,11 @@ public class StressInjector extends Thread implements IInjector {
 	public IMessenger getMessenger() {
 		return messenger;
 	}
-	@Override
-	public boolean isFinished() {
-		return queue.isEmpty() && !reader.canRead();
-	}
 	public void setReader(StressFileReader reader) {
 		this.reader = reader;
 	}
 	public boolean hasFinish() {
-		return queue.isEmpty();
+		return queue.isEmpty() && reader.hasFinish();
 	}
 	public void setListener(IInjectorListener listener) {
 		this.listener = listener!= null ? listener : NullInjectorListener.INSTANCE; 
@@ -126,26 +122,7 @@ public class StressInjector extends Thread implements IInjector {
 	public InjectorResult getResult() {
 		return result;
 	}
-	public MessengerResult getMessengerResult() {
-		return messengerResult;
-	}
 	public String toString() {
 		return "Injector-"+socket;
-	}
-	public String getStatsCycle() {
-		return "[TS:"+new Timestamp(System.currentTimeMillis())
-		+",N:"+messengerResult.getNumOfCycle()
-		+",IP:"+socket.getConnection().getAddress()
-		+",P:"+socket.getConnection().getPort()
-		+","+result.getStatsCycle()
-		+","+messengerResult.getStatsCycle()+"]";
-	}
-	public String getStatsGlobal() {
-		return "[Timestamp:"+new Timestamp(System.currentTimeMillis())
-		+",NumCycle:"+messengerResult.getNumOfCycle()
-		+",IP:"+socket.getConnection().getAddress()
-		+",Port:"+socket.getConnection().getPort()
-		+","+result.getStatsCycle()
-		+","+messengerResult.getStatsCycle()+"]";
 	}
 }

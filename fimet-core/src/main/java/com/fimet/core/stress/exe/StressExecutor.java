@@ -1,7 +1,9 @@
 package com.fimet.core.stress.exe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -17,20 +19,27 @@ import com.fimet.core.net.IMessengerListener;
 import com.fimet.core.net.ISocket;
 import com.fimet.core.stress.IStress;
 
-public class StressExecutor implements IMessengerListener, IInjectorListener, IExecutor, IConnectorOnConnectAll, IConnectorOnConnect {
+public class StressExecutor
+implements IMessengerListener,
+	IInjectorListener,
+	IExecutor,
+	IConnectorOnConnectAll,
+	IConnectorOnConnect {
+	
 	private IStress stress;
-	volatile private IExecutorListener listener;
-	volatile private Map<IMessenger, IInjector> injectors;
-	volatile private Map<IMessenger, InjectorResult> injectorResults;
-	volatile private Map<IMessenger, MessengerResult> messengerResults;
-	private Set<IMessenger> toComplete;
+	private IExecutorListener listener;
+	volatile private Map<IMessenger, StressInjector> injectors;
+	volatile private Set<IMessenger> toComplete;
+	volatile private IStoreResults store; 
 	public StressExecutor(IStress stress) {
 		this.injectors = new HashMap<>();
-		this.messengerResults = new HashMap<>();
-		this.injectorResults = new HashMap<>();
 		this.toComplete = new HashSet<IMessenger>();
 		this.stress = stress;
 		this.listener = NullExecutorListener.INSTANCE;
+		this.store = NullStoreResults.INSTANCE;
+	}
+	public void setStoreResults(IStoreResults store) {
+		this.store = store != null ? store : NullStoreResults.INSTANCE;
 	}
 	public void setListener(IExecutorListener listener) {
 		this.listener = listener != null ? listener : NullExecutorListener.INSTANCE;
@@ -42,16 +51,11 @@ public class StressExecutor implements IMessengerListener, IInjectorListener, IE
 	public void onConnectorConnect(IMessenger messenger) {
 		messenger.setListener(this);
 		ISocket iSocket = messenger.getConnection();
-		MessengerResult mr = new MessengerResult(messenger.getConnection().toString());
-		mr.initialReadSocket.set(messenger.getSocket().getNumOfRead());
-		mr.initialWriteSocket.set(messenger.getSocket().getNumOfWrite());
-		messengerResults.put(messenger, mr);
 		if (stress.getStressFile(iSocket) != null) {
 			toComplete.add(messenger);
-			StressInjector injector = new StressInjector(messenger, mr, stress.getStressFile(iSocket), stress.getCycleTime(), stress.getMessagesPerCycle());
+			StressInjector injector = new StressInjector(messenger, stress.getStressFile(iSocket), stress.getCycleTime(), stress.getMessagesPerCycle());
 			injector.setListener(StressExecutor.this);
 			injectors.put(messenger, injector);
-			injectorResults.put(messenger, injector.getResult());
 		}
 	}
 	@Override
@@ -59,14 +63,15 @@ public class StressExecutor implements IMessengerListener, IInjectorListener, IE
 		_execute();
 	}
 	public void _execute() {
-		for (Map.Entry<IMessenger, IInjector> i : injectors.entrySet()) {
+		listener.onExecutorStart(this);
+		for (Map.Entry<IMessenger, StressInjector> i : injectors.entrySet()) {
 			i.getValue().startInjector();
 		}
 	}
 	public void onExecutorFinishExecution() {
-		for (Entry<IMessenger, MessengerResult> e : messengerResults.entrySet()) {
-			e.getValue().numOfRead.set(e.getKey().getSocket().getNumOfRead()-e.getValue().initialReadSocket.get());
-			e.getValue().numOfWrite.set(e.getKey().getSocket().getNumOfWrite()-e.getValue().initialWriteSocket.get());
+		for (Entry<IMessenger, StressInjector> e : injectors.entrySet()) {
+			e.getValue().getResult().numOfRead.set(e.getKey().getSocket().getNumOfRead()-e.getValue().getResult().initialReadSocket.get());
+			e.getValue().getResult().numOfWrite.set(e.getKey().getSocket().getNumOfWrite()-e.getValue().getResult().initialWriteSocket.get());
 		}
 		listener.onExecutorFinish(this);
 	}
@@ -84,54 +89,55 @@ public class StressExecutor implements IMessengerListener, IInjectorListener, IE
 	public void onMessengerReadFromSocket(IMessenger messenger, byte[] message) {}
 	@Override
 	public void onMessengerReadMessage(IMessenger messenger, Message message) {
-		if (!toComplete.isEmpty() && injectors.containsKey(messenger) && injectors.get(messenger).isFinished()) {
-			MessengerResult mr = messengerResults.get(messenger);
-			InjectorResult ir = injectors.get(messenger).getResult();
-			mr.numOfRead.set(messenger.getSocket().getNumOfRead()-mr.initialReadSocket.get());
-			if (ir.getInjectorMessagesInjected() == mr.getNumOfRead() && !mr.hasFinished.get()) {
-				mr.hasFinished.set(true);
-				mr.startTime = ir.injectorStartTime;
-				mr.finishTime = System.currentTimeMillis();		
-				toComplete.remove(messenger);
-				if (toComplete.isEmpty()) {
-					onExecutorFinishExecution();
-				}
-			} 
-		}
+		//validatorFinish.validateExecutorFinish(messenger);
+	}
+	public boolean hasFinish() {
+		return toComplete.isEmpty();
 	}
 	@Override
 	synchronized public void onInjectorStartInject(IInjector injector) {
-		listener.onInjectorStart(injector);
+		listener.onInjectorStart(injector.getResult());
 	}
 	@Override
 	synchronized public void onInjectorFinishInject(IInjector injector) {
-		messengerResults.get(injector.getMessenger()).numOfWrite.set(injector.getResult().getInjectorMessagesInjected());
-		listener.onInjectorFinish(injector);
+		IMessenger messenger = injector.getMessenger();
+		injector.getResult().numOfWrite.set(injector.getResult().getInjectorMessagesInjected());
+		listener.onInjectorFinish(injector.getResult());
+		toComplete.remove(messenger);
+		InjectorResult ir = injector.getResult();
+		ir.numOfRead.set(messenger.getSocket().getNumOfRead()-ir.initialReadSocket.get());
+		ir.hasFinished.set(true);
+		ir.startTime = ir.injectorStartTime;
+		ir.finishTime = System.currentTimeMillis();		
+		store.storeGlobalResults(ir);
+		if (toComplete.isEmpty()) {
+			onExecutorFinishExecution();
+		}
 	}
 	@Override
 	public void onInjectorStartCycle(IInjector injector) {}
 	@Override
 	public void onInjectorFinishCycle(IInjector injector) {
+		InjectorResult ir = injector.getResult();
 		IAdaptedSocket socket = injector.getMessenger().getSocket();
-		IMessenger m = injector.getMessenger();
-		MessengerResult mr = messengerResults.get(m);
-		mr.numOfCycle.incrementAndGet();
-		long numOfWrite = socket.getNumOfWrite()-mr.initialWriteSocket.get();
-		long numOfRead = socket.getNumOfRead()-mr.initialReadSocket.get();
-		mr.numOfReadCycle.set(numOfRead-mr.numOfRead.get());
-		mr.numOfWriteCycle.set(numOfWrite-mr.numOfWrite.get());
-		mr.numOfRead.set(numOfRead);
-		mr.numOfWrite.set(numOfWrite);
-		mr.ratioResponseCycle.set(mr.numOfReadCycle.get()/(0D+mr.numOfWriteCycle.get()));
-		mr.sumOfRatioResponse.set(mr.sumOfRatioResponse.get()+mr.ratioResponseCycle.get());
-		listener.onInjectorFinishCycle(injector);
+		ir.numOfCycle.incrementAndGet();
+		long numOfWrite = socket.getNumOfWrite()-ir.initialWriteSocket.get();
+		long numOfRead = socket.getNumOfRead()-ir.initialReadSocket.get();
+		ir.numOfReadCycle.set(numOfRead-ir.numOfRead.get());
+		ir.numOfWriteCycle.set(numOfWrite-ir.numOfWrite.get());
+		ir.numOfRead.set(numOfRead);
+		ir.numOfWrite.set(numOfWrite);
+		ir.ratioResponseCycle.set(ir.numOfReadCycle.get()/(0D+ir.numOfWriteCycle.get()));
+		ir.sumOfRatioResponse.set(ir.sumOfRatioResponse.get()+ir.ratioResponseCycle.get());
+		store.storeCycleResults(injector.getResult());
+		listener.onInjectorFinishCycle(injector.getResult());
 	}
 	@Override
-	public Map<IMessenger, MessengerResult> getMessengerResults() {
-		return messengerResults;
-	}
-	@Override
-	public Map<IMessenger, InjectorResult> getInjectorResults() {
-		return injectorResults;
+	public List<InjectorResult> getInjectorResults() {
+		List<InjectorResult> results = new ArrayList<>();
+		for (Entry<IMessenger, StressInjector> e : injectors.entrySet()) {
+			results.add(e.getValue().getResult());
+		}
+		return results;
 	}
 }

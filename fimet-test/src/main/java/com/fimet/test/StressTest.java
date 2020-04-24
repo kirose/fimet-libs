@@ -60,8 +60,7 @@ public class StressTest {
     	new TestBuilder()
     	.addSocketStress(socketAcq, stressFile)
     	.addSocketStress(socketAcq2, stressFile2)
-    	.addConnection(socketIss)
-    	.addConnection(socketIss2)
+    	.connect(socketIss, socketIss2)
     	.execute();
 	}
 }

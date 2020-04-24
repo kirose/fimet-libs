@@ -26,7 +26,6 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 		DISCONNECTED, CONNECTING, CONNECTED
 	}
 	static int RECONNECTION_TIME = Manager.get(IPreferencesManager.class).getInt(IPreferencesManager.SOCKET_RECONNECT_TIME_SEC,2)*1000;// In Miliseconds
-	static final IAdaptedSocketListener NULL_SOCKET_LISTENER = new NullSocketListener();
 
 	protected ISocket iSocket;
 	protected java.net.Socket socket;
@@ -43,7 +42,7 @@ public abstract class AdaptedSocket implements IAdaptedSocket {
 		if (iSocket == null)
 			throw new NullPointerException();
 		this.iSocket = new Socket(iSocket);
-		this.listener = listener != null ? listener : NULL_SOCKET_LISTENER;
+		this.listener = listener != null ? listener : NullSocketListener.INSTANCE;
 		if (iSocket.getAddress() == null) {
 			throw new NullPointerException();
 		} else if (!iSocket.getAddress().matches("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {

@@ -3,7 +3,7 @@ package com.fimet.core.usecase.exe;
 import com.fimet.core.usecase.IUseCase;
 
 public class NullExecutorMonitor implements IExecutorMonitor {
-	public static IExecutorMonitor INSTANCE = new NullExecutorMonitor();
+	public static final IExecutorMonitor INSTANCE = new NullExecutorMonitor();
 	@Override
 	public void onStart(IUseCase useCase) {
 	}

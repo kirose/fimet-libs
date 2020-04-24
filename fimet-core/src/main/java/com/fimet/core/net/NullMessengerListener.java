@@ -4,7 +4,7 @@ import com.fimet.core.iso8583.parser.Message;
 
 public class NullMessengerListener implements IMessengerListener {
 
-	public static IMessengerListener INSTANCE = new NullMessengerListener();
+	public static final IMessengerListener INSTANCE = new NullMessengerListener();
 	@Override
 	public void onMessengerConnected(IMessenger messenger) {}
 

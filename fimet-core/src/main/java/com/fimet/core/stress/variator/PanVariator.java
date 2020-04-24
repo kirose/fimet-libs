@@ -12,12 +12,9 @@ public class PanVariator {
 	public PanVariator(String bin) {
 		this.bin = bin;
 	}
-	public PanVariator setStart(int i) {
-		start = i;
-		return this;
-	}
-	public PanVariator setEnd(int i) {
-		end = i;
+	public PanVariator setRange(int start, int end) {
+		this.start = start;
+		this.end = end;
 		return this;
 	}
 	public PanVariator setPanLength(int length) {
@@ -32,10 +29,10 @@ public class PanVariator {
 		return this;
 	}
 	public String[] variate() {
-		String[] out = new String[end-start+1];
+		String[] out = new String[end-start];
 		String pan = null;
 		String format = "%0"+(length-7)+"d";
-		for (int i = 0, index = start; index <= end; i++, index++) {
+		for (int i = 0, index = start; index < end; i++, index++) {
 			 pan = bin + String.format(format, index)+"0";
 			 char lastDigit = PanUtils.calculateLastDigit(pan);
 			 pan = pan.substring(0,pan.length()-1)+lastDigit+pan.substring(pan.length())+append;
@@ -44,7 +41,7 @@ public class PanVariator {
 		return out;
 	}
 	public static void main(String[] args) {
-		String[] pans = new PanVariator("400195").setStart(0).setEnd(99).append("=2210").variate();
+		String[] pans = new PanVariator("400195").setRange(0,10).append("=2210").variate();
 		for (String pan : pans) {
 			System.out.println(pan);
 		}
