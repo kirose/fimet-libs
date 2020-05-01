@@ -7,33 +7,33 @@ import java.util.List;
 
 import com.fimet.commons.exception.FimetException;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.iso8583.parser.Message;
-import com.fimet.core.simulator.ISimulator;
+import com.fimet.iso8583.parser.Message;
+import com.fimet.simulator.ISimulatorModel;
 
 public abstract class SimulatorMessage {
-	protected ISimulator simulator;
 	protected String header;
 	protected String mti;
 	protected char type;
 	protected List<String> excludeFields;
 	protected List<SimulatorField> simulatedFields;
-	public SimulatorMessage(ISimulator simulator, com.fimet.core.entity.sqlite.SimulatorMessage sm) {
+	protected ISimulatorModel simulator;
+	public SimulatorMessage(ISimulatorModel simulator, com.fimet.entity.sqlite.ESimulatorMessage sm) {
 		super();
 		this.simulator = simulator;
 		mti = sm.getMti();
 		type = sm.getType();
 		excludeFields = sm.getExcludeFields();
 		header = sm.getHeader();
-		List<com.fimet.core.entity.sqlite.pojo.SimulatorField> incflds = sm.getIncludeFields();
+		List<com.fimet.entity.sqlite.pojo.SimulatorField> incflds = sm.getIncludeFields();
 		if (incflds != null && !incflds.isEmpty()) {
 			simulatedFields = new ArrayList<>();
-			for (com.fimet.core.entity.sqlite.pojo.SimulatorField sf : incflds) {
+			for (com.fimet.entity.sqlite.pojo.SimulatorField sf : incflds) {
 				SimulatorField simulatorField = null;
 				switch (sf.getType()) {
-				case com.fimet.core.entity.sqlite.pojo.SimulatorField.FIXED:
+				case com.fimet.entity.sqlite.pojo.SimulatorField.FIXED:
 					simulatorField = new SimulatorFieldFixed(sf.getIdField(), sf.getValue());
 					break;
-				case com.fimet.core.entity.sqlite.pojo.SimulatorField.CUSTOM:
+				case com.fimet.entity.sqlite.pojo.SimulatorField.CUSTOM:
 					ISimulatorField isf = null;
 					String className = sf.getValue();
 					if (sf.getValue() != null && sf.getValue().trim().length() > 0) {

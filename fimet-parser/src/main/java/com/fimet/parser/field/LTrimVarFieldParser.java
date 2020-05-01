@@ -6,8 +6,8 @@ import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.utils.ByteUtils;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 
 /**
  * Useful for visa and tpv's
@@ -18,7 +18,7 @@ import com.fimet.core.iso8583.parser.IMessage;
  */
 public class LTrimVarFieldParser extends VarFieldParser {
 
-	public LTrimVarFieldParser(FieldFormat fieldFormat) {
+	public LTrimVarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

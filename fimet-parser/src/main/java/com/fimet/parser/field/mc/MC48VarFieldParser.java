@@ -7,13 +7,13 @@ import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.exception.ParserException;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
 
 public class MC48VarFieldParser extends VarFieldParser {
 
-	public MC48VarFieldParser(FieldFormat fieldFormat) {
+	public MC48VarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

@@ -1,7 +1,7 @@
 package com.fimet.simulator.field;
 
 import com.fimet.commons.utils.StringUtils;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.msg.ISimulatorField;
 
 public class IfHasSetModuloExtranjero implements ISimulatorField {

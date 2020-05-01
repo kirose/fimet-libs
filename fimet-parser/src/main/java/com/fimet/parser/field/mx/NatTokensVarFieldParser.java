@@ -9,13 +9,13 @@ import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.exception.ParserException;
 import com.fimet.commons.utils.StringUtils;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
 
 public class NatTokensVarFieldParser extends VarFieldParser {
 	
-	public NatTokensVarFieldParser(FieldFormat fieldFormat) {
+	public NatTokensVarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

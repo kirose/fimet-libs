@@ -5,8 +5,8 @@ import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.utils.ByteUtils;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 
 /**
  * Parser for MessageFields from the message 
@@ -18,7 +18,7 @@ import com.fimet.core.iso8583.parser.IMessage;
 public class RTrimFixedFieldParser extends FixedFieldParser {
 
 	private Integer length;
-	public RTrimFixedFieldParser(FieldFormat fieldFormat) {
+	public RTrimFixedFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.length = fieldFormat.getLength();
 	}

@@ -12,13 +12,13 @@ import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.data.writer.impl.ByteArrayWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.exception.ParserException;
-import com.fimet.core.IFieldFormatManager;
-import com.fimet.core.IFieldParserManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.entity.sqlite.FieldFormatGroup;
-import com.fimet.core.iso8583.parser.IFieldParser;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.IFieldFormatManager;
+import com.fimet.IFieldParserManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.entity.sqlite.EFieldFormatGroup;
+import com.fimet.iso8583.parser.IFieldParser;
+import com.fimet.iso8583.parser.IMessage;
 
 /**
  * Parser for MessageFields from the message 
@@ -37,12 +37,12 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	protected final String type;
 	protected final IConverter  converterValue;
 	protected final List<String> childs;
-	protected final FieldFormatGroup group;
+	protected final EFieldFormatGroup group;
 	protected final int length;
 	private static IFieldParserManager fieldParserManager = Manager.get(IFieldParserManager.class);
 	private static IFieldFormatManager fieldFormatGroupManager = Manager.get(IFieldFormatManager.class);
 	
-	public AbstractFieldParser(FieldFormat fieldFormat) {
+	public AbstractFieldParser(EFieldFormat fieldFormat) {
 		super();
 		if (fieldFormat.getType() == null || "".equals(fieldFormat.getType().trim())) {
 			throw new ParserException(this+"  FieldFormat.type is null for field: "+fieldFormat.getIdField() + "-" +fieldFormat.getName());
@@ -162,7 +162,7 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	public static IFieldParserManager getFieldParserManager() {
 		return fieldParserManager;
 	}
-	public FieldFormatGroup getGroup() {
+	public EFieldFormatGroup getGroup() {
 		return group;
 	}
 	@Override

@@ -2,10 +2,10 @@ package com.fimet.parser;
 
 import com.fimet.commons.converter.Converter;
 import com.fimet.commons.converter.IConverter;
-import com.fimet.core.IFieldParserManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.Parser;
-import com.fimet.core.iso8583.parser.IParser;
+import com.fimet.IFieldParserManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EParser;
+import com.fimet.iso8583.parser.IParser;
 
 
 public abstract class AbstractMessageBaseParser implements IParser {
@@ -31,7 +31,7 @@ public abstract class AbstractMessageBaseParser implements IParser {
 	private Integer idGroup;
 	private boolean validateTypes = true;
 	private String keySequence;
-	public AbstractMessageBaseParser(Parser entity){
+	public AbstractMessageBaseParser(EParser entity){
 		this.idParser = entity.getId();
 		this.converter = Converter.get(entity.getIdConverter());
 		this.name = entity.getName();

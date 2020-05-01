@@ -3,7 +3,7 @@ package com.fimet.simulator.field;
 import java.util.Date;
 
 import com.fimet.commons.utils.DateUtils;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.msg.ISimulatorField;
 
 public class IfHasSetNewDateyyMMddhhmmss implements ISimulatorField {

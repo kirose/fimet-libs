@@ -1,6 +1,6 @@
 package com.fimet.simulator.msg;
 
-import com.fimet.core.ISimulatorFieldManager;
+import com.fimet.ISimulatorFieldManager;
 import com.fimet.simulator.field.*;
 
 public class SimulatorFieldManager implements ISimulatorFieldManager {
@@ -18,10 +18,16 @@ public class SimulatorFieldManager implements ISimulatorFieldManager {
 			IfHasSetPanLast4Digits.class,
 			IfHasSetRRN.class,
 			IfHasSetModuloExtranjero.class,
+			IfHasSetRandom12N.class,
+			IfHasSetRandom6N.class,
+			IfHasSetRandom12AN.class,
+			IfHasSetRandom6AN.class,
 			SetRandom15N.class,
 			SetRandom12N.class,
 			SetRandom6N.class,
 			SetRandom9N.class,
+			SetRandom12AN.class,
+			SetRandom6AN.class,
 			SetNewDateyyMMddhhmmss.class,
 			SetNewDateMMddhhmmss.class,
 			SetNewDatehhmmss.class,

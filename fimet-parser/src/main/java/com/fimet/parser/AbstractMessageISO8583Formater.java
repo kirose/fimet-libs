@@ -5,9 +5,9 @@ import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.data.writer.impl.ByteArrayWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.Parser;
-import com.fimet.core.iso8583.parser.IMessage;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.entity.sqlite.EParser;
+import com.fimet.iso8583.parser.IMessage;
+import com.fimet.iso8583.parser.Message;
 /**
  * 
  * @author Marco A. Salazar
@@ -19,7 +19,7 @@ public abstract class AbstractMessageISO8583Formater extends AbstractMessageBase
 	private static final int SIZE_BITMAP = 4*16;
 	private static final String EMPTY_BITMAP = "1000000000000000000000000000000000000000000000000000000000000000";
 	
-	public AbstractMessageISO8583Formater(Parser entity) {
+	public AbstractMessageISO8583Formater(EParser entity) {
 		super(entity);
 	}
 

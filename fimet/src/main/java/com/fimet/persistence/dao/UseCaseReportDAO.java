@@ -1,0 +1,68 @@
+package com.fimet.persistence.dao;
+
+
+import java.sql.SQLException;
+import java.util.List;
+
+import com.fimet.commons.exception.PersistenceException;
+import com.fimet.entity.sqlite.EUseCaseReport;
+import com.j256.ormlite.dao.RawRowMapper;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.support.ConnectionSource;
+
+public class UseCaseReportDAO extends AbstractDAO<EUseCaseReport,String> {
+	private static UseCaseReportDAO instance;
+	public static UseCaseReportDAO getInstance() {
+		if (instance == null) {
+			instance = new UseCaseReportDAO();
+		}
+		return instance;
+	}
+	public UseCaseReportDAO() {
+		super();
+	}
+	public UseCaseReportDAO(ConnectionSource connection) {
+		super(connection);
+	}
+	public EUseCaseReport findByPath(String path) {
+		return findById(path);
+	}
+	public List<EUseCaseReport> findByProject(String project) {
+		try {
+			QueryBuilder<EUseCaseReport, String> qb = getDAO().queryBuilder();
+			qb.setWhere(qb.where().eq("project", project));
+			qb.orderBy("path", true);
+			PreparedQuery<EUseCaseReport> preparedQuery = qb.prepare();
+			List<EUseCaseReport> result = getDAO().query(preparedQuery);
+			return result;
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+	public List<EUseCaseReport> findByIdJob(Long idJob) {
+		try {
+			QueryBuilder<EUseCaseReport, String> qb = getDAO().queryBuilder();
+			qb.setWhere(qb.where().eq("idJob", idJob));
+			qb.orderBy("path", true);
+			PreparedQuery<EUseCaseReport> preparedQuery = qb.prepare();
+			List<EUseCaseReport> result = getDAO().query(preparedQuery);
+			return result;
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+	public List<String> findProjects() {
+		try {
+			List<String> projects = getDAO().queryRaw("select project from UseCaseReport group by project", new RawRowMapper<String>() {
+			       @Override
+			       public String mapRow(String[] columnNames, String[] resultColumns) throws SQLException {
+			            return resultColumns[0];
+			       }
+			}).getResults();
+			return projects;
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+}

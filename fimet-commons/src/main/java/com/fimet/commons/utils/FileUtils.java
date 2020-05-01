@@ -208,4 +208,26 @@ public final class FileUtils {
 			file.delete();
 		}
 	}
+	public static String getExtension(File file) {
+		if (file == null || !file.isFile()) {
+			return null;
+		}
+		int index = file.getName().lastIndexOf('.');
+		if (index > 0) {
+			return file.getName().substring(index+1);
+		} else {
+			return null;
+		}
+	}
+	public static String getSimpleName(File file) {
+		if (file == null || !file.isFile()) {
+			return null;
+		}
+		int index = file.getName().lastIndexOf('.');
+		if (index > 0) {
+			return file.getName().substring(0,index);
+		} else {
+			return file.getName();
+		}
+	}
 }

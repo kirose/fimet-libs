@@ -6,15 +6,15 @@ import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.numericparser.INumericParser;
 import com.fimet.commons.numericparser.NumericParser;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.FixedFieldParser;
 
 public class NatTagFixedFieldParser extends FixedFieldParser {
 
 	protected final IConverter  converterLength;
 	protected final INumericParser parserLength;
-	public NatTagFixedFieldParser(FieldFormat fieldFormat) {
+	public NatTagFixedFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.converterLength = Converter.get(fieldFormat.getIdConverterLength());
 		this.parserLength = NumericParser.get(fieldFormat.getIdParserLength());

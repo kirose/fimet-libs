@@ -10,11 +10,11 @@ import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.utils.StringUtils;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.iso8583.parser.Message;
 import com.fimet.parser.AbstractMessageISO8583Parser;
 
 public class MasterCardParser extends AbstractMessageISO8583Parser {
-	public MasterCardParser(com.fimet.core.entity.sqlite.Parser entity) {
+	public MasterCardParser(com.fimet.entity.sqlite.EParser entity) {
 		super(entity);
 	}
 	@Override

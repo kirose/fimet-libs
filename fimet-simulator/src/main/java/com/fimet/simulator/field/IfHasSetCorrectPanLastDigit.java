@@ -1,7 +1,7 @@
 package com.fimet.simulator.field;
 
 import com.fimet.commons.utils.PanUtils;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.msg.ISimulatorField;
 
 public class IfHasSetCorrectPanLastDigit implements ISimulatorField {

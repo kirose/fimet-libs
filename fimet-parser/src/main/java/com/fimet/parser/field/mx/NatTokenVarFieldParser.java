@@ -3,13 +3,13 @@ package com.fimet.parser.field.mx;
 import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
 
 public class NatTokenVarFieldParser extends VarFieldParser {
 
-	public NatTokenVarFieldParser(FieldFormat fieldFormat) {
+	public NatTokenVarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

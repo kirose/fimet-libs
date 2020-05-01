@@ -7,9 +7,9 @@ import com.fimet.commons.converter.Converter;
 import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.reader.impl.ByteArrayReader;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.IFieldParserManager;
-import com.fimet.core.entity.sqlite.Parser;
-import com.fimet.core.iso8583.parser.Message;
+import com.fimet.IFieldParserManager;
+import com.fimet.entity.sqlite.EParser;
+import com.fimet.iso8583.parser.Message;
 /**
  * Una clase abstracta que genera un parseo general de un mensaje ISO-8583 a un Message
  * Unicamente se parsean campos presentes en el Bitmap
@@ -19,7 +19,7 @@ import com.fimet.core.iso8583.parser.Message;
  *
  */
 public abstract class AbstractMessageISO8583Parser extends AbstractMessageISO8583Formater {
-	public AbstractMessageISO8583Parser(Parser entity) {
+	public AbstractMessageISO8583Parser(EParser entity) {
 		super(entity);
 	}
 	@Override

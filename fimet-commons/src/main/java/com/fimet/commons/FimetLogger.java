@@ -1,90 +1,80 @@
 package com.fimet.commons;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import com.fimet.commons.exception.FimetException;
 
 public class FimetLogger {
-	public static final int INFO = 1;
-	public static final int WARNING = 2;
-	public static final int ERROR = 4;
-	public static final int DEBUG = 8;
+	static {
+		File file = new File("resources/log4j.properties");
+		try {
+			PropertyConfigurator.configure(new FileInputStream(file.getAbsoluteFile()));
+		} catch (FileNotFoundException e) {
+			throw new FimetException("Cannot found "+file.getAbsolutePath()); 
+		}
+	}
 	static Logger logger = Logger.getLogger(FimetLogger.class);
 	static int level;
-	private static void write(String level, String message) {
-//		System.out.println(message);
-		logger.debug(message);
-	}
-	private static void write(String level, String message, Throwable e) {
-//		System.out.println(message);
-//		e.printStackTrace();
-		logger.debug(message);
-	}
 	public static void debug(String message) {
-		write("DEBUG", message);
+		logger.debug(message);
 	}
 	public static void debug(Class<?> clazz, String message) {
-		write("DEBUG", message);
+		Logger.getLogger(clazz).debug(message);
 	}
 	public static void debug(Class<?> clazz, String message, Throwable e) {
-		write("DEBUG", message, e);
+		Logger.getLogger(clazz).debug(message, e);
 	}
 	public static void debug(String message, Throwable e) {
-		write("DEBUG", message, e);
+		logger.debug(message, e);
 	}
 	public static void info(Class<?> clazz, String message) {
-		write("INFO", message);
+		Logger.getLogger(clazz).info(message);
 	}
 	public static void info(Class<?> clazz, String message, Throwable e) {
-		write("INFO", message, e);
+		Logger.getLogger(clazz).info(message, e);
 	}
 	public static void info(String message) {
-		write("INFO", message);
+		logger.info(message);
 	}
 	public static void info(String message, Throwable e) {
-		write("INFO", message, e);
+		logger.info(message);
 	}
 	public static void warning(Class<?> clazz, String message) {
-		write("WARNING", message);
+		Logger.getLogger(clazz).warn(message);
 	}
 	public static void warning(Class<?> clazz, String message, Throwable e) {
-		write("WARNING", message, e);
+		Logger.getLogger(clazz).warn(message, e);
 	}
 	public static void warning(String message) {
-		write("WARNING", message);
+		logger.warn(message);
 	}
 	public static void warning(String message, Throwable e) {
-		write("WARNING", message, e);
+		logger.warn(message, e);
 	}
 	public static void error(Class<?> clazz, String message) {
-		System.err.println(message);
-		write("ERROR", message);
+		Logger.getLogger(clazz).error(message);
 	}
 	public static void error(Class<?> clazz, String message, Throwable e) {
-		System.err.println(message);
-		e.printStackTrace(System.err);
-		write("ERROR", message, e);
+		Logger.getLogger(clazz).error(message, e);
 	}
 	public static void error(String message) {
-		System.err.println(message);
-		write("ERROR", message);
+		logger.error(message);
 	}
 	public static void error(String message, Throwable e) {
-		System.err.println(message);
-		e.printStackTrace(System.err);
-		write("ERROR", message, e);
-	}
-	public static boolean isEnabledError() {
-		return (level & ERROR) > 0;
-	}
-	public static boolean isEnabledWarning() {
-		return (level & WARNING) > 0;
+		logger.error(message, e);
 	}
 	public static boolean isEnabledInfo() {
-		return (level & INFO) > 0;
+		return logger.isInfoEnabled();
 	}
 	public static boolean isEnabledDebug() {
-		return (level & DEBUG) > 0;
+		return logger.isDebugEnabled();
 	}
-	public static void setLevel(int level) {
-		FimetLogger.level = level;
+	public static boolean isTraceEnabled() {
+		return logger.isTraceEnabled();
 	}
 }

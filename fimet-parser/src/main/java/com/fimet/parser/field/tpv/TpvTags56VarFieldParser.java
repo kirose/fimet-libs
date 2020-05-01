@@ -5,13 +5,13 @@ import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.reader.impl.ByteArrayReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
 
 public class TpvTags56VarFieldParser extends VarFieldParser {
 
-	public TpvTags56VarFieldParser(FieldFormat fieldFormat) {
+	public TpvTags56VarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	protected void parseChilds(byte[] value, IMessage message) {

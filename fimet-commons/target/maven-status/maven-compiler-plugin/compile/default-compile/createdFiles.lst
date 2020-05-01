@@ -1,4 +1,5 @@
 com\fimet\commons\history\History$Modify.class
+com\fimet\commons\concurrent\AtomicFloat.class
 com\fimet\commons\exception\FieldFormatException.class
 com\fimet\commons\numericparser\NumericParserDecHalf.class
 com\fimet\commons\data\reader\impl\ByteArrayReader$MsgMatcher.class
@@ -12,6 +13,7 @@ com\fimet\commons\cache\Cache.class
 com\fimet\commons\converter\ConverterBinaryToHex.class
 com\fimet\commons\utils\ThreadUtils.class
 com\fimet\commons\utils\ByteUtils.class
+com\fimet\commons\exception\StressException.class
 com\fimet\commons\data\writer\impl\ByteArrayWriter.class
 com\fimet\commons\data\reader\IMatcher.class
 com\fimet\commons\exception\FimetTypeException.class
@@ -65,17 +67,15 @@ com\fimet\commons\converter\ConverterEbcdicToHex.class
 com\fimet\commons\exception\ConverterException.class
 com\fimet\commons\data\reader\impl\StringReader$1.class
 com\fimet\commons\exception\ClassLoaderException.class
-com\fimet\commons\console\IPrintable.class
 com\fimet\commons\data\reader\impl\StringReader$MsgChunk.class
 com\fimet\commons\preference\IPreference.class
 com\fimet\commons\converter\ConverterNone.class
 com\fimet\commons\converter\ConverterHexToEbcdic.class
 com\fimet\commons\history\HistoryGroup$Modify.class
+com\fimet\commons\concurrent\AtomicDouble.class
 com\fimet\commons\utils\PanUtils.class
 com\fimet\commons\converter\ConverterHexEbcdicToAscii.class
 com\fimet\commons\exception\FieldValidatorException.class
-com\fimet\commons\AbstractActivator.class
-com\fimet\commons\console\Console.class
 com\fimet\commons\exception\FormatException.class
 com\fimet\commons\numericparser\NumericParserDecDouble.class
 com\fimet\commons\exception\EncryptionException.class

@@ -7,15 +7,15 @@ import com.fimet.commons.converter.Converter;
 import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.reader.impl.ByteArrayReader;
 import com.fimet.commons.data.writer.IWriter;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
 
 public class Visa63VarFieldParser extends VarFieldParser {
 
 	private static final String EMPTY_BITMAP = "000000000000000000000000";
 	
-	public Visa63VarFieldParser(FieldFormat fieldFormat) {
+	public Visa63VarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

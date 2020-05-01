@@ -4,8 +4,8 @@ package com.fimet.parser.field;
 import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.FormatException;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.AbstractFieldParser;
 
 /**
@@ -18,7 +18,7 @@ import com.fimet.parser.AbstractFieldParser;
 public class FixedFieldParser extends AbstractFieldParser {
 
 	private Integer length;
-	public FixedFieldParser(FieldFormat fieldFormat) {
+	public FixedFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.length = fieldFormat.getLength();
 	}

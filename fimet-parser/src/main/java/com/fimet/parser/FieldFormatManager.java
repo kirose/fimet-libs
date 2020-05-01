@@ -6,27 +6,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fimet.core.IFieldFormatManager;
-import com.fimet.core.IParserManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.entity.sqlite.FieldFormatGroup;
-import com.fimet.core.persistence.dao.FieldFormatDAO;
-import com.fimet.core.persistence.dao.FieldFormatGroupDAO;
+import com.fimet.IFieldFormatManager;
+import com.fimet.IParserManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.entity.sqlite.EFieldFormatGroup;
+import com.fimet.persistence.dao.FieldFormatDAO;
+import com.fimet.persistence.dao.FieldFormatGroupDAO;
 
 public class FieldFormatManager implements IFieldFormatManager {
 	
 	private FieldFormatGroupDAO dao = FieldFormatGroupDAO.getInstance();
 	private FieldFormatDAO daoFieldFormat = FieldFormatDAO.getInstance();
-	private Map<Integer, FieldFormatGroup> cache = new HashMap<>();
+	private Map<Integer, EFieldFormatGroup> cache = new HashMap<>();
 	
-	public FieldFormatGroup getGroup(Integer idGroup) {
+	public EFieldFormatGroup getGroup(Integer idGroup) {
 		if (cache.containsKey(idGroup)) {
 			return cache.get(idGroup);
 		} else {
-			FieldFormatGroup group = dao.findById(idGroup);
+			EFieldFormatGroup group = dao.findById(idGroup);
 			if (group == null) return null;
-			FieldFormatGroup parent, child = group;
+			EFieldFormatGroup parent, child = group;
 			while (child.getIdParent() != null) {
 				child.setParent(parent = getGroup(child.getIdParent()));
 				child = parent;
@@ -36,20 +36,20 @@ public class FieldFormatManager implements IFieldFormatManager {
 		}
 	}
 
-	public List<FieldFormat> getFieldsFormat(Integer idGroup) {
+	public List<EFieldFormat> getFieldsFormat(Integer idGroup) {
 		if (getGroup(idGroup) != null) {
-			List<FieldFormat> formats = getFieldsFormat(getGroup(idGroup), new ArrayList<>());
-			Collections.sort(formats, (FieldFormat f1, FieldFormat f2) ->{return f1.getIdOrder().compareTo(f2.getIdOrder());});
+			List<EFieldFormat> formats = getFieldsFormat(getGroup(idGroup), new ArrayList<>());
+			Collections.sort(formats, (EFieldFormat f1, EFieldFormat f2) ->{return f1.getIdOrder().compareTo(f2.getIdOrder());});
 			return formats;
 		} else {
 			return null;
 		}
 	}
-	private List<FieldFormat> getFieldsFormat(FieldFormatGroup group, List<String> exclude){
-		List<FieldFormat> formats = daoFieldFormat.findByGroup(group.getId(), exclude);
+	private List<EFieldFormat> getFieldsFormat(EFieldFormatGroup group, List<String> exclude){
+		List<EFieldFormat> formats = daoFieldFormat.findByGroup(group.getId(), exclude);
 		if (group.getParent() != null) {
 			if (formats != null && !formats.isEmpty()) {
-				for (FieldFormat format : formats) {
+				for (EFieldFormat format : formats) {
 					if (format.getIdFieldParent() == null) {
 						if (!exclude.contains(format.getIdField())) {
 							exclude.add(format.getIdField());
@@ -57,9 +57,9 @@ public class FieldFormatManager implements IFieldFormatManager {
 					}
 				}
 			}
-			List<FieldFormat> formatsParent = getFieldsFormat(group.getParent(), exclude);
+			List<EFieldFormat> formatsParent = getFieldsFormat(group.getParent(), exclude);
 			if (formatsParent != null && !formatsParent.isEmpty()) {
-				for (FieldFormat format : formatsParent) {
+				for (EFieldFormat format : formatsParent) {
 					formats.add(format);
 				}
 			}
@@ -67,29 +67,29 @@ public class FieldFormatManager implements IFieldFormatManager {
 		return formats;
 	}
 	@Override
-	public List<FieldFormatGroup> getRootGroups() {
+	public List<EFieldFormatGroup> getRootGroups() {
 		List<Integer> ids = dao.findRootIds();
-		List<FieldFormatGroup> roots = new ArrayList<>();
+		List<EFieldFormatGroup> roots = new ArrayList<>();
 		for (Integer id : ids) {
 			roots.add(getGroup(id));
 		}
 		return roots;
 	}
 	@Override
-	public List<FieldFormatGroup> getGroups() {
+	public List<EFieldFormatGroup> getGroups() {
 		List<Integer> ids = dao.findAllIds();
-		List<FieldFormatGroup> all = new ArrayList<>();
+		List<EFieldFormatGroup> all = new ArrayList<>();
 		for (Integer id : ids) {
 			all.add(getGroup(id));
 		}
 		return all;
 	}
-	public List<FieldFormatGroup> getSubGroups(Integer idGroup) {
+	public List<EFieldFormatGroup> getSubGroups(Integer idGroup) {
 		List<Integer> ids = dao.findChildIds(idGroup);
 		if (ids == null || ids.isEmpty()) {
 			return null;
 		}
-		List<FieldFormatGroup> subgroups = new ArrayList<>();
+		List<EFieldFormatGroup> subgroups = new ArrayList<>();
 		for (Integer id : ids) {
 			subgroups.add(getGroup(id));
 		}
@@ -101,36 +101,36 @@ public class FieldFormatManager implements IFieldFormatManager {
 	}
 	@Override
 	public void saveState() {}
-	public FieldFormatGroup saveGroup(FieldFormatGroup group) {
+	public EFieldFormatGroup saveGroup(EFieldFormatGroup group) {
 		FieldFormatGroupDAO.getInstance().insertOrUpdate(group);
 		if (group.getId() == null) {
-			FieldFormatGroup last = FieldFormatGroupDAO.getInstance().findLast();
+			EFieldFormatGroup last = FieldFormatGroupDAO.getInstance().findLast();
 			if (last != null)
 				group.setId(last.getId());
 		}
 		return group;
 	}
-	public FieldFormatGroup deleteGroup(FieldFormatGroup group) {
+	public EFieldFormatGroup deleteGroup(EFieldFormatGroup group) {
 		FieldFormatGroupDAO.getInstance().delete(group);
 		FieldFormatDAO.getInstance().deleteByIdGroup(group.getId());
 		return group;
 	}
-	public FieldFormat saveField(FieldFormat field) {
+	public EFieldFormat saveField(EFieldFormat field) {
 		FieldFormatDAO.getInstance().insertOrUpdate(field);
 		if (field.getIdFieldFormat() == null) {
-			FieldFormat last = FieldFormatDAO.getInstance().findLast("idFieldFormat");
+			EFieldFormat last = FieldFormatDAO.getInstance().findLast("idFieldFormat");
 			if (last != null)
 				field.setIdFieldFormat(last.getIdFieldFormat());
 		}
 		return field;
 	}
-	public FieldFormat deleteField(FieldFormat field) {
+	public EFieldFormat deleteField(EFieldFormat field) {
 		FieldFormatDAO.getInstance().delete(field);
 		return field;
 	}
 
 	@Override
-	public List<FieldFormat> getFieldsFormatOnlyGroup(Integer idGroup) {
+	public List<EFieldFormat> getFieldsFormatOnlyGroup(Integer idGroup) {
 		return daoFieldFormat.findByGroup(idGroup, null);
 	}
 
@@ -138,7 +138,7 @@ public class FieldFormatManager implements IFieldFormatManager {
 	public void free(List<Integer> groups) {
 		Manager.get(IParserManager.class).free(groups);
 		for (Integer idGroup : groups) {
-			FieldFormatGroup group = cache.remove(idGroup);
+			EFieldFormatGroup group = cache.remove(idGroup);
 			if (group != null) {
 				group.setParent(null);
 			}

@@ -51,6 +51,6 @@ public final class Messages
   public static String UseCase_IssuerRequest;
   static
   {
-//    NLS.initializeMessages("com.fimet.core.commons.messages.Messages", Messages.class);
+//    NLS.initializeMessages("com.fimet.commons.messages.Messages", Messages.class);
   }
 }

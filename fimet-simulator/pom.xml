@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
     	<groupId>com.fimet</groupId>
-    	<artifactId>fimet-core</artifactId>
+    	<artifactId>fimet</artifactId>
     	<version>1.0.0</version>
     </dependency>
   </dependencies>

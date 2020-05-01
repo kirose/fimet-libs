@@ -4,16 +4,16 @@ import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.ParserException;
 import com.fimet.commons.utils.ByteUtils;
 import com.fimet.commons.utils.EncryptionUtils;
-import com.fimet.core.IPreferencesManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.IPreferencesManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 
 public class NatTokenEZVarFieldParser extends NatTokenVarFieldParser {
 
 	private static final String DEFAULT_BDK = "0123456789ABCDEFFEDCBA9876543210";
 	private static IPreferencesManager preferencesManager = Manager.get(IPreferencesManager.class);
-	public NatTokenEZVarFieldParser(FieldFormat fieldFormat) {
+	public NatTokenEZVarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

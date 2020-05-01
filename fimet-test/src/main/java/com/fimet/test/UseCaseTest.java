@@ -1,31 +1,52 @@
 package com.fimet.test;
 
-import com.fimet.core.ICompilerManager;
-import com.fimet.core.Manager;
-import com.fimet.core.iso8583.adapter.IAdapterManager;
-import com.fimet.core.net.Socket;
-import com.fimet.core.usecase.TestBuilder;
-import com.fimet.core.validator.IValidator;
-
-public class UseCaseTest {
+import com.fimet.IUseCaseManager;
+import com.fimet.Manager;
+import com.fimet.adapter.iso8583.MLI;
+import com.fimet.simulator.PSimulator;
+import com.fimet.usecase.IUseCase;
+import com.fimet.usecase.exe.ExecutionResult;
+import com.fimet.usecase.exe.IExecutorListener;
+import com.fimet.utils.UseCaseBuilder;
+/**
+ * A simple example for create and execute use cases 
+ * @author Marco A. Salazar
+ *
+ */
+public class UseCaseTest implements IExecutorListener {
+	static IUseCaseManager useCaseManager = Manager.get(IUseCaseManager.class);
 	public static void main(String[] args) throws Exception {
+		new UseCaseTest().test();
+	}
+	private void test() {
+		// Execute all use cases in the folder usecases/ and use a executor listener
+		// Use cases execution is sequential
+		// See logs/socket.log and logs/validatios.log for results execution
+		useCaseManager.execute("usecases/", this);
 
-		String source = "package com.fimet.test;\n\n\nimport com.fimet.core.iso8583.parser.Message;\nimport com.fimet.core.net.ISocket;\nimport com.fimet.core.validator.IValidator;\n\npublic class Validator1 implements IValidator {\n\n	public Validator1() {\n	}\n	public void onWriteMessage(ISocket socket, Message msg) {\n		System.out.println(\"onWriteMessage: \"+msg);		\n	}\n	public void onReadMessage(ISocket socket, Message msg) {\n		System.out.println(\"onReadMessage: \"+msg);		\n	}\n\n}\n";
-		Class<IValidator> clazz = (Class<IValidator>)Manager.get(ICompilerManager.class).compile("com.fimet.test.Validator1", source);
-		IValidator validator = clazz.newInstance();
-		System.out.println(validator);
-		Socket socketAcq = new Socket("127.0.0.1", 8583, false, "National", "National Acquirer", IAdapterManager.MLI_EXCLISIVE);
-    	Socket socketIss = new Socket("127.0.0.1", 8583, true, "National", "National Issuer", IAdapterManager.MLI_EXCLISIVE);
+		// Simulator Parameters
+		PSimulator socketAcq = new PSimulator("National", "National", "127.0.0.1", 8583, false, MLI.EXCLUSIVE);
+    	PSimulator socketIss = new PSimulator("National", "National", "127.0.0.1", 8583, true, MLI.EXCLUSIVE);
 
-    	new TestBuilder("Compra", socketAcq)
+		// Execute a use cases with UseCaseBuilder
+    	new UseCaseBuilder("Compra", socketAcq)
     	.addConnection(socketIss)
-    	.setMti("0200")
-    	.setHeader("ISO858300000")
-    	.setValue(2, "1234567890123456")
-    	.setValue(3, "000000")
-    	.setValue(4, "000000012300")
-    	.setValue(11, "123456")
-    	.setValidator(clazz.newInstance())
-    	.execute();
+    	.setMessageMti("0200")
+    	.setMessageHeader("ISO858300000")
+    	.setMessageValue(2, "1234567890123456")
+    	.setMessageValue(3, "000000")
+    	.setMessageValue(4, "000000012300")
+    	.setMessageValue(11, "123456")
+    	// Simulator extensions are created authomatically for files "uc"
+    	.setSimulatorExtension(new SimulatorExtension())
+    	.execute();		
+	}
+	@Override
+	public void onStart(IUseCase useCase) {
+		System.out.println("start-"+useCase.getName());
+	}
+	@Override
+	public void onFinish(IUseCase useCase, ExecutionResult results) {
+		System.out.println("finish-"+useCase.getName());
 	}
 }

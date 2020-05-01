@@ -1,12 +1,12 @@
 package com.fimet.simulator.msg;
 
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.iso8583.parser.Message;
-import com.fimet.core.simulator.ISimulator;
+import com.fimet.iso8583.parser.Message;
+import com.fimet.simulator.ISimulatorModel;
 
 public class SimulatorMessageResponse extends SimulatorMessage {
 	private String mtiResponse;
-	public SimulatorMessageResponse(ISimulator simulator, com.fimet.core.entity.sqlite.SimulatorMessage sm) {
+	public SimulatorMessageResponse(ISimulatorModel simulator, com.fimet.entity.sqlite.ESimulatorMessage sm) {
 		super(simulator, sm);
 		mtiResponse = String.format("%04d", Integer.parseInt(sm.getMti())+10);
 	}
@@ -14,7 +14,7 @@ public class SimulatorMessageResponse extends SimulatorMessage {
 	public Message simulate(Message message) {
 		if (message != null) {
 			if (FimetLogger.isEnabledInfo()) {
-				FimetLogger.info(SimulatorMessageResponse.class, "Simulator Response "+simulator.toString() +", mti: " + message.getMti());
+				FimetLogger.info(SimulatorMessageResponse.class, "Simulator Response "+simulator +", mti: " + message.getMti());
 			}
 			Message simulated = message.clone(excludeFields);
 			if (simulatedFields != null) {

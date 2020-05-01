@@ -5,9 +5,9 @@ import java.util.List;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.data.writer.impl.ByteArrayWriter;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.Parser;
-import com.fimet.core.iso8583.parser.IFieldParser;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EParser;
+import com.fimet.iso8583.parser.IFieldParser;
+import com.fimet.iso8583.parser.IMessage;
 /**
  * 
  * @author Marco A. Salazar
@@ -16,7 +16,7 @@ import com.fimet.core.iso8583.parser.IMessage;
  */
 public abstract class AbstractMessageLayoutFormater extends AbstractMessageBaseParser {
 
-	public AbstractMessageLayoutFormater(Parser entity) {
+	public AbstractMessageLayoutFormater(EParser entity) {
 		super(entity);
 	}
 

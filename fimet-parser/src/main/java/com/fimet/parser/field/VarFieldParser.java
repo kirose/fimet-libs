@@ -9,8 +9,8 @@ import com.fimet.commons.exception.FormatException;
 import com.fimet.commons.numericparser.INumericParser;
 import com.fimet.commons.numericparser.NumericParser;
 import com.fimet.commons.FimetLogger;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.iso8583.parser.IMessage;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.iso8583.parser.IMessage;
 import com.fimet.parser.AbstractFieldParser;
 
 /**
@@ -26,7 +26,7 @@ public class VarFieldParser extends AbstractFieldParser {
 	protected final IConverter  converterLength;
 	protected final INumericParser parserLength;
 	
-	public VarFieldParser(FieldFormat fieldFormat) {
+	public VarFieldParser(EFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.maxLength = fieldFormat.getMaxLength();
 		this.converterLength = Converter.get(fieldFormat.getIdConverterLength());

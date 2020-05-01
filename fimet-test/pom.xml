@@ -30,12 +30,7 @@
     </dependency>
     <dependency>
     	<groupId>com.fimet</groupId>
-    	<artifactId>fimet-core</artifactId>
-    	<version>1.0.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.fimet</groupId>
-    	<artifactId>fimet-net</artifactId>
+    	<artifactId>fimet</artifactId>
     	<version>1.0.0</version>
     </dependency>
     <dependency>

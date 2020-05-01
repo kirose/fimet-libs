@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fimet>
+	<!-- The path to FIMET data base -->
 	<source name="fimet" path="resources/fimet.db" />
+	<!-- The application properties -->
 	<properties>
 		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/>
-		<property name="messenger.numberOfThreads" value="5"/>
+		<property name="simulator.numberOfThreads" value="5"/>
+		<property name="usecase.maxExecutionTime" value="9000"/>
 	</properties> 
+	<!-- You can declare a new manager or override an existent -->
 	<managers>
-		<manager id="com.fimet.core.IExecutorManager" class="com.fimet.core.usecase.exe.ExecutorManager"/>
+		<manager id="com.fimet.ISocketManager" class="com.fimet.net.SocketManager"/>
+		<manager id="com.fimet.IUseCaseManager" class="com.fimet.usecase.UseCaseManager">
+			<extension id="com.fimet.usecase.exe.IStoreResults" class="com.fimet.usecase.exe.LogFilesStore" />
+		</manager>
 	</managers>
+	<!-- This simulators will be pre-loaded but not connected -->
+	<simulators>
+		<simulator id="Nat" model="National" parser="National" server="false" address="127.0.0.1" port="9128" adapter="Exclusive" /> 
+	</simulators>
 </fimet>

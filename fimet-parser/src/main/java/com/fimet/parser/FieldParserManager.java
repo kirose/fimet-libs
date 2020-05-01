@@ -9,14 +9,14 @@ import java.util.Map;
 import com.fimet.commons.data.reader.IReader;
 import com.fimet.commons.data.writer.IWriter;
 import com.fimet.commons.exception.ParserException;
-import com.fimet.core.IFieldFormatManager;
-import com.fimet.core.IFieldParserManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.FieldFormat;
-import com.fimet.core.entity.sqlite.FieldFormatGroup;
-import com.fimet.core.iso8583.parser.IFieldParser;
-import com.fimet.core.iso8583.parser.IMessage;
-import com.fimet.core.persistence.dao.FieldFormatDAO;
+import com.fimet.IFieldFormatManager;
+import com.fimet.IFieldParserManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EFieldFormat;
+import com.fimet.entity.sqlite.EFieldFormatGroup;
+import com.fimet.iso8583.parser.IFieldParser;
+import com.fimet.iso8583.parser.IMessage;
+import com.fimet.persistence.dao.FieldFormatDAO;
 import com.fimet.parser.field.FixedFieldParser;
 import com.fimet.parser.field.LTrimFixedFieldParser;
 import com.fimet.parser.field.LTrimVarFieldParser;
@@ -94,16 +94,16 @@ public class FieldParserManager implements IFieldParserManager {
 	 * @param idField
 	 * @return
 	 */
-	public IFieldParser getFieldParser(FieldFormatGroup group, String idField) {
+	public IFieldParser getFieldParser(EFieldFormatGroup group, String idField) {
 		if (cache.containsKey(group.getId() + "." + idField)) {
 			return cache.get(group.getId() + "." + idField);
 		} else {
-			FieldFormat fieldFormat = FieldFormatDAO.getInstance().findByGroupAndIdField(group.getId(),idField);
+			EFieldFormat fieldFormat = FieldFormatDAO.getInstance().findByGroupAndIdField(group.getId(),idField);
 			if (fieldFormat != null) {
 				try {
 					IFieldParser fieldParser = null;
 					Class<?> classParser = Class.forName(fieldFormat.getClassParser());
-					fieldParser = (IFieldParser) classParser.getConstructor(FieldFormat.class).newInstance(fieldFormat);
+					fieldParser = (IFieldParser) classParser.getConstructor(EFieldFormat.class).newInstance(fieldFormat);
 					cache.put(group.getId() + "." + idField, fieldParser);
 					return fieldParser;
 				} catch (Exception e) {
@@ -132,7 +132,7 @@ public class FieldParserManager implements IFieldParserManager {
 	 * @param group
 	 * @return
 	 */
-	public List<IFieldParser> getRootFieldParsers(FieldFormatGroup group){
+	public List<IFieldParser> getRootFieldParsers(EFieldFormatGroup group){
 		loadGroup(group);
 		String id = group.getId()+".";
 		List<IFieldParser> parsers = new ArrayList<IFieldParser>();
@@ -147,7 +147,7 @@ public class FieldParserManager implements IFieldParserManager {
 		});
 		return parsers;
 	}
-	private boolean isLoadedGroup(FieldFormatGroup group) {
+	private boolean isLoadedGroup(EFieldFormatGroup group) {
 		String id = group.getId()+".";
 		for (Map.Entry<String, IFieldParser> e : cache.entrySet()) {
 			if (e.getKey().startsWith(id)) {
@@ -156,15 +156,15 @@ public class FieldParserManager implements IFieldParserManager {
 		}
 		return false;
 	}
-	private void loadGroup(FieldFormatGroup group) {
+	private void loadGroup(EFieldFormatGroup group) {
 		if (!isLoadedGroup(group)) {
-			List<FieldFormat> formats = FieldFormatDAO.getInstance().findByGroup(group.getId());
-			for (FieldFormat format : formats) {
+			List<EFieldFormat> formats = FieldFormatDAO.getInstance().findByGroup(group.getId());
+			for (EFieldFormat format : formats) {
 				if (!cache.containsKey(group.getId() + "." + format.getIdField())) {
 					try {
 						IFieldParser fieldParser = null;
 						Class<?> classParser = Class.forName(format.getClassParser());
-						fieldParser = (IFieldParser) classParser.getConstructor(FieldFormat.class).newInstance(format);
+						fieldParser = (IFieldParser) classParser.getConstructor(EFieldFormat.class).newInstance(format);
 						cache.put(group.getId() + "." + format.getIdField(), fieldParser);
 					} catch (Exception e) {
 						throw new ParserException(group+" cannot found Parser: "+format.getClassParser(),e);
@@ -182,22 +182,22 @@ public class FieldParserManager implements IFieldParserManager {
 	 */
 	public void deleteCache(Integer idGroup) {
 		if (!cache.isEmpty() && idGroup != null) {
-			FieldFormatGroup group = fieldFormatGroupManager.getGroup(idGroup);
+			EFieldFormatGroup group = fieldFormatGroupManager.getGroup(idGroup);
 			deleteCache(group);
 		}
 	}
-	public void deleteCache(FieldFormatGroup group) {
+	public void deleteCache(EFieldFormatGroup group) {
 		if (!cache.isEmpty() && group != null) {
 			_deleteCache(group);
-			List<FieldFormatGroup> subGroups = fieldFormatGroupManager.getSubGroups(group.getId());
+			List<EFieldFormatGroup> subGroups = fieldFormatGroupManager.getSubGroups(group.getId());
 			if (subGroups != null && !subGroups.isEmpty()) {
-				for (FieldFormatGroup subgroup : subGroups) {
+				for (EFieldFormatGroup subgroup : subGroups) {
 					deleteCache(subgroup);
 				}
 			}
 		}
 	}
-	private void _deleteCache(FieldFormatGroup group) {
+	private void _deleteCache(EFieldFormatGroup group) {
 		Map<String, IFieldParser> newCache = new HashMap<>();
 		List<String> starts = new ArrayList<String>();
 		while (group != null) {

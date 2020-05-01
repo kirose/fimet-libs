@@ -10,12 +10,12 @@ import java.util.Map.Entry;
 
 import com.fimet.commons.exception.ParserException;
 import com.fimet.commons.history.History;
-import com.fimet.core.IFieldParserManager;
-import com.fimet.core.IParserManager;
-import com.fimet.core.Manager;
-import com.fimet.core.entity.sqlite.Parser;
-import com.fimet.core.iso8583.parser.IParser;
-import com.fimet.core.persistence.dao.ParserDAO;
+import com.fimet.IFieldParserManager;
+import com.fimet.IParserManager;
+import com.fimet.Manager;
+import com.fimet.entity.sqlite.EParser;
+import com.fimet.iso8583.parser.IParser;
+import com.fimet.persistence.dao.ParserDAO;
 import com.fimet.parser.mx.AmexParser;
 import com.fimet.parser.mx.DiscoverParser;
 import com.fimet.parser.mx.LayoutParser;
@@ -38,7 +38,7 @@ public class ParserManager implements IParserManager {
 		if (mapNameId.containsKey(name)) {
 			return mapIdParsers.get(mapNameId.get(name));
 		} else {
-			Parser entity = findEntity(name);
+			EParser entity = findEntity(name);
 			IParser parser = newParser(entity);
 			mapIdParsers.put(parser.getId(), parser);
 			mapNameId.put(parser.getName(),parser.getId());
@@ -52,7 +52,7 @@ public class ParserManager implements IParserManager {
 		if (mapIdParsers.containsKey(idParser)) {
 			return mapIdParsers.get(idParser);
 		} else {
-			Parser entity = findEntity(idParser);
+			EParser entity = findEntity(idParser);
 			IParser parser = newParser(entity);
 			mapIdParsers.put(parser.getId(), parser);
 			mapNameId.put(parser.getName(),parser.getId());
@@ -61,7 +61,7 @@ public class ParserManager implements IParserManager {
 		}
 	}
 	@Override
-	public IParser getParser(Parser entity) {
+	public IParser getParser(EParser entity) {
 		int hashCode = entity.hashCode();
 		if (mapHashParsers.containsKey(hashCode)) {
 			return mapHashParsers.get(hashCode);
@@ -72,16 +72,16 @@ public class ParserManager implements IParserManager {
 			return parser;			
 		}
 	}
-	private Parser findEntity(Integer idParser) {
-		Parser entity = ParserDAO.getInstance().findById(idParser);
+	private EParser findEntity(Integer idParser) {
+		EParser entity = ParserDAO.getInstance().findById(idParser);
 		if (entity != null) {
 			return entity;
 		} else {
 			throw new ParserException("Invalid parser id: "+idParser);
 		}
 	}
-	private Parser findEntity(String parser) {
-		Parser entity = ParserDAO.getInstance().findByName(parser);
+	private EParser findEntity(String parser) {
+		EParser entity = ParserDAO.getInstance().findByName(parser);
 		if (entity != null) {
 			return entity;
 		} else {
@@ -89,17 +89,17 @@ public class ParserManager implements IParserManager {
 		}
 	}
 	@SuppressWarnings("unchecked")
-	private IParser newParser(Parser entity) {
+	private IParser newParser(EParser entity) {
 		try {
 			Class<? extends AbstractMessageISO8583Parser> parserClass = (Class<? extends AbstractMessageISO8583Parser>) Class.forName(entity.getParserClass());
-			Constructor<? extends AbstractMessageISO8583Parser> constructor = parserClass.getConstructor(com.fimet.core.entity.sqlite.Parser.class);
+			Constructor<? extends AbstractMessageISO8583Parser> constructor = parserClass.getConstructor(com.fimet.entity.sqlite.EParser.class);
 			return constructor.newInstance(entity);
 		} catch (ClassNotFoundException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (NoSuchMethodException e) {
-			throw new ParserException("No found public constructor with com.fimet.core.entity.sqlite.Parser.class as argument in class: " + entity.getParserClass(),e);
+			throw new ParserException("No found public constructor with com.fimet.entity.sqlite.Parser.class as argument in class: " + entity.getParserClass(),e);
 		} catch (SecurityException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (IllegalArgumentException | InvocationTargetException e) {
@@ -109,10 +109,10 @@ public class ParserManager implements IParserManager {
 
 	@Override
 	public List<IParser> getParsers() {
-		List<Parser> entities = ParserDAO.getInstance().findAll();
+		List<EParser> entities = ParserDAO.getInstance().findAll();
 		if (entities != null) {
 			List<IParser> ps = new ArrayList<>();
-			for (Parser e : entities) {
+			for (EParser e : entities) {
 				if (mapIdParsers.containsKey(e.getId())) {
 					ps.add(mapIdParsers.get(e.getId()));
 				} else {
@@ -152,28 +152,28 @@ public class ParserManager implements IParserManager {
 	@Override
 	public void saveState() {}
 	@Override
-	public List<Parser> getEntities() {
+	public List<EParser> getEntities() {
 		return ParserDAO.getInstance().findAll();
 	}
 	@Override
-	public List<Parser> getEntities(int type) {
+	public List<EParser> getEntities(int type) {
 		return ParserDAO.getInstance().findByType(type);
 	}
 	@Override
-	public Parser insert(Parser parser) {
+	public EParser insert(EParser parser) {
 		if (parser.getId() == null)
 			parser.setId(getNextIdParser());
 		ParserDAO.getInstance().insert(parser);
 		return parser;
 	}
 	@Override
-	public Parser update(Parser parser) {
+	public EParser update(EParser parser) {
 		ParserDAO.getInstance().update(parser);
 		reload(parser.getId());
 		return parser;
 	}
 	@Override
-	public Parser delete(Parser parser) {
+	public EParser delete(EParser parser) {
 		ParserDAO.getInstance().delete(parser);
 		uninstall(parser.getId());
 		return parser;
@@ -222,19 +222,19 @@ public class ParserManager implements IParserManager {
 	}
 
 	@Override
-	public Parser getEntity(Integer id) {
+	public EParser getEntity(Integer id) {
 		return ParserDAO.getInstance().findById(id);
 	}
 
 	@Override
-	public void commit(History<Parser> history) {
-		for (Parser m : history.getDeletes()) {
+	public void commit(History<EParser> history) {
+		for (EParser m : history.getDeletes()) {
 			delete(m);
 		}
-		for (Parser m : history.getUpdates()) {
+		for (EParser m : history.getUpdates()) {
 			update(m);
 		}
-		for (Parser m : history.getInserts()) {
+		for (EParser m : history.getInserts()) {
 			insert(m);
 		}		
 	}
