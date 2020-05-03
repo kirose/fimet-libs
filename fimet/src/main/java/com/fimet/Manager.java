@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.commons.exception.FimetException;
-import com.fimet.usecase.UseCaseManager;
 import com.fimet.xml.ExtensionXml;
 import com.fimet.xml.FimetXml;
 import com.fimet.xml.ManagerXml;
@@ -220,8 +219,27 @@ public class Manager {
 		}
 		return value;
 	}
+	public static Boolean getPropertyBoolean(String name) {
+		String value = getProperty(name);
+		if (value != null) {
+			try {
+				return Boolean.valueOf(value);
+			} catch (Exception e) {}
+		}
+		return null;
+	}
+	public static Boolean getPropertyBoolean(String name, Boolean defaultValue) {
+		Boolean value = getPropertyBoolean(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
+	}
+	public static <T> T newInstanceForExtension(Class<T> iClazz){
+		return newInstanceForExtension(iClazz, null);
+	}
 	@SuppressWarnings("unchecked")
-	public static <T> T newExtensionInstance(Class<T> iClazz){
+	public static <E extends T,T> T newInstanceForExtension(Class<T> iClazz, Class<E> defaultClass){
 		String extensionClassName = getProperty(iClazz.getName());
 		if (extensionClassName != null) {
 			try {
@@ -229,12 +247,19 @@ public class Manager {
 				if (iClazz.isAssignableFrom(clazz)) {
 					return (T) clazz.newInstance();
 				} else {
-					FimetLogger.warning(UseCaseManager.class, "Extension error, "+extensionClassName+" must implements "+iClazz.getName());	
+					throw new FimetException("Extension error, "+extensionClassName+" must implements "+iClazz.getName());
 				}
 			} catch (Exception e) {
-				FimetLogger.error(UseCaseManager.class, "Extension error "+extensionClassName,e);
+				throw new FimetException("Invalid extension "+extensionClassName,e);
 			}
+		} else if (defaultClass != null) {
+			try {
+				return defaultClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new FimetException(e); 
+			}
+		} else {
+			return null;
 		}
-		return null;
 	}
 }

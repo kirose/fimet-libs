@@ -15,11 +15,16 @@ public class UseCaseBuilder {
 	static IUseCaseManager useCaseManager = Manager.get(IUseCaseManager.class);
 	UseCase useCase;
 	public UseCaseBuilder(String name, PSimulator acquirer) {
-		ISimulator sAcquirer = simulatorManager.getSimulator(acquirer);
+		this(name, simulatorManager.getSimulator(acquirer));
+	}
+	public UseCaseBuilder(String name, String idSimulator) {
+		this(name, simulatorManager.getSimulator(idSimulator));
+	}
+	public UseCaseBuilder(String name, ISimulator simulator) {
 		useCase = new UseCase();
 		useCase.setName(name);
-		useCase.addSimulator(sAcquirer);
-		useCase.setMessage(new Message("0200","ISO858300000",sAcquirer.getParser()));
+		useCase.addSimulator(simulator);
+		useCase.setMessage(new Message("0200","ISO858300000",simulator.getParser()));		
 	}
 	public UseCaseBuilder setAuthorization(String authorization) {
 		useCase.setAuthorization(authorization);

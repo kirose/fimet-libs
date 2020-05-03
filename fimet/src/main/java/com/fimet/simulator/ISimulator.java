@@ -15,7 +15,6 @@ public interface ISimulator extends IConnectable {
 	public IParser getParser();
 	public ISocket getSocket();
 	public void setListener(ISimulatorListener listener);
-	public void free();
 	public Message simulateRequest(Message message);
 	public Message simulateResponse(Message message);
 	public void writeMessage(Message message);

@@ -37,7 +37,6 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	IConnectionListener connectionListener;
 	IParser parser;
 	ISimulatorModel model;
-	Integer idSimulator;
 	public Simulator(PSimulator pSimulator) {
 		if (pSimulator == null)
 			throw new NullPointerException("Simulator parameters are null");
@@ -51,8 +50,7 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 		this.listener = NullSimulatorListener.INSTANCE;
 		this.connectionListener = NullConnectionListener.INSTANCE;
 		this.parser = parserManager.getParser(pSimulator.getParser());
-		this.idSimulator = pSimulator.getIdSimulator();
-		this.model = simulatorModelManager.getSimulatorModel(idSimulator);
+		this.model = simulatorModelManager.getSimulatorModel(pSimulator.getModel());
 	}
 	/**
 	 * Attempt to connect the iSocket
@@ -107,10 +105,6 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	@Override
 	public IParser getParser() {
 		return parser;
-	}
-	@Override
-	public void free() {
-		model.free();
 	}
 	@Override
 	public int hashCode() {

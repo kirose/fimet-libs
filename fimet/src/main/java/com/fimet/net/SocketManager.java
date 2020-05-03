@@ -1,15 +1,15 @@
 package com.fimet.net;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fimet.ISocketManager;
 import com.fimet.commons.utils.ThreadUtils;
 
 public class SocketManager implements ISocketManager {
-	private Map<Integer, ISocket> connections = new HashMap<>();
+	private Map<Integer, ISocket> connections = new ConcurrentHashMap<>();
 	private List<ISocketMonitor> monitors = new ArrayList<>();
 	public SocketManager() {
 	}

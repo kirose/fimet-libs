@@ -1,15 +1,23 @@
 package com.fimet.utils;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.fimet.IClassLoaderManager;
 import com.fimet.ICompilerManager;
 import com.fimet.Manager;
 import com.fimet.commons.FimetLogger;
+import com.fimet.commons.exception.FimetException;
+import com.fimet.entity.sqlite.ESimulator;
+import com.fimet.entity.sqlite.ESimulatorMessage;
+import com.fimet.entity.sqlite.pojo.SimulatorField;
 import com.fimet.iso8583.parser.Message;
+import com.fimet.persistence.dao.SimulatorMessageDAO;
 import com.fimet.simulator.AbstractSimulatorExtension;
+import com.fimet.simulator.AbstractSimulatorModel;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorExtension;
+import com.fimet.simulator.ISimulatorModel;
 import com.fimet.simulator.IValidator;
 import com.fimet.simulator.NullSimulatorExtension;
 import com.fimet.simulator.ValidationResult;
@@ -20,7 +28,8 @@ import com.fimet.usecase.json.SimulatorRules;
 import com.fimet.usecase.json.UseCaseJson;
 
 public final class SimulatorUtils {
-	public static final String PACKAGE = "com.fimet.validator.tmp"; 
+	public static final String PACKAGE_EXTENSION = "com.fimet.simulator.extension";
+	public static final String PACKAGE_MODEL = "com.fimet.simulator.model";
 	private SimulatorUtils() {}
 	public static ISimulatorExtension newSimulatorExtension(UseCaseJson json) {
 		Class<?> clazz = getClassValidator(json);
@@ -38,14 +47,16 @@ public final class SimulatorUtils {
 			return NullSimulatorExtension.class;
 		}
 		String simpleClassName = "SE"+Math.abs(hash);
-		String className = PACKAGE+"."+simpleClassName;
+		String className = PACKAGE_EXTENSION+"."+simpleClassName;
 		if (Manager.get(IClassLoaderManager.class).isInstalled(className)) {
 			try {
 				return Manager.get(IClassLoaderManager.class).loadClass(className);
-			} catch (ClassNotFoundException e) {}
+			} catch (ClassNotFoundException e) {
+				throw new FimetException(e);
+			}
 		}
 		StringBuilder s = new StringBuilder();
-		s.append("package ").append(PACKAGE).append(";\n\n");
+		s.append("package ").append(PACKAGE_EXTENSION).append(";\n\n");
 		s.append("import ").append(AbstractSimulatorExtension.class.getName()).append(";\n");
 		s.append("import ").append(ISimulator.class.getName()).append(";\n");
 		s.append("import ").append(ValidationResult.class.getName()).append(";\n");
@@ -139,5 +150,106 @@ public final class SimulatorUtils {
 		} else {
 			s.append("\t\t\t\tnew "+ValidationResult.class.getSimpleName()+"(\""+v.replace("\"", "\\\"")+"\", "+v+"),\n");
 		}		
+	}
+	@SuppressWarnings("unchecked")
+	public static Class<ISimulatorModel> getClassSimulatorModel(ESimulator simulator) {
+		String simpleClassName = "SM"+Math.abs(simulator.getName().hashCode());
+		String className = PACKAGE_MODEL+"."+simpleClassName;
+		if (Manager.get(IClassLoaderManager.class).isInstalled(className)) {
+			try {
+				return (Class<ISimulatorModel>)Manager.get(IClassLoaderManager.class).loadClass(className);
+			} catch (ClassNotFoundException e) {
+				throw new FimetException(e);
+			}
+		}
+		return installClassSimulatorModel(simulator);
+	}
+	@SuppressWarnings("unchecked")
+	public static Class<ISimulatorModel> installClassSimulatorModel(ESimulator simulator) {
+		String simpleClassName = "SM"+Math.abs(simulator.getName().hashCode());
+		String className = PACKAGE_MODEL+"."+simpleClassName;
+		StringBuilder s = new StringBuilder();
+		s.append("package ").append(PACKAGE_MODEL).append(";\n\n");
+		s.append("import ").append(ISimulatorModel.class.getName()).append(";\n");
+		s.append("import ").append(AbstractSimulatorModel.class.getName()).append(";\n");
+		s.append("import ").append(Message.class.getName()).append(";\n");
+		s.append("import ").append(Message.class.getName()).append(";\n");
+		
+		s.append("/**\n");
+		s.append("* FIMET\n");
+		s.append("* Code generated automatically\n");
+		s.append("**/\n");
+		s.append("public class ").append(simpleClassName).append(" extends ").append(AbstractSimulatorModel.class.getSimpleName()).append(" {\n\n");
+		s.append("\tpublic "+simpleClassName+" () {\n\t\tsuper(\""+simulator.getName()+"\");\n\t}\n\n");
+
+		StringBuilder sreq = new StringBuilder();
+		StringBuilder sres = new StringBuilder();
+		StringBuilder sc = null;
+		List<ESimulatorMessage> simulators = SimulatorMessageDAO.getInstance().findByIdSimulator(simulator.getId());
+		if (simulators != null && !simulators.isEmpty()) {
+			for (ESimulatorMessage sm : simulators) {
+				if (sm.getType() == ESimulatorMessage.REQUEST) {
+					sc = sreq;
+				} else if (sm.getType() == ESimulatorMessage.RESPONSE) {
+					sc = sres;
+				} else {
+					throw new FimetException("Invalid Simulator type "+sm.getType());
+				}
+				sc.append("\t\tif (\""+sm.getMti()+"\".equals(msg.getMti())){\n");
+				if (sm.getType() == ESimulatorMessage.RESPONSE) {
+					sc.append("\t\t\tmsg = cloneMessage(msg);\n");
+					sc.append("\t\t\tmsg.setMti(String.format(\"%04d\", Integer.parseInt(msg.getMti())+10));\n");
+				}
+				if (sm.getHeader() != null) {
+					sc.append("\t\t\tmsg.setHeader(\""+sm.getHeader()+"\");\n");
+				}
+				if (sm.getExcludeFields() != null && !sm.getExcludeFields().isEmpty()) {
+					sc.append("\t\t\tmsg.remove(");
+					for (String idField : sm.getExcludeFields()) {
+						sc.append("\""+idField+"\",");
+					}
+					sc.delete(sc.length()-1, sc.length());
+					sc.append(");\n");
+				}
+				if (sm.getIncludeFields() != null && !sm.getIncludeFields().isEmpty()) {
+					for (SimulatorField f : sm.getIncludeFields()) {
+						if (f.getType() == SimulatorField.FIXED) {
+							sc.append("\t\t\tmsg.setValue(\""+f.getIdField()+"\",\""+f.getValue()+"\");\n");
+						} else if (f.getType() == SimulatorField.CUSTOM) {
+							sc.append("\t\t\t"+f.getValue()+".getInstance().simulate(msg,\""+f.getIdField()+"\");\n");
+						} else {
+							throw new FimetException("Invalid Simulator Field type "+sm.getType());
+						}
+					}
+				}
+				sc.append("\t\t\treturn msg;\n");
+				sc.append("\t\t}\n");
+			}
+		}
+		s.append("\t/**\n");
+		s.append("\t* @param Message msg the outgoing message\n");
+		s.append("\t**/\n");
+		s.append("\t@Override\n");
+		s.append("\tpublic Message simulateRequest(Message msg){\n");
+		if (sreq.length() > 0) {
+			s.append(sreq);
+		}
+		s.append("\t\treturn msg;\n");
+		s.append("\t").append("}\n\n");
+		
+		
+		s.append("\t/**\n");
+		s.append("\t* @param Message msg is the incoming message\n");
+		s.append("\t**/\n");
+		s.append("\t").append("@Override").append("\n");
+		s.append("\t").append("\tpublic Message simulateResponse(Message msg){\n");
+		if (sres.length() > 0) {
+			s.append(sres);
+		}
+		s.append("\t\treturn null;\n");
+		s.append("\t").append("}\n");
+		s.append("}\n");
+		Class<?> compile = Manager.get(ICompilerManager.class).compile(className, s.toString());
+		return (Class<ISimulatorModel>)compile;		
 	}
 }

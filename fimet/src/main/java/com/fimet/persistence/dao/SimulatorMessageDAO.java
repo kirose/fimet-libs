@@ -46,7 +46,7 @@ public class SimulatorMessageDAO extends AbstractDAO<ESimulatorMessage,Integer> 
 			throw new PersistenceException("Cannot find SimulatorMessage",e);
 		}
 	}
-	public List<ESimulatorMessage> findByIdSmulator(Integer idSimulator) {
+	public List<ESimulatorMessage> findByIdSimulator(Integer idSimulator) {
 		try {
 			QueryBuilder<ESimulatorMessage, Integer> qb = getDAO().queryBuilder();
 			qb.setWhere(qb.where().eq("idSimulator", idSimulator));

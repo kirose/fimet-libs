@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class SimulatorsXml {
 	@XmlElement(name="simulator")
 	private List<SimulatorXml> simulator;
+	@XmlElement(name="model")
+	private List<SimulatorModelXml> model;
 	public SimulatorsXml() {
 		super();
 	}
@@ -24,5 +26,11 @@ public class SimulatorsXml {
 	}
 	public void setSimulators(List<SimulatorXml> managers) {
 		this.simulator = managers;
+	}
+	public List<SimulatorModelXml> getModels() {
+		return model;
+	}
+	public void setModels(List<SimulatorModelXml> model) {
+		this.model = model;
 	}
 }

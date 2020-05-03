@@ -1,15 +1,11 @@
 package com.fimet.simulator;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fimet.commons.exception.FimetException;
-import com.fimet.commons.exception.SimulatorException;
 import com.fimet.ISimulatorManager;
-import com.fimet.ISimulatorModelManager;
 import com.fimet.Manager;
-import com.fimet.entity.sqlite.ESimulator;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorThread;
 import com.fimet.simulator.PSimulator;
@@ -23,10 +19,8 @@ import com.fimet.xml.SimulatorXml;
  */
 public class SimulatorManager implements ISimulatorManager {
 	static final int NUMBER_OF_THREADS = 5;	
-	private ISimulatorModelManager simulatorModelManager = Manager.get(ISimulatorModelManager.class);
-	private Map<Integer, ISimulator> simulators = new HashMap<>();
-	private Map<Integer, Integer> mapIdToHash = new HashMap<>();
-	private Map<String, PSimulator> externals = new HashMap<>();
+	private Map<Integer, ISimulator> simulators = new ConcurrentHashMap<>();
+	private Map<String, PSimulator> externals = new ConcurrentHashMap<>();
 	private SimulatorThread next;
 	private SimulatorThread head;
 	public SimulatorManager() {
@@ -74,17 +68,7 @@ public class SimulatorManager implements ISimulatorManager {
 		if (simulators.containsKey(simulator.hashCode())) {
 			return simulators.get(simulator.hashCode());	
 		} else {
-			if (simulator.getModel() == null && simulator.getIdSimulator() == null) {
-				simulator.setIdSimulator(-1);
-			} else {
-				ESimulator entity = simulatorModelManager.getEntity(simulator.getModel());
-				if (entity == null) {
-					throw new SimulatorException("Unkown simulator model "+simulator.getModel());
-				}
-				simulator.setIdSimulator(entity.getId());
-			}
 			simulators.put(simulator.hashCode(), new Simulator(simulator));
-			mapIdToHash.put(simulator.getIdSimulator(), simulator.hashCode());
 		}
 		return simulators.get(simulator.hashCode());
 	}
@@ -113,23 +97,8 @@ public class SimulatorManager implements ISimulatorManager {
 		return next = next.next;
 	}
 	@Override
-	public void freeSimulator(int id) {
-		if (mapIdToHash.containsKey(id)) {
-			simulators.get(mapIdToHash.get(id)).free();
-		}
-	}
-	@Override
 	public void free() {
-		for (java.util.Map.Entry<Integer, ISimulator> e : simulators.entrySet()) {
-			e.getValue().free();
-		}
 	}
 	@Override
 	public void saveState() {}
-	@Override
-	public void freeSimulators(List<Integer> ids) {
-		for (Integer id : ids) {
-			freeSimulator(id);
-		}
-	}
 }

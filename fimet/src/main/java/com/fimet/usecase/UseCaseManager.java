@@ -14,10 +14,7 @@ public class UseCaseManager implements IUseCaseManager {
 	private SyncExecutor syncExecutor;
 //	private IExecutor asyncExecutor;
 	public UseCaseManager() {
-		IStoreResults store = Manager.newExtensionInstance(IStoreResults.class);
-		if (store == null) {
-			store = new LogFilesStore();
-		}
+		IStoreResults store = Manager.newInstanceForExtension(IStoreResults.class, LogFilesStore.class);
 		syncExecutor = new SyncExecutor();
 		syncExecutor.setStore(store);
 		syncExecutor.startExecutor();

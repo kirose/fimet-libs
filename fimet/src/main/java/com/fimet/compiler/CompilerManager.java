@@ -51,7 +51,7 @@ public class CompilerManager implements ICompilerManager {
 				if (errors != null && errors.length() > 0) {
 					FimetLogger.error(CompilerManager.class, "Compilation error:\n"+errors);
 				}
-				throw new CompilationException("Compilation error for class "+className);
+				throw new CompilationException("Compilation error for class "+className+"\n see log for complete errors:\n"+errors.substring(0,Math.min(100, errors.length())));
 			} else {
 				byte[] contents = FileUtils.readBytesContents(classFile);
 				FileUtils.delete(classFile);
@@ -59,8 +59,10 @@ public class CompilerManager implements ICompilerManager {
 				return classLoaderManager.loadClass(className);
 			}
 		} catch (Exception e) {
-			FimetLogger.error(CompilerManager.class, "Compilation error",e);
-			return null;	
+			if (e instanceof CompilationException) {
+				throw ((CompilationException)e);
+			}
+			throw new CompilationException("Compilation error for class "+className);
 		}
 	}
 	@Override

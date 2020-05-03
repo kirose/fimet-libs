@@ -1,0 +1,31 @@
+[2020-05-02 19:48:34.496][START][purchase-0]
+[2020-05-02 19:48:34.533][END][purchase-0][COMPLETE][37]
+[2020-05-02 19:48:34.72][START][purchase-1]
+[2020-05-02 19:48:34.727][I][purchase-1][National][7991][
+[SUCCESSFUL]["00".equals(msg.getValue(39))]
+]
+[2020-05-02 19:48:34.727][END][purchase-1][COMPLETE][7]
+[2020-05-02 19:48:34.874][START][purchase-2]
+[2020-05-02 19:48:34.874][I][purchase-2][National][7121][
+[SUCCESSFUL]["00".equals(msg.getValue(39))]
+]
+[2020-05-02 19:48:34.874][END][purchase-2][COMPLETE][0]
+[2020-05-02 19:48:35.014][START][purchase]
+[2020-05-02 19:48:35.014][I][purchase][National][7251][
+[SUCCESSFUL]["00".equals(msg.getValue(39))]
+]
+[2020-05-02 19:48:35.014][END][purchase][COMPLETE][0]
+[2020-05-02 19:48:35.155][START][reversal]
+[2020-05-02 19:48:35.155][I][reversal][National][7251][
+[SUCCESSFUL]["00".equals(msg.getValue(39))]
+]
+[2020-05-02 19:48:35.155][END][reversal][COMPLETE][0]
+[2020-05-02 19:48:35.155][START][Compra]
+[2020-05-02 19:48:35.686][I][Compra][National][8583][
+[SUCCESSFUL][Approved]
+]
+[2020-05-02 19:48:35.688][END][Compra][COMPLETE][533]
+[2020-05-02 19:48:35.689][START][PurchaseVisa]
+[2020-05-02 19:48:35.7][END][PurchaseVisa][COMPLETE][11]
+[2020-05-02 19:48:35.7][START][ReversalVisa]
+[2020-05-02 19:48:35.705][END][ReversalVisa][COMPLETE][5]

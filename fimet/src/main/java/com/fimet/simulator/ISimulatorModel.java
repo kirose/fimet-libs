@@ -8,9 +8,7 @@ import com.fimet.iso8583.parser.Message;
  *
  */
 public interface ISimulatorModel {
-	public Integer getId();
 	public String getName();
 	public Message simulateRequest(Message message);
 	public Message simulateResponse(Message message);
-	public void free();
 }

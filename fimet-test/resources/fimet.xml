@@ -6,6 +6,7 @@
 	<properties>
 		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/>
 		<property name="simulator.numberOfThreads" value="5"/>
+		<property name="simulator.recompileModelsAtStartup" value="true"/>
 		<property name="usecase.maxExecutionTime" value="9000"/>
 	</properties> 
 	<!-- You can declare a new manager or override an existent -->
@@ -17,6 +18,7 @@
 	</managers>
 	<!-- This simulators will be pre-loaded but not connected -->
 	<simulators>
-		<simulator id="Nat" model="National" parser="National" server="false" address="127.0.0.1" port="9128" adapter="Exclusive" /> 
+		<simulator id="SVisa" model="MVisa" parser="National" server="false" address="127.0.0.1" port="9128" adapter="Exclusive" />
+		<model id = "MVisa" class="com.fimet.test.SMVisa" />
 	</simulators>
 </fimet>

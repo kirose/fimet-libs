@@ -78,7 +78,6 @@ public class SimulatorModel implements ISimulatorModel {
 			return simulator.simulate(message);
 		}
 	}
-	@Override
 	public Integer getId() {
 		return idSimulator;
 	}

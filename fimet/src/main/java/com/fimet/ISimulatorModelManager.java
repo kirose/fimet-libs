@@ -17,8 +17,6 @@ public interface ISimulatorModelManager extends IManager {
 	public List<ESimulator> getIssuerEntities();
 	public ESimulator getEntity(Integer id);
 	public ESimulator getEntity(String name);
-	public void freeSimulator(int id);
-	public void freeSimulators(List<Integer> ids);
 	public ESimulator saveSimulator(ESimulator simulator);
 	public ESimulator deleteSimulator(ESimulator simulator);
 	public ESimulatorMessage saveSimulatorMessage(ESimulatorMessage message);
@@ -26,5 +24,6 @@ public interface ISimulatorModelManager extends IManager {
 	public Integer getNextIdSimulator();
 	public Integer getPrevIdSimulator();
 	public ISimulatorModel getSimulatorModel(String name);
-	public ISimulatorModel getSimulatorModel(Integer idSimulator);
+	public void reloadSimulator(String name);
+	public void reloadSimulators(List<String> names);
 }

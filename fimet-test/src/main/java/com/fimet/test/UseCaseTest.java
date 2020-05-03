@@ -1,8 +1,10 @@
 package com.fimet.test;
 
+import com.fimet.ISimulatorManager;
 import com.fimet.IUseCaseManager;
 import com.fimet.Manager;
 import com.fimet.adapter.iso8583.MLI;
+import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.PSimulator;
 import com.fimet.usecase.IUseCase;
 import com.fimet.usecase.exe.ExecutionResult;
@@ -27,6 +29,7 @@ public class UseCaseTest implements IExecutorListener {
 		// Simulator Parameters
 		PSimulator socketAcq = new PSimulator("National", "National", "127.0.0.1", 8583, false, MLI.EXCLUSIVE);
     	PSimulator socketIss = new PSimulator("National", "National", "127.0.0.1", 8583, true, MLI.EXCLUSIVE);
+    	PSimulator socketVisaIss = new PSimulator("National", "National", "127.0.0.1", 9128, true, MLI.EXCLUSIVE);
 
 		// Execute a use cases with UseCaseBuilder
     	new UseCaseBuilder("Compra", socketAcq)
@@ -39,7 +42,27 @@ public class UseCaseTest implements IExecutorListener {
     	.setMessageValue(11, "123456")
     	// Simulator extensions are created authomatically for files "uc"
     	.setSimulatorExtension(new SimulatorExtension())
-    	.execute();		
+    	.execute();
+
+    	new UseCaseBuilder("PurchaseVisa", "SVisa")
+    	.addConnection(socketVisaIss)
+    	.setMessageMti("0200")
+    	.setMessageHeader("ISO858300000")
+    	.setMessageValue(2, "1234567890123456")
+    	.setMessageValue(3, "000000")
+    	.setMessageValue(4, "000000012300")
+    	.setMessageValue(11, "123456")
+    	.execute();
+    	new UseCaseBuilder("ReversalVisa", "SVisa")
+    	.addConnection(socketVisaIss)
+    	.setAuthorization("PurchaseVisa")
+    	.setMessageMti("0420")
+    	.setMessageHeader("ISO858300000")
+    	.setMessageValue(2, "1234567890123456")
+    	.setMessageValue(3, "000000")
+    	.setMessageValue(4, "000000012300")
+    	.setMessageValue(11, "123456")
+    	.execute();	
 	}
 	@Override
 	public void onStart(IUseCase useCase) {

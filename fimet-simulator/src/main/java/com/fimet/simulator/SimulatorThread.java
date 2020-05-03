@@ -11,22 +11,22 @@ import com.fimet.simulator.ISimulatorThread;
 public class SimulatorThread extends Thread implements ISimulatorThread {
 	SimulatorThread next;
 	private boolean alive;
-	private LinkedBlockingQueue<Node> queue;
+	private LinkedBlockingQueue<Operation> queue;
 	public SimulatorThread(int index) {
 		super("SimulatorThread-"+index);
-		queue = new LinkedBlockingQueue<Node>();
+		queue = new LinkedBlockingQueue<Operation>();
 		alive = true;
 		start();
 	}
 	public void simulateRead(ISimulator s, byte[] message) {
-		queue.add(new Node(Type.READ, s, message));
+		queue.add(new Operation(Type.READ, s, message));
 	}
 	public void simulateWrite(ISimulator s, Message message) {
-		queue.add(new Node(Type.WRITE, s, message));
+		queue.add(new Operation(Type.WRITE, s, message));
 	}
 	public void run() {
 		try {
-			Node next;
+			Operation next;
 			while (alive) {
 				next = queue.take();
 				switch (next.type) {
@@ -44,11 +44,11 @@ public class SimulatorThread extends Thread implements ISimulatorThread {
 			FimetLogger.error("Thread error", e);
 		}
 	}
-	private class Node {
+	private class Operation {
 		Type type;
 		volatile ISimulator simulator;
 		volatile Object message;
-		public Node(Type type, ISimulator s, Object message) {
+		public Operation(Type type, ISimulator s, Object message) {
 			super();
 			this.type = type;
 			this.simulator = s;

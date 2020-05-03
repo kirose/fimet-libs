@@ -113,7 +113,12 @@ public class Message implements Serializable, Cloneable, IMessage {
 	public void remove(String idField) {
 		fields.remove(idField);
 	}
-	public void removeAll(Collection<String> all) {
+	public void remove(String ...idFields) {
+		for (String idField : idFields) {
+			fields.remove(idField);
+		}
+	}
+	public void remove(Collection<String> all) {
 		for (String idField : all) {
 			fields.remove(idField);
 		}

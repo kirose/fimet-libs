@@ -18,6 +18,4 @@ public interface ISimulatorManager extends IManager {
 	public void disconnect(PSimulator simulator);
 	public void disconnectAll();
 	public ISimulatorThread getNextSimulatorThread();
-	public void freeSimulator(int id);
-	public void freeSimulators(List<Integer> ids);
 }
