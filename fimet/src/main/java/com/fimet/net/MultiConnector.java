@@ -1,14 +1,16 @@
 package com.fimet.net;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fimet.ISimulatorManager;
 import com.fimet.ITimerManager;
 import com.fimet.Manager;
 import com.fimet.commons.FimetLogger;
+import com.fimet.simulator.ISimulator;
 import com.fimet.timer.ITimerListener;
 import com.fimet.timer.Scheduled;
 
@@ -16,41 +18,31 @@ public class MultiConnector implements IConnectionListener, ITimerListener {
 	private static final long MAX_WAITING_TIME = Manager.getPropertyLong("multiConnector.maxWaitingTime", 3000L);
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
 	static ITimerManager timerManager = Manager.get(ITimerManager.class);
-	private IMultiConnectorListener listener = NullMultiConnectorListener.INSTANCE;
-	private IConnectionListener connectionListener = NullConnectionListener.INSTANCE;
+	private IMultiConnectorListener listener;
 	private IMultiConnectable multiConnectable;
-	private Set<Integer> toConnect = new HashSet<Integer>();
+	private Map<IConnectable, IConnectionListener> toConnect;
 	private boolean async;
 	private Scheduled scheduled;
-	public MultiConnector(IMultiConnectable multiConnectable, IMultiConnectorListener listener) {
-		this.multiConnectable = multiConnectable;
-		for (IConnectable p : multiConnectable.getConnectables()) {
-			this.toConnect.add(p.hashCode());
-		}
-		this.setMultiConnectiorListener(listener);
-		if (listener instanceof IConnectionListener) {
-			connectionListener = (IConnectionListener)listener;
-		}
-	}
-	public MultiConnector(IMultiConnectable connectable) {
-		this(connectable, (connectable instanceof IMultiConnectorListener) ? (IMultiConnectorListener)connectable : null);
+	public MultiConnector(IMultiConnectable multiConnectable) {
+		_init(multiConnectable);
 	}
 	public MultiConnector(IConnectable ... connectables) {
-		this.multiConnectable = new DefaultMultiConnectable(connectables);
-		for (IConnectable p : connectables) {
-			this.toConnect.add(p.hashCode());
-		}
+		_init(new DefaultMultiConnectable(connectables));
 	}
 	public MultiConnector(List<IConnectable> connectables) {
-		this.multiConnectable = new DefaultMultiConnectable(connectables);
-		for (IConnectable p : connectables) {
-			this.toConnect.add(p.hashCode());
-		}
+		_init(new DefaultMultiConnectable(connectables));
+	}
+	private void _init(IMultiConnectable multiConnectable) {
+		this.multiConnectable = multiConnectable;
+		this.listener = NullMultiConnectorListener.INSTANCE;
+		this.toConnect = new ConcurrentHashMap<IConnectable, IConnectionListener>();
+		prepareToConnect(multiConnectable.getConnectables());
 	}
 	@Override
 	synchronized public void onConnected(IConnectable connectable) {
-		connectable.setConnectionListener(connectionListener);
-		toConnect.remove(connectable.hashCode());
+		IConnectionListener original = toConnect.remove(connectable);
+		connectable.setConnectionListener(original);
+		original.onConnected(connectable);
 		listener.onConnectorConnect(connectable);
 		if(toConnect.isEmpty()) {
 			scheduled.cancel();
@@ -62,24 +54,28 @@ public class MultiConnector implements IConnectionListener, ITimerListener {
 			}
 		}
 	}
-	private void _connectSimulators() {
-		scheduled = timerManager.schedule(this, MAX_WAITING_TIME, this);
-		for (IConnectable connectable : multiConnectable.getConnectables()) {
-			if (connectable.isDisconnected()) {
-				connectable.setConnectionListener(this);
-				connectable.connect();
-			} else if (connectable.isConnected()) {
-				onConnected(connectable);
+	private void doConnect() {
+		if (toConnect.isEmpty()) {
+			listener.onConnectorConnectAll(multiConnectable);
+		} else {
+			scheduled = timerManager.schedule(this, MAX_WAITING_TIME, this);
+			for (IConnectable connectable : multiConnectable.getConnectables()) {
+				if (connectable.isDisconnected()) {
+					connectable.connect();
+				} else if (connectable.isConnected()) {
+					onConnected(connectable);
+				}
 			}
 		}
 	}
-	public void connectAsync() {
+	public void connectAsync(IMultiConnectorListener listener) {
 		async = true;
-		_connectSimulators();
+		this.listener = listener != null ? listener : NullMultiConnectorListener.INSTANCE;
+		doConnect();
 	}
 	public void connectSync() {
 		async = true;
-		_connectSimulators();
+		doConnect();
 		if(!toConnect.isEmpty()) {
 			synchronized (this) {
 				try {
@@ -90,19 +86,24 @@ public class MultiConnector implements IConnectionListener, ITimerListener {
 			}
 		}
 	}
-	public MultiConnector setAsync(boolean async) {
-		this.async = async;
-		return this;
-	}
-	public MultiConnector setMultiConnectiorListener(IMultiConnectorListener listener) {
-		this.listener = listener != null ? listener : NullMultiConnectorListener.INSTANCE;
-		return this;
+	private void prepareToConnect(List<IConnectable> connectables) {
+		for (IConnectable c : connectables) {
+			if (c.isDisconnected()) {
+				if (c instanceof ISimulator) {
+					c =((ISimulator)c).getSocket();
+				}
+				if (!toConnect.containsKey(c)) {
+					toConnect.put(c, c.getConnectionListener());
+					c.setConnectionListener(this);
+				}
+			}
+		}
 	}
 	public static interface IMultiConnectable {
 		List<IConnectable> getConnectables();
 	}
 	public static interface IMultiConnectorListener {
-		void onConnectorConnect(IConnectable simulator);
+		void onConnectorConnect(IConnectable connectable);
 		void onConnectorConnectAll(IMultiConnectable connectable);
 		void onConnectorTimeout(IMultiConnectable connectable);
 	}
@@ -128,9 +129,8 @@ public class MultiConnector implements IConnectionListener, ITimerListener {
 	}
 	@Override
 	public void onTimeout(Object o) {
-		List<IConnectable> connectables = multiConnectable.getConnectables();
-		for (IConnectable iConnectable : connectables) {
-			iConnectable.setConnectionListener(connectionListener);
+		for (Entry<IConnectable, IConnectionListener> e : toConnect.entrySet()) {
+			e.getKey().setConnectionListener(e.getValue());
 		}
 		listener.onConnectorTimeout(multiConnectable);
 	}

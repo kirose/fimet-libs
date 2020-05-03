@@ -2,27 +2,33 @@ package com.fimet.stress.exe;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.commons.exception.FimetException;
+import com.fimet.exe.IStressStore;
 
-public class FileStoreResults implements IStoreResults {
+public class StressStore implements IStressStore {
 	private File fileCycle;
 	private File fileGlobal;
-	private java.io.OutputStreamWriter outCycle;
-	private java.io.OutputStreamWriter outGlobal;
-	public FileStoreResults(String pathCycle) {
+	private OutputStreamWriter outCycle;
+	private OutputStreamWriter outGlobal;
+	public StressStore() {
+		this((File)null, (File)null);
+	}
+	public StressStore(String pathCycle) {
 		this(new File(pathCycle));
 	}
-	public FileStoreResults(File cycleOutputFile) {
+	public StressStore(File cycleOutputFile) {
 		this(cycleOutputFile,null);
 	}
-	public FileStoreResults(String cycleOutputPath, String globalOutputPath) {
-		this(new File(cycleOutputPath), globalOutputPath != null ? new File(globalOutputPath) : null);
+	public StressStore(String cycleOutputPath, String globalOutputPath) {
+		this(cycleOutputPath != null ? new File(cycleOutputPath) : null,
+			globalOutputPath != null ? new File(globalOutputPath) : null);
 	}
-	public FileStoreResults(File cycleOutputFile, File globalOutputFile) {
-		this.fileCycle = cycleOutputFile;
-		this.fileGlobal = globalOutputFile;
+	public StressStore(File cycleOutputFile, File globalOutputFile) {
+		this.fileCycle = cycleOutputFile != null ? cycleOutputFile : new File("stress/stress-results-cycle.txt");
+		this.fileGlobal = globalOutputFile != null ? globalOutputFile : new File("stress/stress-results-final.txt");
 		open();
 		writeHeaders();
 	}
@@ -31,14 +37,14 @@ public class FileStoreResults implements IStoreResults {
 			outCycle.write(InjectorResult.getHeadersCycleStats()+"\n");
 			outCycle.flush();
 		} catch (IOException e) {
-			FimetLogger.error(FileStoreResults.class, "Error writing cycle results", e);
+			FimetLogger.error(StressStore.class, "Error writing cycle results", e);
 		}
 		if (outGlobal != null) {
 			try {
 				outGlobal.write(InjectorResult.getHeadersGlobalStats()+"\n");
 				outGlobal.flush();
 			} catch (IOException e) {
-				FimetLogger.error(FileStoreResults.class, "Error writing cycle results", e);
+				FimetLogger.error(StressStore.class, "Error writing cycle results", e);
 			}
 		}
 	}
@@ -48,7 +54,7 @@ public class FileStoreResults implements IStoreResults {
 			outCycle.write(result.getCycleStats()+"\n");
 			outCycle.flush();
 		} catch (IOException e) {
-			FimetLogger.error(FileStoreResults.class, "Error writing cycle results", e);
+			FimetLogger.error(StressStore.class, "Error writing cycle results", e);
 		}
 	}
 
@@ -59,7 +65,7 @@ public class FileStoreResults implements IStoreResults {
 				outGlobal.write(result.getGlobalStats()+"\n");
 				outGlobal.flush();
 			} catch (IOException e) {
-				FimetLogger.error(FileStoreResults.class, "Error writing cycle results", e);
+				FimetLogger.error(StressStore.class, "Error writing cycle results", e);
 			}
 		}
 	}

@@ -11,39 +11,33 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
 import com.fimet.commons.FimetLogger;
+import com.fimet.exe.IStressExecutorListener;
 import com.fimet.net.ISocket;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.PSimulator;
+import com.fimet.stress.Stress;
 import com.fimet.stress.creator.CartesianCreator;
-import com.fimet.stress.exe.IExecutor;
-import com.fimet.stress.exe.IExecutorListener;
-import com.fimet.stress.exe.IStoreResults;
 import com.fimet.stress.exe.InjectorResult;
-import com.fimet.stress.exe.NullExecutorListener;
-import com.fimet.stress.exe.NullStoreResults;
+import com.fimet.stress.exe.NullStressExecutorListener;
 import com.fimet.usecase.UseCase;
 
-public class StressMultiStepBuilder implements IExecutorListener {
+public class StressMultiStepBuilder implements IStressExecutorListener {
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
 	private List<ISimulator> simulators;
 	private ConcurrentLinkedQueue<Step> steps = new ConcurrentLinkedQueue<Step>();
 	private Map<File, IStepFileCreator> stepFileCreators;
-	private IStoreResults store;
 	private File output;
-	private IExecutorListener listener;
-	public StressMultiStepBuilder() {
+	private IStressExecutorListener listener;
+	private String name; 
+	public StressMultiStepBuilder(String name) {
+		this.name = name;
 		simulators = new ArrayList<>();
-		store = NullStoreResults.INSTANCE;
 		stepFileCreators = new HashMap<>();
 		output = new File("stress/");
-		listener = NullExecutorListener.INSTANCE;
+		listener = NullStressExecutorListener.INSTANCE;
 	}
-	public StressMultiStepBuilder setStore(IStoreResults store) {
-		this.store = store != null ? store : NullStoreResults.INSTANCE;
-		return this;
-	}
-	public StressMultiStepBuilder setExecutorListener(IExecutorListener listener) {
-		this.listener = listener != null ? listener : NullExecutorListener.INSTANCE;
+	public StressMultiStepBuilder setExecutorListener(IStressExecutorListener listener) {
+		this.listener = listener != null ? listener : NullStressExecutorListener.INSTANCE;
 		return this;
 	}
 	public StressMultiStepBuilder connect(PSimulator ... simulators) {
@@ -77,10 +71,9 @@ public class StressMultiStepBuilder implements IExecutorListener {
 		return this;
 	}
 	private void executeStep(Step step) {
-		StressBuilder sb = new StressBuilder()
+		StressBuilder sb = new StressBuilder(name+"-"+step)
     	.setCycleTime(step.cycleTime)
     	.setMessagesPerCycle(step.numOfInjecion)
-    	.setStoreResults(store)
     	.setExecutorListener(this)
 		.connect(simulators);
 		for (Entry<File, IStepFileCreator> e : stepFileCreators.entrySet()) {
@@ -114,7 +107,6 @@ public class StressMultiStepBuilder implements IExecutorListener {
 		}
 	}
 	private void onMultiStepFinish() {
-		store.close();
 		for (Entry<File, IStepFileCreator> e : stepFileCreators.entrySet()) {
 			try {
 				UseCase useCase = UseCaseUtils.parseForExecution(e.getKey());
@@ -159,6 +151,9 @@ public class StressMultiStepBuilder implements IExecutorListener {
 		public int getPanEnd() {
 			return panEnd;
 		}
+		public String toString() {
+			return cycleTime+"x"+numOfInjecion+"["+panStart+","+panEnd+"]";
+		}
 	}
 	@Override
 	public void onInjectorFinishCycle(InjectorResult result) {
@@ -173,12 +168,12 @@ public class StressMultiStepBuilder implements IExecutorListener {
 		listener.onInjectorFinish(result);
 	}
 	@Override
-	public void onExecutorStart(IExecutor executor) {
-		listener.onExecutorStart(executor);
+	public void onStressStart(Stress stress) {
+		listener.onStressStart(stress);
 	}
 	@Override
-	public void onExecutorFinish(IExecutor executor) {
-		listener.onExecutorFinish(executor);
+	public void onStressFinish(Stress stress, List<InjectorResult> results) {
+		listener.onStressFinish(stress, results);
 		executeNextStep();
 	}
 }

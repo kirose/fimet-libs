@@ -12,8 +12,9 @@
 	<!-- You can declare a new manager or override an existent -->
 	<managers>
 		<manager id="com.fimet.ISocketManager" class="com.fimet.net.SocketManager"/>
-		<manager id="com.fimet.IUseCaseManager" class="com.fimet.usecase.UseCaseManager">
-			<extension id="com.fimet.usecase.exe.IStoreResults" class="com.fimet.usecase.exe.LogFilesStore" />
+		<manager id="com.fimet.IExecutorManager" class="com.fimet.exe.ExecutorManager">
+			<extension id="com.fimet.exe.IUseCaseExecutor" class="com.fimet.usecase.exe.UseCaseExecutor" />
+			<extension id="com.fimet.exe.IUseCaseStore" class="com.fimet.usecase.exe.UseCaseStore" />
 		</manager>
 	</managers>
 	<!-- This simulators will be pre-loaded but not connected -->

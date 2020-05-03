@@ -38,6 +38,10 @@ public final class PanUtils {
 		System.out.println(calculateLastDigit("4101773000653800"));
 		System.out.println(calculateLastDigit("6274670000000006"));
 		System.out.println(calculateLastDigit("9900003000653804"));
+		System.out.println(calculateLastDigit("9900003000653801232"));
+		StringBuffer sb = new StringBuffer();
+		
+		System.out.println(sb.append(2).append(15).toString());
 	}
 	public static char calculateLastDigit(String pan) {
 		if (pan == null) {

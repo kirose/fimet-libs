@@ -75,7 +75,7 @@ public class Manager {
 		loadManager(ICompilerManager.class, "com.fimet.compiler.CompilerManager");
 		loadManager(IPreferencesManager.class, "com.fimet.preferences.PreferencesManager");
 		loadManager(ISessionManager.class, "com.fimet.usecase.SessionManager");
-		loadManager(IUseCaseManager.class, "com.fimet.usecase.UseCaseManager");
+		loadManager(IExecutorManager.class, "com.fimet.exe.ExecutorManager");
 		loadManager(IAdapterManager.class, "com.fimet.adapter.AdapterManager");
 		loadManager(ISocketManager.class, "com.fimet.net.SocketManager");
 		loadManager(ISimulatorModelManager.class, "com.fimet.simulator.SimulatorModelManager");

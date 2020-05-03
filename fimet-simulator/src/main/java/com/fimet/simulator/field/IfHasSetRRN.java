@@ -1,7 +1,7 @@
 package com.fimet.simulator.field;
 
 import com.fimet.iso8583.parser.Message;
-import com.fimet.simulator.msg.ISimulatorField;
+import com.fimet.simulator.ISimulatorField;
 
 public class IfHasSetRRN implements ISimulatorField {
 	private static IfHasSetRRN instance;

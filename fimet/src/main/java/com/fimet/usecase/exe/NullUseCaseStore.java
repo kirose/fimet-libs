@@ -1,12 +1,13 @@
 package com.fimet.usecase.exe;
 
+import com.fimet.exe.IUseCaseStore;
 import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ValidationResult;
 import com.fimet.usecase.IUseCase;
 
-public class NullStoreResults implements IStoreResults {
-	public static final IStoreResults INSTANCE = new NullStoreResults();
+public class NullUseCaseStore implements IUseCaseStore {
+	public static final IUseCaseStore INSTANCE = new NullUseCaseStore();
 
 	@Override
 	public void storeStart(IUseCase useCase) {

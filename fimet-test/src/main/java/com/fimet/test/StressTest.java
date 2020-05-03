@@ -1,15 +1,15 @@
 package com.fimet.test;
 
 import java.io.File;
+import java.util.List;
 
 import com.fimet.adapter.iso8583.MLI;
+import com.fimet.exe.IStressExecutorListener;
 import com.fimet.simulator.PSimulator;
+import com.fimet.stress.Stress;
 import com.fimet.stress.creator.CartesianCreator;
 import com.fimet.stress.creator.FieldVariator;
 import com.fimet.stress.creator.PanVariator;
-import com.fimet.stress.exe.FileStoreResults;
-import com.fimet.stress.exe.IExecutor;
-import com.fimet.stress.exe.IExecutorListener;
 import com.fimet.stress.exe.InjectorResult;
 import com.fimet.usecase.UseCase;
 import com.fimet.utils.MessageBuilder;
@@ -20,7 +20,7 @@ import com.fimet.utils.UseCaseUtils;
  * @author Marco A. Salazar
  *
  */
-public class StressTest implements IExecutorListener {
+public class StressTest implements IStressExecutorListener {
 	public static void main(String[] args) throws Exception {
 		new StressTest().test();
 	}
@@ -62,9 +62,7 @@ public class StressTest implements IExecutorListener {
 		.addVariation("11", new FieldVariator(6,'0').setRange(0, 4).variate())
 		.create();
     	
-    	new StressBuilder()
-    	// Setting the store for the results 
-    	.setStoreResults(new FileStoreResults("stress/stress-results-cycle.txt", "stress/stress-results-final.txt"))
+    	new StressBuilder("StressTest")
     	// cycle time until the file is fully read
     	.setCycleTime(1000)
     	// number of messages injected per cycle
@@ -96,12 +94,12 @@ public class StressTest implements IExecutorListener {
 	}
 
 	@Override
-	public void onExecutorStart(IExecutor executor) {
+	public void onStressStart(Stress executor) {
 		System.out.println("***********Start stress execution************");
 	}
 
 	@Override
-	public void onExecutorFinish(IExecutor executor) {
+	public void onStressFinish(Stress executor, List<InjectorResult> results) {
 		System.out.println("***********Finish stress execution************");
 	}
 }

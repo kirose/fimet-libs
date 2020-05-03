@@ -2,8 +2,8 @@ package com.fimet.simulator.field;
 
 
 import com.fimet.iso8583.parser.Message;
-import com.fimet.simulator.msg.AbstractRandom;
-import com.fimet.simulator.msg.ISimulatorField;
+import com.fimet.simulator.AbstractRandom;
+import com.fimet.simulator.ISimulatorField;
 
 public class IfHasSetRandom6N extends AbstractRandom implements ISimulatorField {
 	private static IfHasSetRandom6N instance;

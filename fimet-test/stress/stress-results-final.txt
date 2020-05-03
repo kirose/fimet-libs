@@ -1,0 +1,1 @@
+CycleNumber,Port,NumOfWriteSocket,NumOfReadSocket,RatioResponse,MeanRatioResponse,NumOfInject,InjectedTime,IP,TimestampStart,TimestampFinish

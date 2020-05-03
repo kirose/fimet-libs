@@ -9,6 +9,30 @@ import com.fimet.Manager;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorThread;
 import com.fimet.simulator.PSimulator;
+import com.fimet.simulator.field.IfHasSetAmount;
+import com.fimet.simulator.field.IfHasSetCorrectPanLastDigit;
+import com.fimet.simulator.field.IfHasSetEntryMode;
+import com.fimet.simulator.field.IfHasSetModuloExtranjero;
+import com.fimet.simulator.field.IfHasSetNewDateMMdd;
+import com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss;
+import com.fimet.simulator.field.IfHasSetNewDatehhmmss;
+import com.fimet.simulator.field.IfHasSetNewDateyyMMddhhmmss;
+import com.fimet.simulator.field.IfHasSetPanLast4Digits;
+import com.fimet.simulator.field.IfHasSetRRN;
+import com.fimet.simulator.field.IfHasSetRandom12AN;
+import com.fimet.simulator.field.IfHasSetRandom12N;
+import com.fimet.simulator.field.IfHasSetRandom6AN;
+import com.fimet.simulator.field.IfHasSetRandom6N;
+import com.fimet.simulator.field.SetNewDateMMdd;
+import com.fimet.simulator.field.SetNewDateMMddhhmmss;
+import com.fimet.simulator.field.SetNewDatehhmmss;
+import com.fimet.simulator.field.SetNewDateyyMMddhhmmss;
+import com.fimet.simulator.field.SetRandom12AN;
+import com.fimet.simulator.field.SetRandom12N;
+import com.fimet.simulator.field.SetRandom15N;
+import com.fimet.simulator.field.SetRandom6AN;
+import com.fimet.simulator.field.SetRandom6N;
+import com.fimet.simulator.field.SetRandom9N;
 import com.fimet.xml.FimetXml;
 import com.fimet.xml.SimulatorXml;
 
@@ -101,4 +125,33 @@ public class SimulatorManager implements ISimulatorManager {
 	}
 	@Override
 	public void saveState() {}
+	@Override
+	public Class<?>[] getSimulatorFieldClasses() {
+		return new Class<?>[] {
+			IfHasSetNewDateyyMMddhhmmss.class,
+			IfHasSetNewDateMMddhhmmss.class,
+			IfHasSetNewDatehhmmss.class,
+			IfHasSetNewDateMMdd.class,
+			IfHasSetAmount.class,
+			IfHasSetEntryMode.class,
+			IfHasSetCorrectPanLastDigit.class,
+			IfHasSetPanLast4Digits.class,
+			IfHasSetRRN.class,
+			IfHasSetModuloExtranjero.class,
+			IfHasSetRandom12N.class,
+			IfHasSetRandom6N.class,
+			IfHasSetRandom12AN.class,
+			IfHasSetRandom6AN.class,
+			SetRandom15N.class,
+			SetRandom12N.class,
+			SetRandom6N.class,
+			SetRandom9N.class,
+			SetRandom12AN.class,
+			SetRandom6AN.class,
+			SetNewDateyyMMddhhmmss.class,
+			SetNewDateMMddhhmmss.class,
+			SetNewDatehhmmss.class,
+			SetNewDateMMdd.class
+		};
+	}
 }

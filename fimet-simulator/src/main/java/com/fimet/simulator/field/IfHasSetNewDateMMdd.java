@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.fimet.commons.utils.DateUtils;
 import com.fimet.iso8583.parser.Message;
-import com.fimet.simulator.msg.ISimulatorField;
+import com.fimet.simulator.ISimulatorField;
 
 public class IfHasSetNewDateMMdd implements ISimulatorField {
 	private static IfHasSetNewDateMMdd instance;

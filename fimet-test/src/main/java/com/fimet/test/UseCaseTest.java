@@ -1,22 +1,20 @@
 package com.fimet.test;
 
-import com.fimet.ISimulatorManager;
-import com.fimet.IUseCaseManager;
+import com.fimet.IExecutorManager;
 import com.fimet.Manager;
 import com.fimet.adapter.iso8583.MLI;
-import com.fimet.simulator.ISimulator;
+import com.fimet.exe.IUseCaseExecutorListener;
 import com.fimet.simulator.PSimulator;
 import com.fimet.usecase.IUseCase;
 import com.fimet.usecase.exe.ExecutionResult;
-import com.fimet.usecase.exe.IExecutorListener;
 import com.fimet.utils.UseCaseBuilder;
 /**
  * A simple example for create and execute use cases 
  * @author Marco A. Salazar
  *
  */
-public class UseCaseTest implements IExecutorListener {
-	static IUseCaseManager useCaseManager = Manager.get(IUseCaseManager.class);
+public class UseCaseTest implements IUseCaseExecutorListener {
+	static IExecutorManager useCaseManager = Manager.get(IExecutorManager.class);
 	public static void main(String[] args) throws Exception {
 		new UseCaseTest().test();
 	}

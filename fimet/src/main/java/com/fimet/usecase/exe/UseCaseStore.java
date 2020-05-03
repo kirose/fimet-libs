@@ -8,19 +8,20 @@ import java.sql.Timestamp;
 import com.fimet.commons.FimetLogger;
 import com.fimet.commons.converter.Converter;
 import com.fimet.commons.exception.FimetException;
+import com.fimet.exe.IUseCaseStore;
 import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ValidationResult;
-import com.fimet.stress.exe.FileStoreResults;
+import com.fimet.stress.exe.StressStore;
 import com.fimet.usecase.IUseCase;
 
-public class LogFilesStore implements IStoreResults {
+public class UseCaseStore implements IUseCaseStore {
 	private static final File LOGS_FOLDER = new File("logs"); 
 	private File logFile;
 	private File validationsFile;
 	private OutputStreamWriter logWriter;
 	private OutputStreamWriter validationsWriter;
-	public LogFilesStore() {
+	public UseCaseStore() {
 		if (!LOGS_FOLDER.exists()) {
 			LOGS_FOLDER.mkdirs();
 		}
@@ -58,7 +59,7 @@ public class LogFilesStore implements IStoreResults {
 			 );
 			validationsWriter.flush();
 		} catch (IOException e) {
-			FimetLogger.error(FileStoreResults.class, "Error writing log:"+validationsFile.getName(), e);
+			FimetLogger.error(StressStore.class, "Error writing log:"+validationsFile.getName(), e);
 		}
 	}
 	@Override
@@ -73,7 +74,7 @@ public class LogFilesStore implements IStoreResults {
 			 );
 			validationsWriter.flush();
 		} catch (IOException e) {
-			FimetLogger.error(FileStoreResults.class, "Error writing log:"+validationsFile.getName(), e);
+			FimetLogger.error(StressStore.class, "Error writing log:"+validationsFile.getName(), e);
 		}
 	}
 	private void writeLog(String inOut, ISimulator simulator, IUseCase useCase, Message message, byte[] bytes) {
@@ -89,7 +90,7 @@ public class LogFilesStore implements IStoreResults {
 			 );
 			logWriter.flush();
 		} catch (IOException e) {
-			FimetLogger.error(FileStoreResults.class, "Error writing log:"+validationsFile.getName(), e);
+			FimetLogger.error(StressStore.class, "Error writing log:"+validationsFile.getName(), e);
 		}
 	}
 	private void writeValidations(String inOut, ISimulator simulator, IUseCase useCase, ValidationResult[] validations) {
@@ -109,7 +110,7 @@ public class LogFilesStore implements IStoreResults {
 				validationsWriter.write(s.toString());
 				validationsWriter.flush();
 			} catch (IOException e) {
-				FimetLogger.error(FileStoreResults.class, "Error writing log:"+logFile.getName(), e);
+				FimetLogger.error(StressStore.class, "Error writing log:"+logFile.getName(), e);
 			}
 		}
 	}

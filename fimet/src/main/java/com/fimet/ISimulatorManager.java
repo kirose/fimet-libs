@@ -1,7 +1,5 @@
 package com.fimet;
 
-import java.util.List;
-
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorThread;
 import com.fimet.simulator.PSimulator;
@@ -11,11 +9,11 @@ import com.fimet.simulator.PSimulator;
  *
  */
 public interface ISimulatorManager extends IManager {
-	
 	public ISimulator getSimulator(String externalId);
 	public ISimulator getSimulator(PSimulator simulator);
 	public ISimulator connect(PSimulator simulator);
 	public void disconnect(PSimulator simulator);
 	public void disconnectAll();
 	public ISimulatorThread getNextSimulatorThread();
+	public Class<?>[] getSimulatorFieldClasses();
 }

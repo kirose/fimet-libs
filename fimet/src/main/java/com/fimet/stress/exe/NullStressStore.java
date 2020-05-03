@@ -1,7 +1,9 @@
 package com.fimet.stress.exe;
 
-public class NullStoreResults implements IStoreResults {
-	public static final IStoreResults INSTANCE = new NullStoreResults();
+import com.fimet.exe.IStressStore;
+
+public class NullStressStore implements IStressStore {
+	public static final IStressStore INSTANCE = new NullStressStore();
 	@Override
 	public void storeCycleResults(InjectorResult result) {}
 

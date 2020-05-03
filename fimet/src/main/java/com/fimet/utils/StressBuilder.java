@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fimet.IExecutorManager;
 import com.fimet.ISimulatorManager;
 import com.fimet.ISocketManager;
 import com.fimet.Manager;
 import com.fimet.commons.exception.FimetException;
+import com.fimet.exe.IStressExecutorListener;
 import com.fimet.net.IConnectable;
 import com.fimet.net.ISocket;
 import com.fimet.net.MultiConnector;
@@ -18,21 +20,20 @@ import com.fimet.net.MultiConnector.IMultiConnectable;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.PSimulator;
 import com.fimet.stress.Stress;
-import com.fimet.stress.exe.IExecutorListener;
-import com.fimet.stress.exe.IStoreResults;
-import com.fimet.stress.exe.StressExecutor;
+import com.fimet.stress.exe.NullStressExecutorListener;
 
 public class StressBuilder implements IMultiConnectorListener, IMultiConnectable {
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
 	static ISocketManager socketManager = Manager.get(ISocketManager.class);
+	static IExecutorManager executorManager = Manager.get(IExecutorManager.class);
+	
 	private Stress stress;
-	private StressExecutor executor;
+	private IStressExecutorListener listener;
 	private List<IConnectable> connectables;
-	public StressBuilder() {
+	public StressBuilder(String name) {
 		stress = new Stress();
-		stress.setName("Stress Unkown");
+		stress.setName(name);
 		stress.setStressFiles(new HashMap<>());
-		executor = new StressExecutor(stress);
 		connectables = new ArrayList<>();
 	}
 	public StressBuilder connect(List<ISimulator> simulators) {
@@ -81,10 +82,6 @@ public class StressBuilder implements IMultiConnectorListener, IMultiConnectable
 		stress.setMessagesPerCycle(messagesPerCycle);
 		return this;
 	}
-	public StressBuilder setStoreResults(IStoreResults store) {
-		executor.setStoreResults(store);
-		return this;
-	}
 	public StressBuilder addStressFile(ISocket socket, File stressFile) {
 		addConnectableSafe(socket);
 		stress.getStressFiles().put(socket, stressFile);
@@ -97,53 +94,26 @@ public class StressBuilder implements IMultiConnectorListener, IMultiConnectable
 		return this;
 	}
 	private void addConnectableSafe(IConnectable c) {
-		IConnectable found = null;
-		if (c instanceof ISocket) {
-			found = findConnectableAsociated((ISocket)c);
-		} else if (c instanceof ISocket) {
-			found = findConnectableAsociated((ISimulator)c);
+		if (c instanceof ISimulator) {
+			c = ((ISimulator)c).getSocket();
 		}
-		if (found == null) {
+		if (!connectables.contains(c)) {
 			connectables.add(c);
 		}
-	}
-	private IConnectable findConnectableAsociated(ISimulator s) {
-		if (!connectables.isEmpty()) {
-			for (IConnectable c : connectables) {
-				if (c instanceof ISimulator && c == s) {
-					return c;
-				} else if (c instanceof ISocket && c == s.getSocket()) {
-					return c;
-				}
-			}
-		}
-		return null;
-	}
-	private IConnectable findConnectableAsociated(ISocket s) {
-		if (!connectables.isEmpty()) {
-			for (IConnectable c : connectables) {
-				if (c instanceof ISimulator && ((ISimulator) c).getSocket() == s) {
-					return c;
-				} else if (c instanceof ISocket && c == s) {
-					return c;
-				}
-			}
-		}
-		return null;
 	}
 	public Stress build() {
 		return stress;
 	}
-	public StressBuilder setExecutorListener(IExecutorListener listener) {
-		executor.setListener(listener);
+	public StressBuilder setExecutorListener(IStressExecutorListener listener) {
+		this.listener = listener != null ? listener : NullStressExecutorListener.INSTANCE;
 		return this;
 	}
 	public void execute() {
-		new MultiConnector(this).connectAsync();
+		new MultiConnector(this).connectAsync(this);
 	}
 	@Override
 	public void onConnectorConnectAll(IMultiConnectable connectable) {
-		executor.execute();
+		executorManager.execute(stress, listener);
 	}
 	@Override
 	public List<IConnectable> getConnectables() {

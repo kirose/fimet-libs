@@ -1,4 +1,4 @@
-package com.fimet.simulator.msg;
+package com.fimet.simulator;
 
 import com.fimet.iso8583.parser.Message;
 

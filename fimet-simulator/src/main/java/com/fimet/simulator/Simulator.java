@@ -2,7 +2,7 @@ package com.fimet.simulator;
 
 import com.fimet.commons.FimetLogger;
 import com.fimet.IParserManager;
-import com.fimet.IUseCaseManager;
+import com.fimet.IExecutorManager;
 import com.fimet.ISimulatorManager;
 import com.fimet.ISimulatorModelManager;
 import com.fimet.ISocketManager;
@@ -28,7 +28,7 @@ import com.fimet.simulator.PSimulator;
 public class Simulator  implements ISimulator, ISocketListener, IConnectionListener, IConnectable {
 	static ISocketManager socketManager = Manager.get(ISocketManager.class);
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
-	static IUseCaseManager executorManager = Manager.get(IUseCaseManager.class);
+	static IExecutorManager executorManager = Manager.get(IExecutorManager.class);
 	static IParserManager parserManager = Manager.get(IParserManager.class);
 	static ISimulatorModelManager simulatorModelManager = Manager.get(ISimulatorModelManager.class);
 	
@@ -55,26 +55,32 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	/**
 	 * Attempt to connect the iSocket
 	 */
+	@Override
 	public void connect() {
 		if (isDisconnected()) {// Maybe socket is in CONNECTED or CONNECTING status
 			socket.connect();
 		}
 	}
+	@Override
 	public void disconnect() {
 		if (socket != null) {
 			socket.disconnect();
 			socket = null;
 		}
 	}
+	@Override
 	public ISocket getSocket() {
 		return socket;
 	}
+	@Override
 	public synchronized boolean isConnected() {
 		return socket != null && socket.isConnected();
 	}
+	@Override
 	public synchronized boolean isDisconnected() {
 		return socket == null || socket.isDisconnected();
 	}
+	@Override
 	public synchronized boolean isConnecting() {
 		return socket != null && socket.isConnecting();
 	}
@@ -93,6 +99,10 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	@Override
 	public void setListener(ISimulatorListener listener) {
 		this.listener = listener != null ? listener : NullSimulatorListener.INSTANCE;
+	}
+	@Override
+	public IConnectionListener getConnectionListener() {
+		return connectionListener;
 	}
 	@Override
 	public void setConnectionListener(IConnectionListener listener) {
@@ -118,9 +128,11 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	public Message simulateResponse(Message message) {
 		return model.simulateResponse(message);
 	}
+	@Override
 	public void writeMessage(Message msg) {
 		simulatorManager.getNextSimulatorThread().simulateWrite(this, msg);
 	}
+	@Override
 	public void onSocketRead(byte[] bytes) {
 		simulatorManager.getNextSimulatorThread().simulateRead(this, bytes);
 	}

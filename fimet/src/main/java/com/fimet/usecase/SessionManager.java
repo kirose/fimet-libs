@@ -1,6 +1,5 @@
 package com.fimet.usecase;
 
-import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
@@ -73,9 +72,9 @@ public class SessionManager implements ISessionManager {
 				while (alive) {
 					next = queue.take();
 					key = calculateKey(next.useCase.getMessage());
-					System.out.println("timeout-"+next.useCase.getName()+"-"+new Timestamp(System.currentTimeMillis()));
+					//System.out.println("timeout-"+next.useCase.getName()+"-"+new java.sql.Timestamp(System.currentTimeMillis()));
 					if (next.listener != null) {
-						next.listener.timeout(next.useCase);
+						next.listener.onSessionExpire(next.useCase);
 					}
 					contexts.remove(key);
 				}

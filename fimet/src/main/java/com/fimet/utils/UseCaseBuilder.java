@@ -1,7 +1,7 @@
 package com.fimet.utils;
 
 import com.fimet.ISimulatorManager;
-import com.fimet.IUseCaseManager;
+import com.fimet.IExecutorManager;
 import com.fimet.Manager;
 import com.fimet.iso8583.parser.Message;
 import com.fimet.simulator.ISimulator;
@@ -12,7 +12,7 @@ import com.fimet.usecase.UseCase;
 
 public class UseCaseBuilder {
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
-	static IUseCaseManager useCaseManager = Manager.get(IUseCaseManager.class);
+	static IExecutorManager useCaseManager = Manager.get(IExecutorManager.class);
 	UseCase useCase;
 	public UseCaseBuilder(String name, PSimulator acquirer) {
 		this(name, simulatorManager.getSimulator(acquirer));

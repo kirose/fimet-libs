@@ -7,37 +7,70 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 
+import com.fimet.commons.exception.FimetException;
+import com.fimet.exe.IStressExecutor;
+import com.fimet.exe.IStressExecutorListener;
+import com.fimet.exe.IStressStore;
+import com.fimet.net.IConnectable;
 import com.fimet.net.ISocket;
+import com.fimet.net.MultiConnector;
+import com.fimet.net.MultiConnector.IMultiConnectable;
+import com.fimet.net.MultiConnector.IMultiConnectorListener;
 import com.fimet.stress.IStress;
+import com.fimet.stress.Stress;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StressExecutor
 implements 
 	IInjectorListener,
-	IExecutor {
+	IStressExecutor,
+	IMultiConnectorListener {
 	
-	private IStress stress;
-	private IExecutorListener listener;
+	private IStressExecutorListener listener;
 	volatile private Map<ISocket, StressInjector> injectors;
 	volatile private Set<ISocket> toComplete;
-	volatile private IStoreResults store; 
-	public StressExecutor(IStress stress) {
+	volatile private IStressStore store;
+	private Queue<IStress> queue = new ConcurrentLinkedQueue<IStress>();
+	private Stress stress;
+	public StressExecutor() {
 		this.injectors = new HashMap<>();
 		this.toComplete = new HashSet<ISocket>();
+		this.listener = NullStressExecutorListener.INSTANCE;
+		this.store = NullStressStore.INSTANCE;
+	}
+	public void setStoreResults(IStressStore store) {
+		this.store = store != null ? store : NullStressStore.INSTANCE;
+	}
+	public void setListener(IStressExecutorListener listener) {
+		this.listener = listener != null ? listener : NullStressExecutorListener.INSTANCE;
+	}
+	public void execute(Stress stress) {
+		if (this.stress == null) {
+			prepareExecution(stress);
+		} else {
+			queue.add(stress);
+		}
+	}
+	private void prepareExecution(Stress stress) {
+		new MultiConnector(stress).connectAsync(this);
+	}
+	@Override
+	public void onConnectorConnect(IConnectable connectable) {}
+	@Override
+	public void onConnectorConnectAll(IMultiConnectable connectable) {
+		doExecute((Stress)connectable);
+	}
+	@Override
+	public void onConnectorTimeout(IMultiConnectable connectable) {
+		throw new FimetException("Cannot connect connectables for stress "+connectable);
+	}
+	private void doExecute(Stress stress) {
 		this.stress = stress;
-		this.listener = NullExecutorListener.INSTANCE;
-		this.store = NullStoreResults.INSTANCE;
-	}
-	public void setStoreResults(IStoreResults store) {
-		this.store = store != null ? store : NullStoreResults.INSTANCE;
-	}
-	public void setListener(IExecutorListener listener) {
-		this.listener = listener != null ? listener : NullExecutorListener.INSTANCE;
-	}
-	public void execute() {
-		listener.onExecutorStart(this);
+		listener.onStressStart(stress);
 		for (Map.Entry<ISocket, File> e : stress.getStressFiles().entrySet()) {
 			toComplete.add(e.getKey());
 			StressInjector injector = new StressInjector(e.getKey(), e.getValue(), stress.getCycleTime(), stress.getMessagesPerCycle());
@@ -46,12 +79,19 @@ implements
 			injector.startInjector();
 		}
 	}
-	public void onExecutorFinishExecution() {
+	public void onExecutorFinishStress() {
 		for (Entry<ISocket, StressInjector> e : injectors.entrySet()) {
 			e.getValue().getResult().numOfRead.set(e.getKey().getNumOfRead()-e.getValue().getResult().initialReadSocket.get());
 			e.getValue().getResult().numOfWrite.set(e.getKey().getNumOfWrite()-e.getValue().getResult().initialWriteSocket.get());
 		}
-		listener.onExecutorFinish(this);
+		List<InjectorResult> results = getInjectorResults();
+		listener.onStressFinish(stress, results);
+		stress = null;
+		toComplete.clear();
+		injectors.clear();
+		if (!queue.isEmpty()) {
+			prepareExecution(stress);
+		}
 	}
 	public boolean hasFinish() {
 		return toComplete.isEmpty();
@@ -73,7 +113,7 @@ implements
 		ir.finishTime = System.currentTimeMillis();		
 		store.storeGlobalResults(ir);
 		if (toComplete.isEmpty()) {
-			onExecutorFinishExecution();
+			onExecutorFinishStress();
 		}
 	}
 	@Override
@@ -94,12 +134,21 @@ implements
 		store.storeCycleResults(injector.getResult());
 		listener.onInjectorFinishCycle(injector.getResult());
 	}
-	@Override
 	public List<InjectorResult> getInjectorResults() {
 		List<InjectorResult> results = new ArrayList<>();
 		for (Entry<ISocket, StressInjector> e : injectors.entrySet()) {
 			results.add(e.getValue().getResult());
 		}
 		return results;
+	}
+	@Override
+	public void startExecutor() {
+	}
+	@Override
+	public void stopExecutor() {
+	}
+	@Override
+	public void setStore(IStressStore store) {
+		this.store = store != null ? store : NullStressStore.INSTANCE;
 	}
 }

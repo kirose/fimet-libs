@@ -62,15 +62,19 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 		reconnect = false;
 		status = Status.DISCONNECTED;
 	}
+	@Override
 	public IStreamAdapter getAdapter() {
 		return adapter;
 	}
+	@Override
 	public void connect() {
 		if (isDisconnected()) {
 			new ThreadConnector().start();
 		}
 	}
+	abstract void close();
 	abstract protected java.net.Socket newSocket() throws IOException;
+	@Override
 	public void disconnect() {
 		status = Status.DISCONNECTED;
 		alive = false;
@@ -82,25 +86,29 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 			FimetLogger.error(AdaptedSocket.class, "Error Socket Disconnected Listener", e);
 		}
 	}
-	abstract void close();
-	public boolean isConncted() {
-		return socket != null;
-	}
-	public void setConnectionListener(IConnectionListener listener) {
-		connectionListener = listener != null ? listener : NullConnectionListener.INSTANCE;
-	}
 	public void setAutoReconnect(boolean reconnect) {
 		this.reconnect = reconnect;
 	}
 	public InputStream getInputStream() throws IOException {
 		return socket.getInputStream();
 	}
+	@Override
+	public void setConnectionListener(IConnectionListener listener) {
+		connectionListener = listener != null ? listener : NullConnectionListener.INSTANCE;
+	}
+	@Override
+	public IConnectionListener getConnectionListener() {
+		return connectionListener;
+	}
+	@Override
 	public synchronized boolean isDisconnected() {
 		return status == Status.DISCONNECTED;
 	}
+	@Override
 	public synchronized boolean isConnected() {
 		return status == Status.CONNECTED;
 	}
+	@Override
 	public synchronized boolean isConnecting() {
 		return status == Status.CONNECTING;
 	}
@@ -132,9 +140,11 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 	public String toString() {
 		return pSocket.toString();
 	}
+	@Override
 	public void write(byte[] message) {
 		write(message, true);
 	}
+	@Override
 	public void write(byte[] message, boolean adapt) {
 		try {
 			if (socket == null) {
