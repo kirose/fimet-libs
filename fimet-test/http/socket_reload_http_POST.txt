@@ -1,0 +1,13 @@
+POST /socket/reload HTTP/1.1
+service_key: f80ebc87-vf34-4b29-cR45-2345hhyt5434
+Content-Type: application/json
+Authorization: Basic Og==
+User-Agent: PostmanRuntime/7.24.1
+Accept: */*
+Cache-Control: no-cache
+Postman-Token: 7bcece4a-a0e9-4e15-b72f-606450601fcb
+Host: 127.0.0.1
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 0
+

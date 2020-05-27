@@ -4,24 +4,25 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.utils.StringUtils;
-import com.fimet.iso8583.parser.Message;
-import com.fimet.parser.AbstractMessageISO8583Parser;
+import com.fimet.parser.AbstractMessageBitmapParser;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.Message;
+import com.fimet.utils.StringUtils;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
-public class JcbParser extends AbstractMessageISO8583Parser {
-	public JcbParser(com.fimet.entity.sqlite.EParser entity) {
+public class JcbParser extends AbstractMessageBitmapParser {
+	public JcbParser(com.fimet.entity.EParser entity) {
 		super(entity);
 	}
 	@Override
 	protected void formatHeader(IWriter writer, Message msg) {
-		if (msg.getMti().length() != 4) {
-			throw new FormatException("MTI invalid expected length 4 found('"+msg.getMti().length()+"'): '"+msg.getMti()+"'");
+		String mti = (String)msg.getProperty(Message.MTI);
+		if (mti == null || mti.length() != 4) {
+			throw new FormatException("MTI invalid expected length 4 found('"+(mti != null?mti.length():0)+"'): '"+mti+"'");
 		}
-		writer.append(Converter.asciiToHex(Converter.asciiToEbcdic(msg.getMti().getBytes())));
+		writer.append(Converter.asciiToHex(Converter.asciiToEbcdic(mti.getBytes())));
 	}
 	@Override
 	protected void formatBitmap(IWriter writer, Message msg) {
@@ -32,8 +33,8 @@ public class JcbParser extends AbstractMessageISO8583Parser {
 	@Override
 	protected void parseHeader(IReader reader, Message msg) {
 		String mti = new String(Converter.ebcdicToAscii(Converter.hexToAscii(reader.read(8))));
-		msg.setHeader("");
-		msg.setMti(mti);
+		msg.setProperty(Message.HEADER, "");
+		msg.setProperty(Message.MTI, mti);
 	}
 	@Override
 	protected int[] parseBitmap(IReader reader) {

@@ -1,0 +1,64 @@
+package com.fimet.usecase;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.sql.Timestamp;
+
+import com.fimet.FimetException;
+import com.fimet.FimetLogger;
+import com.fimet.ISessionManager;
+import com.fimet.Manager;
+import com.fimet.parser.IMessage;
+import com.fimet.simulator.ISimulator;
+import com.fimet.simulator.ISimulatorStore;
+import com.fimet.stress.StressStoreCsv;
+
+public class SimulatorStoreTxt implements ISimulatorStore {
+	private ISessionManager sessionManager = Manager.get(ISessionManager.class);
+	private static final File STORE_FOLDER = new File("store"); 
+	private File simulatorFile;
+	private OutputStreamWriter simulatorWriter;
+	boolean enable;
+	public SimulatorStoreTxt() {
+		if (!STORE_FOLDER.exists()) {
+			STORE_FOLDER.mkdirs();
+		}
+		this.simulatorFile = new File(STORE_FOLDER, "simulator.txt");
+		try {
+			simulatorWriter = new java.io.FileWriter(simulatorFile);
+		} catch (IOException e) {
+			throw new FimetException(e);
+		}
+	}
+	@Override
+	public void storeIncoming(ISimulator simulator, IMessage message, byte[] bytes) {
+		writeSimulatorLog("I", simulator, message, bytes);
+	}
+
+	@Override
+	public void storeOutgoing(ISimulator simulator, IMessage message, byte[] bytes) {
+		writeSimulatorLog("O", simulator, message, bytes);
+	}
+	public void close() {
+	}
+	private void writeSimulatorLog(String inOut, ISimulator simulator,  IMessage message, byte[] bytes) {
+		if (enable) {
+			Session session = sessionManager.getSession(message);
+			try {
+				simulatorWriter.write(""
+					+"["+new Timestamp(System.currentTimeMillis())+"]"
+					+"["+inOut+"]"
+					+"["+(session != null ? session.getUseCase().getName() : null)+"]"
+					+"["+simulator.getModel().getName()+"]"
+					+"["+simulator.getSocket().getPort()+"]"
+					+"["+message.toJson()+"]\n"
+					//+"["+new String(Converter.asciiToHex(bytes))+"]\n"
+				 );
+				simulatorWriter.flush();
+			} catch (IOException e) {
+				FimetLogger.error(StressStoreCsv.class, "Error writing simulator log:"+simulatorFile.getName(), e);
+			}
+		}
+	}
+}

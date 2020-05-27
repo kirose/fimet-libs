@@ -1,14 +1,14 @@
 package com.fimet.parser.field.visa;
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class VisaDatasetsVarFieldParser extends VarFieldParser {
 
@@ -18,7 +18,7 @@ public class VisaDatasetsVarFieldParser extends VarFieldParser {
 	protected void parseChilds(byte[] value, IMessage message) {
 		if (childs != null && value != null) {
 			try {
-				IReader reader = new ByteArrayReader(value);
+				IReader reader = new ByteBuffer(value);
 				if (!reader.hasNext()) {
 					return;
 				}
@@ -45,11 +45,11 @@ public class VisaDatasetsVarFieldParser extends VarFieldParser {
 		if (nextDataset == null) {
 			throw new ParserException("Unknow dataset starts with: "+reader.toString().substring(0,5)+". Datasets declared: "+childs);	
 		}
-		return getFieldParserManager().getFieldParser(getGroup(),idField+"."+nextDataset).parse(reader, message);
+		return group.parse(idField+"."+nextDataset, message, reader);
 	}
 	private String getNextDataset(IReader reader) {
 		for (String tag : childs) {
-			if (reader.matcher(tag).asByte()) {
+			if (reader.startsWith(tag)) {
 				return tag;
 			}
 		}
@@ -60,7 +60,7 @@ public class VisaDatasetsVarFieldParser extends VarFieldParser {
 		for (String idField : message.getIdChildren(idField)) {
 			String tag = idField.substring(idField.lastIndexOf('.')+1);
 			validateDataset(tag);
-			getFieldParserManager().format(message, idField, writer);
+			group.format(idField, message, writer);
 		}
 	}
 	private void validateDataset(String dataset) {

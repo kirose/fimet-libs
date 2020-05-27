@@ -1,14 +1,14 @@
 package com.fimet.parser.field.mx;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.converter.IConverter;
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.numericparser.INumericParser;
-import com.fimet.commons.numericparser.NumericParser;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IMessage;
 import com.fimet.parser.field.FixedFieldParser;
+import com.fimet.parser.numeric.INumericParser;
+import com.fimet.parser.numeric.NumericParser;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.converter.IConverter;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class NatTagFixedFieldParser extends FixedFieldParser {
 

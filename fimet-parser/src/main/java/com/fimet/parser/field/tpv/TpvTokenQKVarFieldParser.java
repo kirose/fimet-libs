@@ -1,14 +1,14 @@
 package com.fimet.parser.field.tpv;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.utils.ByteUtils;
-import com.fimet.commons.utils.EncryptionUtils;
+import com.fimet.entity.EFieldFormat;
 import com.fimet.IPreferencesManager;
 import com.fimet.Manager;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
+import com.fimet.utils.ByteUtils;
+import com.fimet.utils.EncryptionUtils;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.data.IWriter;
 
 public class TpvTokenQKVarFieldParser extends TpvTokenVarFieldParser {
 
@@ -36,7 +36,7 @@ public class TpvTokenQKVarFieldParser extends TpvTokenVarFieldParser {
 		String dataEncrypted = new String(ByteUtils.subArray(fTokenQKEncrypted.getBytes(), 0,80));
 		byte[] crc32 = ByteUtils.subArray(fTokenQKEncrypted.getBytes(), 80, 96);
 		String decrypt = EncryptionUtils.decrypt(dataEncrypted, fKeySerialNumber, preferencesManager.getString(IPreferencesManager.BDK, DEFAULT_BDK));
-		message.setField(idField, ByteUtils.concat(decrypt.getBytes(), crc32));
+		message.setValue(idField, ByteUtils.concat(decrypt.getBytes(), crc32));
 		return ByteUtils.concat(decrypt.getBytes(), crc32);
 	}
 	private byte[] encrypt(byte[] bytes, IMessage message) {

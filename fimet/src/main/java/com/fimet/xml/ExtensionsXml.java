@@ -11,18 +11,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class ExtensionsXml {
 	@XmlElement(name="extension")
-	private List<ManagerXml> managers;
+	private List<ExtensionXml> extensions;
 	public ExtensionsXml() {
 		super();
 	}
-	public ExtensionsXml(List<ManagerXml> managers) {
+	public ExtensionsXml(List<ExtensionXml> extensions) {
 		super();
-		this.managers = managers;
+		this.extensions = extensions;
 	}
-	public List<ManagerXml> getManagers() {
-		return managers;
+	public List<ExtensionXml> getExtensions() {
+		return extensions;
 	}
-	public void setManagers(List<ManagerXml> managers) {
-		this.managers = managers;
+	public void setExtensions(List<ExtensionXml> extensions) {
+		this.extensions = extensions;
 	}
 }

@@ -2,9 +2,9 @@ package com.fimet;
 
 import java.util.List;
 
-import com.fimet.commons.history.History;
-import com.fimet.entity.sqlite.EParser;
-import com.fimet.iso8583.parser.IParser;
+import com.fimet.entity.EParser;
+import com.fimet.parser.IParser;
+import com.fimet.utils.History;
 /**
  * 
  * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
@@ -22,7 +22,6 @@ public interface IParserManager extends IManager {
 	public EParser insert(EParser parser);
 	public EParser update(EParser parser);
 	public EParser delete(EParser parser);
-	public void free(List<Integer> groups);
 	public Integer getNextIdParser();
 	public Integer getPrevIdParser();
 	EParser getEntity(Integer id);

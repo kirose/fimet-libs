@@ -48,8 +48,10 @@ public interface IPreferencesManager extends IManager {
 	public double getDouble(String name, double defaultValue);
 	public double getDouble(String name);
 	public void save(String name, double value);
+	public Long getLongAndIncrease(String name, long defaultValue);
+	public Long getLongAndIncrease(String name);
 	public Long getLong(String name, long defaultValue);
-	public long getLong(String name);
+	public Long getLong(String name);
 	public void save(String name, long value);
 	public boolean getBoolean(String name, boolean defaultValue);
 	public boolean getBoolean(String name);

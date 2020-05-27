@@ -1,11 +1,11 @@
 package com.fimet.parser.field.mx;
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class NatTokenVarFieldParser extends VarFieldParser {
 
@@ -17,11 +17,13 @@ public class NatTokenVarFieldParser extends VarFieldParser {
 		reader.assertChar('!');
 		reader.assertChar(' ');
 		reader.move(2);
-		int length = parserLength.parse(converterLength.convert(reader.getBytes(this.length)));
-		reader.move(this.length);
+		byte[] bytes = reader.read(this.length);
+		bytes = converterLength.convert(bytes);
+		int length = parserLength.parse(bytes);
 		reader.assertChar(' '); 
 		byte[] value = reader.read(length);
-		message.setField(idField, converterValue.convert(value));
+		value = converterValue.convert(value);
+		message.setValue(idField, value);
 		return value;
 	}
 

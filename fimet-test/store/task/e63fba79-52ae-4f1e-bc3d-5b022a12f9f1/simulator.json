@@ -1,0 +1,4 @@
+{"address":"127.0.0.1","port":8583,"model":"National","time":1590566057854,"type":"O","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123452","3":"000000","4":"000000012300","11":"123456"}}}
+{"address":"127.0.0.1","port":8583,"model":"National","time":1590566057855,"type":"I","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123452","3":"000000","4":"000000012300","11":"123456"}}}
+{"address":"127.0.0.1","port":8583,"model":"National","time":1590566057855,"type":"O","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123452","3":"000000","4":"000000012300","11":"123456","15":"0520","38":"228698","39":"00"}}}
+{"address":"127.0.0.1","port":8583,"model":"National","time":1590566057856,"type":"I","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123452","3":"000000","4":"000000012300","11":"123456","15":"0520","38":"228698","39":"00"}}}

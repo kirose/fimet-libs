@@ -1,28 +1,29 @@
 package com.fimet.parser.mx;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.iso8583.parser.Message;
-import com.fimet.parser.AbstractMessageISO8583Parser;
+import com.fimet.parser.AbstractMessageBitmapParser;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.Message;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
-public class VisaParser extends AbstractMessageISO8583Parser {
-	public VisaParser(com.fimet.entity.sqlite.EParser entity) {
+public class VisaParser extends AbstractMessageBitmapParser {
+	public VisaParser(com.fimet.entity.EParser entity) {
 		super(entity);
 	}
 
 	@Override
 	protected void formatHeader(IWriter writer, Message msg) {
-		if (msg.getHeader().length() <= 0) {
+		String header = (String)msg.getProperty(Message.HEADER);
+		if (header == null || header.length() <= 0) {
 			throw new FormatException("ISO header section invalid (length = 0)");
 		}
-		if (msg.getMti().length() != 4) {
-			throw new FormatException("MTI invalid expected length 4 found('"+msg.getMti().length()+"'): '"+msg.getMti()+"'");
+		String mti = (String)msg.getProperty(Message.MTI);
+		if (mti == null || mti.length() != 4) {
+			throw new FormatException("MTI invalid expected length 4 found('"+(mti!=null?mti.length():0)+"'): '"+mti+"'");
 		}
-		String header = msg.getHeader();
 		int ln = (header.length()/2+1);
-		String value = String.format("%02X", ln)+header+msg.getMti();
+		String value = String.format("%02X", ln)+header+mti;
 		writer.append(value.getBytes());
 	}
 	@Override
@@ -45,7 +46,7 @@ public class VisaParser extends AbstractMessageISO8583Parser {
 		String batchNumber = header.substring(26,28);
 		String reserved = header.substring(28,34);
 		String userInformation = header.substring(34,36);*/
-		msg.setHeader(header);
-		msg.setMti(new String(reader.read(4)));
+		msg.setProperty(Message.HEADER, header);
+		msg.setProperty(Message.MTI, new String(reader.read(4)));
 	}
 }

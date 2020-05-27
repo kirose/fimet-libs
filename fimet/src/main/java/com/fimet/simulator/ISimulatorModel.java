@@ -1,6 +1,6 @@
 package com.fimet.simulator;
 
-import com.fimet.iso8583.parser.Message;
+import com.fimet.parser.IMessage;
 
 /**
  * 
@@ -9,6 +9,6 @@ import com.fimet.iso8583.parser.Message;
  */
 public interface ISimulatorModel {
 	public String getName();
-	public Message simulateRequest(Message message);
-	public Message simulateResponse(Message message);
+	public IMessage simulateRequest(IMessage message);
+	public IMessage simulateResponse(IMessage message);
 }

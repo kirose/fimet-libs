@@ -1,9 +1,9 @@
 package com.fimet.parser.mx;
 
-import com.fimet.parser.AbstractMessageLayoutParser;
+import com.fimet.parser.AbstractMessageParser;
 
-public class LayoutParser extends AbstractMessageLayoutParser {
-	public LayoutParser(com.fimet.entity.sqlite.EParser entity) {
+public class LayoutParser extends AbstractMessageParser {
+	public LayoutParser(com.fimet.entity.EParser entity) {
 		super(entity);
 	}
 }

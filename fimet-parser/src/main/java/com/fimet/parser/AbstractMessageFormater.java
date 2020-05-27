@@ -1,0 +1,39 @@
+package com.fimet.parser;
+
+import java.util.List;
+
+import com.fimet.FimetLogger;
+import com.fimet.entity.EParser;
+import com.fimet.utils.data.ByteBuilder;
+import com.fimet.utils.data.IWriter;
+/**
+ * 
+ * @author Marco A. Salazar
+ * @email marcoasb99@ciencias.unam.mx
+ *
+ */
+public abstract class AbstractMessageFormater extends BaseMessageParser {
+
+	public AbstractMessageFormater(EParser entity) {
+		super(entity);
+	}
+
+	@Override
+	public byte[] formatMessage(IMessage msg) {
+		IWriter writer = new ByteBuilder();
+		formatFields(writer, msg);
+		byte[] iso = getConverter().deconvert(getConverter().deconvert(writer.getBytes()));
+		return iso;
+	}
+	protected void formatFields(IWriter writer, IMessage msg) {
+		List<IFieldParser> roots = getFieldGroup().getRoots();
+		for (IFieldParser parser : roots) {
+			try {
+				parser.format(writer, msg);
+			} catch (Exception e) {
+				FimetLogger.error(this+" error formating field "+parser.getIdField(),e);
+				throw e;
+			}
+		}
+	}
+}

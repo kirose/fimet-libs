@@ -1,25 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fimet>
 	<!-- The path to FIMET data base -->
-	<source name="fimet" path="resources/fimet.db" />
+	<databases>
+		<database id="fimet" path="resources/fimet.db" creator="com.fimet.sqlite.FimetCreator" />
+		<database id="store-codes" path="store/codes.db" creator="com.fimet.sqlite.CodeStoreCreator"/>
+	</databases>
 	<!-- The application properties -->
 	<properties>
+		<!-- The CompilerManager will use this path to get the SystemJavaCompiler -->
 		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/>
 		<property name="simulator.numberOfThreads" value="5"/>
+		<!-- If true all Simulator Models will be compiled at startup -->
 		<property name="simulator.recompileModelsAtStartup" value="true"/>
+		<!-- The max execution time in milliseconds -->
 		<property name="usecase.maxExecutionTime" value="9000"/>
-	</properties> 
+		<!-- EAGER or LAZY -->
+		<property name="fieldGroup.mode" value="EAGER"/>
+	</properties>
 	<!-- You can declare a new manager or override an existent -->
 	<managers>
-		<manager id="com.fimet.ISocketManager" class="com.fimet.net.SocketManager"/>
-		<manager id="com.fimet.IExecutorManager" class="com.fimet.exe.ExecutorManager">
-			<extension id="com.fimet.exe.IUseCaseExecutor" class="com.fimet.usecase.exe.UseCaseExecutor" />
-			<extension id="com.fimet.exe.IUseCaseStore" class="com.fimet.usecase.exe.UseCaseStore" />
-		</manager>
+		<manager id="com.fimet.server.ICommandManager" class="com.fimet.server.CommandManager" autostart="true"/>
+		<manager id="com.fimet.IExecutorManager" class="com.fimet.exe.ExecutorManager"/>
+		<manager id="com.fimet.ISessionManager" class="com.fimet.usecase.SessionManager"/>
+		<manager id="com.fimet.ISocketManager" class="com.fimet.socket.SocketManager"/>
+		<manager id="com.fimet.ISimulatorModelManager" class="com.fimet.simulator.SimulatorModelManager"/>
+		<manager id="com.fimet.ISimulatorManager" class="com.fimet.simulator.SimulatorManager"/>
 	</managers>
-	<!-- This simulators will be pre-loaded but not connected -->
+	<!-- You can extend a extension-point for a custom functionality -->
+	<extensions>
+		<extension id="com.fimet.usecase.IUseCaseStore" class="com.fimet.server.UseCaseStore" />
+		<extension id="com.fimet.stress.IStressStore" class="com.fimet.server.StressStore" />
+	</extensions>
+	<!-- This simulators will be loaded but not connected -->
 	<simulators>
 		<simulator id="SVisa" model="MVisa" parser="National" server="false" address="127.0.0.1" port="9128" adapter="Exclusive" />
-		<model id = "MVisa" class="com.fimet.test.SMVisa" />
 	</simulators>
+	<!-- This simulator models will be loaded but not connected -->
+	<simulatorModels>
+		<simulatorModel id = "MVisa" class="com.fimet.test.SMVisa" />
+	</simulatorModels>
+	<!-- Not yet implemented -->
+	<parsers>
+		<parser id="PNational" class="com.fimet.parser.mx.NationalParser" converter="None" fieldsGroup="FNational" />
+	</parsers>
+	<!-- Not yet implemented -->
+	<fieldGroups>
+		<fieldGroup id="FNational" path="resources/fields/FNational.xml"/>
+	</fieldGroups>
 </fimet>

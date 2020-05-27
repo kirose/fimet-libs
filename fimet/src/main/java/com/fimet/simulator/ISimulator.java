@@ -1,9 +1,9 @@
 package com.fimet.simulator;
 
-import com.fimet.iso8583.parser.IParser;
-import com.fimet.iso8583.parser.Message;
-import com.fimet.net.IConnectable;
-import com.fimet.net.ISocket;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.IParser;
+import com.fimet.socket.IConnectable;
+import com.fimet.socket.ISocket;
 
 /**
  * 
@@ -15,9 +15,10 @@ public interface ISimulator extends IConnectable {
 	public IParser getParser();
 	public ISocket getSocket();
 	public void setListener(ISimulatorListener listener);
-	public Message simulateRequest(Message message);
-	public Message simulateResponse(Message message);
-	public void writeMessage(Message message);
-	public void doWriteMessage(Message message);
+	public IMessage simulateRequest(IMessage message);
+	public IMessage simulateResponse(IMessage message);
+	public void writeMessage(IMessage message);
+	public void doWriteMessage(IMessage message);
 	public void doReadMessage(byte[] bytes);
+	public long getNumOfApprovals();
 }

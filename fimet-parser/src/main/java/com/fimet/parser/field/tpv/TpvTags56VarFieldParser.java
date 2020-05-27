@@ -1,13 +1,13 @@
 package com.fimet.parser.field.tpv;
 
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class TpvTags56VarFieldParser extends VarFieldParser {
 
@@ -15,9 +15,9 @@ public class TpvTags56VarFieldParser extends VarFieldParser {
 		super(fieldFormat);
 	}
 	protected void parseChilds(byte[] value, IMessage message) {
-		if (childs != null && message.getField(idField) != null) {
+		if (childs != null && message.hasField(idField)) {
 			try {
-				IReader reader = new ByteArrayReader(message.getField(idField));
+				IReader reader = new ByteBuffer(message.getValueAsBytes(idField));
 				if (!reader.hasNext()) {
 					return;
 				}
@@ -37,13 +37,13 @@ public class TpvTags56VarFieldParser extends VarFieldParser {
 		}
 	}
 	private byte[] parseTag(IReader reader, IMessage message) {
-		String nextTag = new String(reader.getBytes(2));
-		return getFieldParserManager().getFieldParser(getGroup(),idField+"."+nextTag).parse(reader, message);
+		String nextTag = new String(reader.peek(2));
+		return group.parse(idField+"."+nextTag, message, reader);
 	}
 	@Override
 	protected void formatChilds(IWriter writer, IMessage message) {
 		for (String idChild : message.getIdChildren(idField)) {
-			getFieldParserManager().format(message, idChild, writer);
+			group.format(idChild, message, writer);
 		}
 	}
 }

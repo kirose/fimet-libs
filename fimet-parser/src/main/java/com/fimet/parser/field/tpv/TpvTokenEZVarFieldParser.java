@@ -1,14 +1,14 @@
 package com.fimet.parser.field.tpv;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.utils.ByteUtils;
-import com.fimet.commons.utils.EncryptionUtils;
+import com.fimet.entity.EFieldFormat;
 import com.fimet.IPreferencesManager;
 import com.fimet.Manager;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
+import com.fimet.utils.ByteUtils;
+import com.fimet.utils.EncryptionUtils;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.data.IWriter;
 
 public class TpvTokenEZVarFieldParser extends TpvTokenVarFieldParser {
 

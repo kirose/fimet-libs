@@ -1,20 +1,26 @@
 package com.fimet.utils;
 
-import com.fimet.IParserManager;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import com.fimet.FimetException;
+import com.fimet.IFieldGroupManager;
 import com.fimet.Manager;
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.converter.IConverter;
-import com.fimet.iso8583.parser.IParser;
+import com.fimet.entity.EParser;
+import com.fimet.parser.IFieldGroup;
+import com.fimet.parser.IParser;
+import com.fimet.parser.ParserException;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.converter.IConverter;
 
 public class ParserBuilder {
 
-	private static IParserManager parserManager = Manager.get(IParserManager.class);
-	private com.fimet.entity.sqlite.EParser entity;
+	private com.fimet.entity.EParser entity;
+	private Class<?> parserClass;
 
 	public ParserBuilder() {
 		super();
-		entity= new com.fimet.entity.sqlite.EParser();
-		entity.setName("Dinamyc Build");
+		entity= new com.fimet.entity.EParser();
 		entity.setIdGroup(4);
 		entity.setIdConverter(Converter.NONE.getId());
 		entity.setType(IParser.ISO8583);
@@ -23,7 +29,19 @@ public class ParserBuilder {
 		entity.setId(idParser);
 		return this;
 	}
-	public ParserBuilder group(int id) {
+	public ParserBuilder name(String name) {
+		entity.setName(name);
+		return this;
+	}
+	public ParserBuilder fieldGroup(String name) {
+		IFieldGroup group = Manager.get(IFieldGroupManager.class).getGroup(name);
+		if (group == null) {
+			throw new FimetException("Unkown field group "+name);
+		}
+		entity.setFieldGroup(group.getName());
+		return this;
+	}
+	public ParserBuilder fieldGroup(int id) {
 		entity.setIdGroup(id);
 		return this;
 	}
@@ -31,9 +49,8 @@ public class ParserBuilder {
 		entity.setIdConverter(converter.getId());
 		return this;
 	}
-	public ParserBuilder clazz(Class<? extends IParser> parserClass) {
-		entity.setId(entity.hashCode());
-		entity.setName("Dinamyc Build "+parserClass.getSimpleName());
+	public ParserBuilder parserClass(Class<? extends IParser> parserClass) {
+		this.parserClass = parserClass;
 		entity.setParserClass(parserClass.getName());
 		return this;
 	}
@@ -41,7 +58,27 @@ public class ParserBuilder {
 		entity.setType(type);
 		return this;
 	}
-	public IParser create() {
-		return parserManager.getParser(entity);
+	public IParser build() {
+		if (parserClass == null) {
+			throw new ParserException("Parser class may not be null");
+		}
+		if (entity.getName() == null) {
+			entity.setName(parserClass.getSimpleName());
+		}
+		return newParser(entity);
+	}
+	private IParser newParser(EParser entity) {
+		try {
+			Constructor<?> constructor = parserClass.getConstructor(com.fimet.entity.EParser.class);
+			return (IParser) constructor.newInstance(entity);
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
+		} catch (NoSuchMethodException e) {
+			throw new ParserException("No found public constructor with "+EParser.class.getName()+" as argument in class: " + entity.getParserClass(),e);
+		} catch (SecurityException e) {
+			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
+		} catch (IllegalArgumentException | InvocationTargetException e) {
+			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
+		}
 	}
 }

@@ -6,15 +6,14 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 import com.fimet.Manager;
-import com.fimet.usecase.exe.ISessionListener;
 
 public class Session implements Delayed {
 	private static final long MAX_EXECUTION_TIME = Manager.getPropertyLong("usecase.maxExecutionTime", 9000L);
 	long timeout;
-	UseCase useCase;
+	IUseCase useCase;
 	ISessionListener listener;
 	Map<String, String> properties;
-	Session(UseCase useCase, ISessionListener listener) {
+	Session(IUseCase useCase, ISessionListener listener) {
 		this.listener = listener;
 		this.useCase = useCase;
 		this.timeout = System.currentTimeMillis() + MAX_EXECUTION_TIME;
@@ -40,7 +39,7 @@ public class Session implements Delayed {
 		}
 		return null;
 	}
-	public UseCase getUseCase() {
+	public IUseCase getUseCase() {
 		return useCase;
 	}
 }

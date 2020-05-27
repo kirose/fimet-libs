@@ -1,12 +1,12 @@
 package com.fimet.parser.field;
 
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.utils.ByteUtils;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.utils.ByteUtils;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 /**
  * Parser for MessageFields from the message 
@@ -25,13 +25,13 @@ public class RTrimFixedFieldParser extends FixedFieldParser {
 	@Override
 	protected byte[] parseValue(IReader reader, IMessage message) {
 		if (length % 2 == 0) {
-			byte[] value = converterValue.convert(reader.getBytes(length));
-			reader.move(length);
+			byte[] value = reader.read(length);
+			value = converterValue.convert(value);
 			return value;
 		} else {
-			byte[] value = converterValue.convert(reader.getBytes(length+1));
+			byte[] value = reader.read(length+1);
+			value = converterValue.convert(value);
 			value = ByteUtils.subArray(value, 0,value.length-1);
-			reader.move(length+1);
 			return value;
 		}
 	}

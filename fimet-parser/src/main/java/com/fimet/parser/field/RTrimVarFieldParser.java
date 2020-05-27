@@ -1,13 +1,13 @@
 package com.fimet.parser.field;
 
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.utils.ByteUtils;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.utils.ByteUtils;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 /**
  * Useful for visa and tpv's

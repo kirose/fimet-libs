@@ -1,8 +1,8 @@
 package com.fimet.simulator;
 
-import com.fimet.iso8583.parser.Message;
+import com.fimet.parser.IMessage;
 
 public interface ISimulatorListener {
-	byte[] onSimulatorWriteMessage(ISimulator simulator, Message message);
-	void onSimulatorReadMessage(ISimulator simulator, Message message, byte[] bytes);
+	byte[] onSimulatorWriteMessage(ISimulator simulator, IMessage message);
+	void onSimulatorReadMessage(ISimulator simulator, IMessage message, byte[] bytes);
 }

@@ -5,7 +5,8 @@ import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ValidationResult;
 import com.fimet.simulator.IValidator;
 import com.fimet.usecase.UseCase;
-import com.fimet.iso8583.parser.Message;
+import com.fimet.parser.Message;
+import com.fimet.parser.IMessage;
 /**
 * FIMET
 * Code generated automatically
@@ -13,10 +14,10 @@ import com.fimet.iso8583.parser.Message;
 public class SE1831905446604 extends AbstractSimulatorExtension {
 
 	/**
-	* @param Message msg the icomming message
+	* @param IMessage msg the icomming message
 	**/
 	@Override
-	public ValidationResult[] validateIncomingMessage(ISimulator simulator, Message msg){
+	public ValidationResult[] validateIncomingMessage(ISimulator simulator, IMessage msg){
 		int indexSimulator = indexOf(simulator, msg);
 		if (indexSimulator == 0){
 			return new ValidationResult[]{
@@ -28,10 +29,10 @@ public class SE1831905446604 extends AbstractSimulatorExtension {
 
 	/**
 	* This method is executed after Simulator processing
-	* @param Message msg is the outgoing message
+	* @param IMessage msg is the outgoing message
 	**/
 	@Override
-	public Message simulateOutgoingMessage(ISimulator simulator, Message msg){
+	public IMessage simulateOutgoingMessage(ISimulator simulator, IMessage msg){
 		return msg;
 	}
 }

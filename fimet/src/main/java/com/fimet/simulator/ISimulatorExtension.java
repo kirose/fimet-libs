@@ -1,16 +1,16 @@
 package com.fimet.simulator;
 
-import com.fimet.iso8583.parser.Message;
+import com.fimet.parser.IMessage;
 
 public interface ISimulatorExtension {
 	/**
 	 * Apply the user validations associated with this socket on write 
 	 * @param request message
 	 */
-	public ValidationResult[] validateIncomingMessage(ISimulator simulator, Message message);
+	public ValidationResult[] validateIncomingMessage(ISimulator simulator, IMessage message);
 	/**
 	 * Apply custom user simulation to responses 
 	 * @param request message
 	 */
-	public Message simulateOutgoingMessage(ISimulator simulator, Message message);
+	public IMessage simulateOutgoingMessage(ISimulator simulator, IMessage message);
 }

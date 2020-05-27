@@ -2,30 +2,27 @@ package com.fimet.simulator;
 
 
 import com.fimet.IAdapterManager;
-import com.fimet.IParserManager;
 import com.fimet.Manager;
-import com.fimet.adapter.IAdapter;
-import com.fimet.net.PSocket;
+import com.fimet.parser.IAdapter;
+import com.fimet.socket.PSocket;
 /**
  * Parameter Object for Simulator
  * @author Marco Antonio
  *
  */
 public class PSimulator {
-	static IParserManager parserManager = Manager.get(IParserManager.class);
-	static IAdapterManager adapterManager = Manager.get(IAdapterManager.class);
 	private String parser;
 	private String externalId;
 	private String model;
 	private Integer idSimulator;
 	private PSocket pSocket;
 	public PSimulator(String externalId, String model, String parser, String address, Integer port, Boolean server, String adapter) {
-		this(model, parser, address, port, server, adapterManager.getAdapter(adapter));
+		this(model, parser, address, port, server, Manager.get(IAdapterManager.class).getAdapter(adapter));
 		this.externalId = externalId;
 	}
 
 	public PSimulator(String model, String parser, String address, Integer port, Boolean server, String adapter) {
-		this(model, parser, address, port, server, adapter != null ? adapterManager.getAdapter(adapter) : null);
+		this(model, parser, address, port, server, adapter != null ? Manager.get(IAdapterManager.class).getAdapter(adapter) : null);
 	}
 	public PSimulator(String model, String parser, String address, Integer port, Boolean server, IAdapter adapter) {
 		this.pSocket = address != null && port != null && server != null && adapter != null ? new PSocket(address, port, server, adapter) : null;

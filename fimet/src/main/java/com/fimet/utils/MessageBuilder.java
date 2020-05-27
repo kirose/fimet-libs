@@ -3,35 +3,31 @@ package com.fimet.utils;
 import com.fimet.IAdapterManager;
 import com.fimet.IParserManager;
 import com.fimet.Manager;
-import com.fimet.adapter.IAdapter;
-import com.fimet.iso8583.parser.IParser;
-import com.fimet.iso8583.parser.Message;
-import com.fimet.usecase.UseCase;
-import com.fimet.usecase.json.UseCaseJson;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.IParser;
+import com.fimet.parser.Message;
+import com.fimet.parser.IAdapter;
+import com.fimet.usecase.IUseCase;
 
 public class MessageBuilder {
 	static IAdapterManager adapterManager = Manager.get(IAdapterManager.class);
 	static IParserManager parserManager = Manager.get(IParserManager.class);
-	Message message;
+	IMessage message;
 	public MessageBuilder() {
 		this.message = new Message();
 	}
 	public MessageBuilder(Message message) {
 		this.message = message;
 	}
-	public MessageBuilder(UseCase useCase) {
+	public MessageBuilder(IUseCase useCase) {
 		this.message = useCase.getMessage();
 	}
-	public MessageBuilder(String useCasePath) {
-		UseCaseJson useCaseJson = com.fimet.utils.UseCaseUtils.parseJson(new java.io.File(useCasePath));
-		this.message = useCaseJson.getMessage();
-	}
 	public MessageBuilder setMti(String mti) {
-		message.setMti(mti);
+		message.setProperty(Message.MTI, mti);
 		return this;
 	}
 	public MessageBuilder setHeader(String header) {
-		message.setHeader(header);
+		message.setProperty(Message.HEADER, header);
 		return this;
 	}
 	public MessageBuilder setParser(int idParser) {
@@ -48,15 +44,15 @@ public class MessageBuilder {
 	}
 	
 	public MessageBuilder setAdapter(int idAdapter) {
-		message.setAdapter(adapterManager.getAdapter(idAdapter));
+		message.setProperty(Message.ADAPTER, adapterManager.getAdapter(idAdapter));
 		return this;
 	}
 	public MessageBuilder setAdapter(String adapter) {
-		message.setAdapter(adapterManager.getAdapter(adapter));
+		message.setProperty(Message.ADAPTER, adapterManager.getAdapter(adapter));
 		return this;
 	}
 	public MessageBuilder setAdapter(IAdapter adapter) {
-		message.setAdapter(adapter);
+		message.setProperty(Message.ADAPTER, adapter);
 		return this;
 	}
 	public MessageBuilder setValue(int idField, String value) {
@@ -76,7 +72,7 @@ public class MessageBuilder {
 		message.remove(idField);
 		return this;
 	}
-	public Message build() {
+	public IMessage build() {
 		return message;
 	}
 }

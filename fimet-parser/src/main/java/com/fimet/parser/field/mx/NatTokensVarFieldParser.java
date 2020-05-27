@@ -2,16 +2,16 @@ package com.fimet.parser.field.mx;
 
 import java.util.List;
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.utils.StringUtils;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.StringUtils;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class NatTokensVarFieldParser extends VarFieldParser {
 	
@@ -23,7 +23,7 @@ public class NatTokensVarFieldParser extends VarFieldParser {
 		if (childs != null) {
 			if (value != null && value.length > 0) {
 				try {
-					IReader reader = new ByteArrayReader(value);
+					IReader reader = new ByteBuffer(value);
 					reader.move(12);
 					if (reader.hasNext()) {
 						parseTokens(reader, message);
@@ -51,7 +51,7 @@ public class NatTokensVarFieldParser extends VarFieldParser {
 			throw new ParserException("Unknow Token: '"+tokenName+"', tokens declared: "+childs);
 		}
 		reader.move(-4);
-		return  getFieldParserManager().getFieldParser(getGroup(),idField+"."+tokenName).parse(reader, message);
+		return  group.parse(idField+"."+tokenName, message, reader);
 	}
 	@Override
 	protected void formatChilds(IWriter writer, IMessage message) {
@@ -73,7 +73,7 @@ public class NatTokensVarFieldParser extends VarFieldParser {
 			if (!childs.contains(token)) {
 				throw new FormatException("Unknow Token: '"+token+"', tokens declared: "+childs);
 			}
-			getFieldParserManager().format(message, idField, writer);
+			group.format(idField, message, writer);
 		}
 		String ln = StringUtils.leftPad(""+(writer.length()-cursor), 5, "0"); 
 		writer.replace(cursorLength, ln);

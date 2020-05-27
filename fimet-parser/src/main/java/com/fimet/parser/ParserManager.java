@@ -6,16 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.history.History;
-import com.fimet.IFieldParserManager;
+import com.fimet.dao.ParserDAO;
+import com.fimet.entity.EParser;
+import com.fimet.AbstractManager;
 import com.fimet.IParserManager;
-import com.fimet.Manager;
-import com.fimet.entity.sqlite.EParser;
-import com.fimet.iso8583.parser.IParser;
-import com.fimet.persistence.dao.ParserDAO;
 import com.fimet.parser.mx.AmexParser;
 import com.fimet.parser.mx.DiscoverParser;
 import com.fimet.parser.mx.LayoutParser;
@@ -24,8 +19,9 @@ import com.fimet.parser.mx.MasterCardParser;
 import com.fimet.parser.mx.NacionalParser;
 import com.fimet.parser.mx.TpvParser;
 import com.fimet.parser.mx.VisaParser;
+import com.fimet.utils.History;
 
-public class ParserManager implements IParserManager {
+public class ParserManager extends AbstractManager implements IParserManager {
 	Map<Integer,IParser> mapIdParsers = new HashMap<>();
 	Map<String,Integer> mapNameId = new HashMap<>();
 	Map<Integer,IParser> mapHashParsers = new HashMap<>();
@@ -91,15 +87,15 @@ public class ParserManager implements IParserManager {
 	@SuppressWarnings("unchecked")
 	private IParser newParser(EParser entity) {
 		try {
-			Class<? extends AbstractMessageISO8583Parser> parserClass = (Class<? extends AbstractMessageISO8583Parser>) Class.forName(entity.getParserClass());
-			Constructor<? extends AbstractMessageISO8583Parser> constructor = parserClass.getConstructor(com.fimet.entity.sqlite.EParser.class);
+			Class<? extends AbstractMessageBitmapParser> parserClass = (Class<? extends AbstractMessageBitmapParser>) Class.forName(entity.getParserClass());
+			Constructor<? extends AbstractMessageBitmapParser> constructor = parserClass.getConstructor(com.fimet.entity.EParser.class);
 			return constructor.newInstance(entity);
 		} catch (ClassNotFoundException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (NoSuchMethodException e) {
-			throw new ParserException("No found public constructor with com.fimet.entity.sqlite.Parser.class as argument in class: " + entity.getParserClass(),e);
+			throw new ParserException("No found public constructor with "+EParser.class.getName()+" as argument in class: " + entity.getParserClass(),e);
 		} catch (SecurityException e) {
 			throw new ParserException("Invalid Parser class: " + entity.getParserClass(),e);
 		} catch (IllegalArgumentException | InvocationTargetException e) {
@@ -148,10 +144,6 @@ public class ParserManager implements IParserManager {
 		install(idParser);
 	}
 	@Override
-	public void free() {}
-	@Override
-	public void saveState() {}
-	@Override
 	public List<EParser> getEntities() {
 		return ParserDAO.getInstance().findAll();
 	}
@@ -178,40 +170,6 @@ public class ParserManager implements IParserManager {
 		uninstall(parser.getId());
 		return parser;
 	}
-	@Override
-	public void free(List<Integer> groups) {
-		List<Integer> ids = new ArrayList<>();
-		for (Entry<Integer, IParser> e : mapIdParsers.entrySet()) {
-			if (groups.contains(e.getValue().getIdGroup())) {
-				ids.add(e.getKey());
-			}
-		}
-		List<Integer> hashes = new ArrayList<>();
-		for (Entry<Integer, IParser> e : mapHashParsers.entrySet()) {
-			if (groups.contains(e.getValue().getIdGroup())) {
-				hashes.add(e.getKey());
-			}
-		}
-		IParser parser = null;
-		for (Integer id : ids) {
-			parser = mapIdParsers.remove(id);
-			if (parser != null)
-				mapNameId.remove(parser.getName());
-		}
-		for (Integer hash : hashes) {
-			parser = mapHashParsers.remove(hash);
-			if (parser != null)
-				mapNameId.remove(parser.getName());
-			if (!ids.contains(parser.getId())) {
-				ids.add(parser.getId());
-			}
-		}
-		IFieldParserManager fieldParserManager = Manager.get(IFieldParserManager.class);
-		for (Integer idGroup : groups) {
-			fieldParserManager.deleteCache(idGroup);
-		}
-	}
-
 	@Override
 	public Integer getNextIdParser() {
 		return ParserDAO.getInstance().getNextSequenceId();

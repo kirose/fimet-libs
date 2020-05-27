@@ -1,12 +1,9 @@
 package com.fimet.xml;
 
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="manager")
@@ -17,8 +14,8 @@ public class ManagerXml {
 	private String id;
 	@XmlAttribute(name="class")
 	private String className;
-	@XmlElement(name="extension")
-	private List<ExtensionXml> extension;
+	@XmlAttribute(name="autostart")
+	private boolean autostart;
 	public ManagerXml() {
 		super();
 	}
@@ -39,11 +36,11 @@ public class ManagerXml {
 	public void setClassName(String className) {
 		this.className = className;
 	}
-	public List<ExtensionXml> getExtensions() {
-		return extension;
+	public boolean isAutostart() {
+		return autostart;
 	}
-	public void setExtensions(List<ExtensionXml> extension) {
-		this.extension = extension;
+	public void setAutostart(boolean autostart) {
+		this.autostart = autostart;
 	}
 	public String toString() {
 		return id;

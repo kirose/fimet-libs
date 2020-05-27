@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
     	<groupId>com.fimet</groupId>
-    	<artifactId>fimet-commons</artifactId>
+    	<artifactId>fimet-utils</artifactId>
     	<version>1.0.0</version>
     </dependency>
     <dependency>
@@ -40,7 +40,12 @@
     </dependency>
     <dependency>
     	<groupId>com.fimet</groupId>
-    	<artifactId>fimet-simulator</artifactId>
+    	<artifactId>fimet-runtime</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.fimet</groupId>
+    	<artifactId>fimet-server</artifactId>
     	<version>1.0.0</version>
     </dependency>
   </dependencies>

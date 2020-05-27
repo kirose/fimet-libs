@@ -3,22 +3,16 @@ package com.fimet.parser;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fimet.commons.FimetLogger;
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.converter.IConverter;
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.data.writer.impl.ByteArrayWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.IFieldFormatManager;
-import com.fimet.IFieldParserManager;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.converter.IConverter;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.ByteBuilder;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
+import com.fimet.FimetLogger;
+import com.fimet.IFieldGroupManager;
 import com.fimet.Manager;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.entity.sqlite.EFieldFormatGroup;
-import com.fimet.iso8583.parser.IFieldParser;
-import com.fimet.iso8583.parser.IMessage;
 
 /**
  * Parser for MessageFields from the message 
@@ -37,10 +31,9 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	protected final String type;
 	protected final IConverter  converterValue;
 	protected final List<String> childs;
-	protected final EFieldFormatGroup group;
 	protected final int length;
-	private static IFieldParserManager fieldParserManager = Manager.get(IFieldParserManager.class);
-	private static IFieldFormatManager fieldFormatGroupManager = Manager.get(IFieldFormatManager.class);
+	protected final IFieldGroup group;
+	private static IFieldGroupManager fieldGroupManager = Manager.get(IFieldGroupManager.class);
 	
 	public AbstractFieldParser(EFieldFormat fieldFormat) {
 		super();
@@ -57,7 +50,7 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		this.key = fieldFormat.getKey();
 		this.type = fieldFormat.getType();
 		this.name = fieldFormat.getName();
-		this.group = fieldFormatGroupManager.getGroup(fieldFormat.getIdGroup());
+		this.group = fieldGroupManager.getGroup(fieldFormat.getIdGroup());
 		this.childs = fieldFormat.getChilds() != null ? Arrays.asList(fieldFormat.getChilds().split(",")) : null;
 		this.converterValue = Converter.get(fieldFormat.getIdConverterValue());
 		String[] orders = idOrder.split("\\.");
@@ -85,22 +78,22 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	protected void preParseValue(IReader reader, IMessage message) {}
 	
 	protected byte[] posParseValue(byte[]value, IMessage message) {
-		message.setField(idField, value);
+		message.setValue(idField, value);
 		applyRuleType(value);
 		parseChilds(value, message);
-		return message.getField(idField);
+		return message.getValueAsBytes(idField);
 	}
 	
 	protected void parseChilds(byte[] value, IMessage message) {
 		if (childs != null) {
-			IReader reader = new ByteArrayReader(value);
+			IReader reader = new ByteBuffer(value);
 			byte[] child;
 			String idChild;
 			for (String childIndex : childs) {
 				try {
 					idChild = idField + "." + childIndex;
-					child = getFieldParserManager().parse(idChild, reader, message);
-					message.setField(idChild, child);
+					child = group.parse(idChild, message, reader);
+					message.setValue(idChild, child);
 				} catch (Exception e) {
 					if (getFailOnError()) {
 						throw e;
@@ -127,11 +120,11 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	protected byte[] preFormatValue(IWriter writer, IMessage message) {
 		byte[] value;
 		if (message.hasChildren(idField)) {
-			ByteArrayWriter temp = new ByteArrayWriter();
+			ByteBuilder temp = new ByteBuilder();
 			formatChilds(temp, message);
 			value = temp.getBytes();
 		} else {
-			value = message.getField(idField);
+			value = message.getValueAsBytes(idField);
 		}
 		applyRuleType(value);
 		return value;
@@ -145,7 +138,7 @@ public abstract class AbstractFieldParser implements IFieldParser {
 			if (!message.hasField(idChild)) {
 				throw new FormatException("Expected subfield: "+idChild);
 			}
-			getFieldParserManager().format(message, idChild, writer);
+			group.format(idChild, message, writer);
 		}
 	}
 	protected void applyRuleType(byte[] value) {
@@ -157,12 +150,9 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		return false;//PreferenceDAO.getBoolean(PreferenceDAO.FAIL_ON_PARSE_FIELD_ERROR, Parser.DEFAUT_FAIL_ON_ERROR);
 	}
 	protected IFieldParser getParent(){
-		return idFieldParent != null ? fieldParserManager.getFieldParser(group,idFieldParent) : null;
+		return idFieldParent != null ? group.getFieldParser(idFieldParent) : null;
 	}
-	public static IFieldParserManager getFieldParserManager() {
-		return fieldParserManager;
-	}
-	public EFieldFormatGroup getGroup() {
+	public IFieldGroup getGroup() {
 		return group;
 	}
 	@Override

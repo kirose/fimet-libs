@@ -2,22 +2,29 @@ package com.fimet;
 
 import java.io.File;
 
-import com.fimet.exe.IStressExecutor;
-import com.fimet.exe.IStressExecutorListener;
-import com.fimet.exe.IUseCaseExecutor;
-import com.fimet.exe.IUseCaseExecutorListener;
-import com.fimet.stress.Stress;
-import com.fimet.usecase.UseCase;
-
+import com.fimet.exe.ExecutionException;
+import com.fimet.exe.IExecutorListener;
+import com.fimet.exe.Task;
+import com.fimet.stress.IStress;
+import com.fimet.stress.IStressExecutorListener;
+import com.fimet.usecase.IUseCase;
+import com.fimet.usecase.IUseCaseExecutorListener;
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
 public interface IExecutorManager extends IManager {
-	void execute(UseCase useCase);
-	void execute(UseCase useCase, IUseCaseExecutorListener listener);
-	void execute(File fileOrFolderUseCase);
-	void execute(File fileOrFolderUseCase, IUseCaseExecutorListener listener);
-	void execute(String pathFileOrFolderUseCase);
-	void execute(String pathFileOrFolderUseCase, IUseCaseExecutorListener listener);
-	void execute(Stress stress, IStressExecutorListener listener);
-	void execute(Stress stress);
-	IStressExecutor getStressExecutor();
-	IUseCaseExecutor getUseCaseExecutor();
+	void setExecutorListener(IExecutorListener listener);
+	Task execute(Task task) throws ExecutionException;
+	Task executeUseCase(Object useCase) throws ExecutionException;
+	Task execute(IUseCase useCase) throws ExecutionException;
+	Task execute(File fileOrFolderUseCase) throws ExecutionException;
+	Task execute(String pathFileOrFolderUseCase) throws ExecutionException;
+	Task executeStress(Object stress) throws ExecutionException;
+	Task execute(IStress stress) throws ExecutionException;
+	void setUseCaseExecutorListener(IUseCaseExecutorListener listener);
+	void setStressExecutorListener(IStressExecutorListener listener);
+	void cancel(Task task);
+	Task getRunningTask();
 }

@@ -1,6 +1,7 @@
 package com.fimet;
 
 import com.fimet.simulator.ISimulator;
+import com.fimet.simulator.ISimulatorStore;
 import com.fimet.simulator.ISimulatorThread;
 import com.fimet.simulator.PSimulator;
 /**
@@ -15,5 +16,6 @@ public interface ISimulatorManager extends IManager {
 	public void disconnect(PSimulator simulator);
 	public void disconnectAll();
 	public ISimulatorThread getNextSimulatorThread();
+	public void setStore(ISimulatorStore store);
 	public Class<?>[] getSimulatorFieldClasses();
 }

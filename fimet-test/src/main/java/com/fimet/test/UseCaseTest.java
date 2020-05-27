@@ -2,11 +2,11 @@ package com.fimet.test;
 
 import com.fimet.IExecutorManager;
 import com.fimet.Manager;
-import com.fimet.adapter.iso8583.MLI;
-import com.fimet.exe.IUseCaseExecutorListener;
+import com.fimet.exe.UseCaseResult;
+import com.fimet.parser.MLI;
 import com.fimet.simulator.PSimulator;
 import com.fimet.usecase.IUseCase;
-import com.fimet.usecase.exe.ExecutionResult;
+import com.fimet.usecase.IUseCaseExecutorListener;
 import com.fimet.utils.UseCaseBuilder;
 /**
  * A simple example for create and execute use cases 
@@ -14,7 +14,7 @@ import com.fimet.utils.UseCaseBuilder;
  *
  */
 public class UseCaseTest implements IUseCaseExecutorListener {
-	static IExecutorManager useCaseManager = Manager.get(IExecutorManager.class);
+	static IExecutorManager executorManager = Manager.get(IExecutorManager.class);
 	public static void main(String[] args) throws Exception {
 		new UseCaseTest().test();
 	}
@@ -22,7 +22,8 @@ public class UseCaseTest implements IUseCaseExecutorListener {
 		// Execute all use cases in the folder usecases/ and use a executor listener
 		// Use cases execution is sequential
 		// See logs/socket.log and logs/validatios.log for results execution
-		useCaseManager.execute("usecases/", this);
+		executorManager.setUseCaseExecutorListener(this);
+		executorManager.execute("usecases/");
 
 		// Simulator Parameters
 		PSimulator socketAcq = new PSimulator("National", "National", "127.0.0.1", 8583, false, MLI.EXCLUSIVE);
@@ -51,6 +52,7 @@ public class UseCaseTest implements IUseCaseExecutorListener {
     	.setMessageValue(4, "000000012300")
     	.setMessageValue(11, "123456")
     	.execute();
+
     	new UseCaseBuilder("ReversalVisa", "SVisa")
     	.addConnection(socketVisaIss)
     	.setAuthorization("PurchaseVisa")
@@ -67,7 +69,7 @@ public class UseCaseTest implements IUseCaseExecutorListener {
 		System.out.println("start-"+useCase.getName());
 	}
 	@Override
-	public void onFinish(IUseCase useCase, ExecutionResult results) {
+	public void onFinish(IUseCase useCase, UseCaseResult results) {
 		System.out.println("finish-"+useCase.getName());
 	}
 }

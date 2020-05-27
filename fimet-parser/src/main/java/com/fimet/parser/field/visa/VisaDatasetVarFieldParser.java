@@ -1,15 +1,15 @@
 package com.fimet.parser.field.visa;
 
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class VisaDatasetVarFieldParser extends VarFieldParser {
 
@@ -29,7 +29,7 @@ public class VisaDatasetVarFieldParser extends VarFieldParser {
 	protected void parseChilds(byte[] value, IMessage message) {
 		if (childs != null && value != null) {
 			try {
-				IReader reader = new ByteArrayReader(value);
+				IReader reader = new ByteBuffer(value);
 				if (!reader.hasNext()) {
 					return;
 				}
@@ -56,11 +56,11 @@ public class VisaDatasetVarFieldParser extends VarFieldParser {
 		if (nextTag == null) {
 			throw new ParserException("Unknow Tag starts with: "+reader.toString().substring(0,5)+".Tags declared: "+childs);	
 		}
-		return getFieldParserManager().getFieldParser(getGroup(),idField+"."+nextTag).parse(reader, message);
+		return group.parse(idField+"."+nextTag, message, reader);
 	}
 	private String getNextTag(IReader reader) {
 		for (String tag : childs) {
-			if (reader.matcher(tag).asByte()) {
+			if (reader.startsWith(tag)) {
 				return tag;
 			}
 		}
@@ -71,7 +71,7 @@ public class VisaDatasetVarFieldParser extends VarFieldParser {
 		for (String idField : message.getIdChildren(idField)) {
 			String tag = idField.substring(idField.lastIndexOf('.')+1);
 			validateTag(tag);
-			getFieldParserManager().format(message, idField, writer);
+			group.format(idField, message, writer);
 		}
 	}
 	private void validateTag(String tag) {

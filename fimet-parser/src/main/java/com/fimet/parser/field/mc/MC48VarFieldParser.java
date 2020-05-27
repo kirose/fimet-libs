@@ -1,15 +1,15 @@
 package com.fimet.parser.field.mc;
 
 
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.commons.exception.FormatException;
-import com.fimet.commons.exception.ParserException;
-import com.fimet.commons.FimetLogger;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.FimetLogger;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.FormatException;
+import com.fimet.parser.IMessage;
+import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class MC48VarFieldParser extends VarFieldParser {
 
@@ -20,8 +20,8 @@ public class MC48VarFieldParser extends VarFieldParser {
 	protected void parseChilds(byte[] value, IMessage message) {
 		if (childs != null) {
 			try {
-				IReader reader = new ByteArrayReader(value);// Tags
-				getFieldParserManager().getFieldParser(getGroup(),idField+"."+"tcc").parse(reader, message);
+				IReader reader = new ByteBuffer(value);// Tags
+				group.parse(idField+"."+"tcc", message, reader);
 				parseTags(message, reader);
 			} catch (Exception e) {
 				if (getFailOnError()) {
@@ -42,11 +42,11 @@ public class MC48VarFieldParser extends VarFieldParser {
 		if (nextTag == null) {
 			throw new ParserException(this+" unknow Tag starts with: "+reader.toString().substring(0,5)+".\nTags declared: "+childs);	
 		}
-		return getFieldParserManager().getFieldParser(getGroup(),idField+"."+nextTag).parse(reader, message);
+		return group.parse(idField+"."+nextTag, message, reader);
 	}
 	private String getNextTag(IReader reader) {
 		for (String tag : childs) {
-			if (reader.matcher(tag).asByte()) {
+			if (reader.startsWith(tag)) {
 				return tag;
 			}
 		}
@@ -56,7 +56,7 @@ public class MC48VarFieldParser extends VarFieldParser {
 	protected void formatChilds(IWriter writer, IMessage message) {
 		for (String idChild : message.getIdChildren(idField)) {
 			validateTag(idChild);
-			getFieldParserManager().format(message, idChild, writer);
+			group.format(idChild, message, writer);
 		}
 	}
 	private void validateTag(String idField) {

@@ -3,14 +3,14 @@ package com.fimet.test;
 import java.io.File;
 import java.util.List;
 
-import com.fimet.adapter.iso8583.MLI;
-import com.fimet.exe.IStressExecutorListener;
+import com.fimet.exe.InjectorResult;
+import com.fimet.parser.MLI;
 import com.fimet.simulator.PSimulator;
-import com.fimet.stress.Stress;
+import com.fimet.stress.IStress;
+import com.fimet.stress.IStressExecutorListener;
 import com.fimet.stress.creator.CartesianCreator;
 import com.fimet.stress.creator.FieldVariator;
 import com.fimet.stress.creator.PanVariator;
-import com.fimet.stress.exe.InjectorResult;
 import com.fimet.usecase.UseCase;
 import com.fimet.utils.MessageBuilder;
 import com.fimet.utils.StressBuilder;
@@ -52,7 +52,7 @@ public class StressTest implements IStressExecutorListener {
 		.create();
     	
     	// Create a stress file with a Cartesian Creator and use case
-    	UseCase uc1 = UseCaseUtils.parseForExecution("usecases/purchase-1.uc");
+    	UseCase uc1 = UseCaseUtils.parseForExecutionFromPath("usecases/purchase-1.uc");
     	
     	File stressFile1 = new CartesianCreator("stress/stress-1.txt")
 		.setMessage(uc1.getMessage())
@@ -69,8 +69,8 @@ public class StressTest implements IStressExecutorListener {
     	.setMessagesPerCycle(10)
     	.setExecutorListener(this)
     	// For each stress file a thread-injector will be instantiated
-    	.addStressFile(socketAcq.getPSocket(), stressFile0) 
-    	.addStressFile(uc1.getAcquirer().getSocket(), stressFile1)
+    	.addStressFile(socketAcq, stressFile0) 
+    	.addStressFile(uc1.getAcquirer(), stressFile1)
     	// if need connect some simulator or socket
     	.connect(socketIss)
     	.connect(uc1)
@@ -94,12 +94,12 @@ public class StressTest implements IStressExecutorListener {
 	}
 
 	@Override
-	public void onStressStart(Stress executor) {
+	public void onStressStart(IStress stress) {
 		System.out.println("***********Start stress execution************");
 	}
 
 	@Override
-	public void onStressFinish(Stress executor, List<InjectorResult> results) {
+	public void onStressFinish(IStress stress, List<InjectorResult> results) {
 		System.out.println("***********Finish stress execution************");
 	}
 }

@@ -1,0 +1,30 @@
+package com.fimet.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public final class ArrayUtils {
+	private ArrayUtils() {
+	}
+	public static <E> List<E> copy(List<E> original) {
+		if (original == null || original.isEmpty()) {
+			return new ArrayList<>();
+		}
+		List<E> out = new ArrayList<>(original.size());
+		for (E e : original) {
+			out.add(e);
+		}
+		return out;
+	}
+	public static <I extends O,O> List<O> copyAs(List<I> original, Class<O> clazz) {
+		if (original == null || original.isEmpty()) {
+			return new ArrayList<>();
+		}
+		List<O> out = new ArrayList<>(original.size());
+		for (I e : original) {
+			out.add(clazz.cast(e));
+		}
+		return out;
+	}	
+}

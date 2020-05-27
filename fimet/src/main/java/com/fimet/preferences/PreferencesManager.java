@@ -4,15 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fimet.IPreferencesManager;
-import com.fimet.entity.sqlite.EPreference;
-import com.fimet.persistence.dao.PreferenceDAO;
+import com.fimet.IThreadManager;
+import com.fimet.Manager;
+import com.fimet.dao.PreferenceDAO;
+import com.fimet.entity.EPreference;
 
 public class PreferencesManager implements IPreferencesManager {
 	private Map<String, Object> preferences = new HashMap<>();
-	@Override
-	public void free() {
-		preferences.clear();
-	}
 	private <T>T getPreferenceValue(String name, Class<T> classValue) {
 		EPreference preference = PreferenceDAO.getInstance().findById(name);
 		if (preference == null) {
@@ -94,7 +92,7 @@ public class PreferencesManager implements IPreferencesManager {
 		}
 		return getPreferenceValue(name, defaultValue, Long.class);
 	}
-	public long getLong(String name) {
+	public Long getLong(String name) {
 		if (preferences.containsKey(name)) {
 			return (long)preferences.get(name);
 		}
@@ -126,6 +124,8 @@ public class PreferencesManager implements IPreferencesManager {
 		}
 	}
 	@Override
+	public void start() {}
+	@Override
 	public void saveState() {
 		System.out.println("Saving preferences");
 		PreferenceDAO dao = PreferenceDAO.getInstance();
@@ -133,5 +133,31 @@ public class PreferencesManager implements IPreferencesManager {
 			dao.insertOrUpdate(new EPreference(e.getKey(), e.getValue()+""));
 		}		
 	}
-
+	private void doSave(String name, String value) {
+		Manager.get(IThreadManager.class).execute(()->{
+			PreferenceDAO dao = PreferenceDAO.getInstance();
+			dao.insertOrUpdate(new EPreference(name, value));
+		});
+	}
+	@Override
+	public void reload() {
+		preferences.clear();
+	}
+	@Override
+	public Long getLongAndIncrease(String name, long defaultValue) {
+		Long value = getLong(name, defaultValue);
+		save(name, value+1);
+		doSave(name, ""+(value+1));
+		return value;
+	}
+	@Override
+	public Long getLongAndIncrease(String name) {
+		Long value = getLong(name);
+		if (value == null) {
+			value = 0L;
+		}
+		save(name, value+1);
+		doSave(name, ""+(value+1));
+		return value;
+	}
 }

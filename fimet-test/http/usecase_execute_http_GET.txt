@@ -1,0 +1,14 @@
+GET /usecase/execute HTTP/1.1
+service_key: f80ebc87-vf34-4b29-cR45-2345hhyt5434
+Content-Type: application/json
+cache-control: no-cache
+Postman-Token: 99da9334-0460-4e4b-a894-063dcecc5b7c
+Authorization: Basic Og==
+User-Agent: PostmanRuntime/7.6.0
+Accept: */*
+Host: 127.0.0.1
+accept-encoding: gzip, deflate
+content-length: 696
+Connection: keep-alive
+
+{"message": {"parser":"National","adapter": "Exclusive","header": "ISO023400070","mti": "0200","fields": {"2":"9988773461796711","3": "500000","4": "000000012300","7": "0423172306","11": "707361","12": "172306","13": "0423","17": "0423","22": "050","32": "12","37": "001341707361","41": "00040805        ","48": "117812             00000000","49": "484"}},"simulators":[{"model":"National","parser":"National","address": "127.0.0.1","port": 7251,"server":false,"adapter":"Exclusive","extension":{"validations":["\"00\".equals(msg.getValue(39))","\"00\".equals(msg.getValue(39))"]}},{"model":"National","parser":"National","address": "127.0.0.1","port": 7251,"server":true,"adapter":"Exclusive"}]}

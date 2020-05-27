@@ -3,13 +3,13 @@ package com.fimet.parser.field.visa;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fimet.commons.converter.Converter;
-import com.fimet.commons.data.reader.IReader;
-import com.fimet.commons.data.reader.impl.ByteArrayReader;
-import com.fimet.commons.data.writer.IWriter;
-import com.fimet.entity.sqlite.EFieldFormat;
-import com.fimet.iso8583.parser.IMessage;
+import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.converter.Converter;
+import com.fimet.utils.data.ByteBuffer;
+import com.fimet.utils.data.IReader;
+import com.fimet.utils.data.IWriter;
 
 public class Visa63VarFieldParser extends VarFieldParser {
 
@@ -21,11 +21,11 @@ public class Visa63VarFieldParser extends VarFieldParser {
 	@Override
 	protected void parseChilds(byte[] value, IMessage message) {
 		if (childs != null) {
-			IReader reader = new ByteArrayReader(value);//ASCII -> HEX
+			IReader reader = new ByteBuffer(value);//ASCII -> HEX
 			if (reader.hasNext()) {
 				List<Integer> bitmap = parseBitmap(reader);
 				for (Integer index : bitmap) {
-					getFieldParserManager().getFieldParser(getGroup(),idField+"."+index).parse(reader, message);
+					group.parse(idField+"."+index, message, reader);
 				}
 			}
 		}
@@ -44,7 +44,7 @@ public class Visa63VarFieldParser extends VarFieldParser {
 	protected void formatChilds(IWriter writer, IMessage message) {
 		formatBitmap(writer, message);
 		for (String idChild : message.getIdChildren(idField)) {
-			getFieldParserManager().format(message, idChild, writer);
+			group.format(idChild, message, writer);
 		}
 	}
 	private void formatBitmap(IWriter writer, IMessage message) {
