@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface IMessage extends Cloneable {
-	
+
+	public static final String USECASE = "usecase";
+	public static final String SESSION = "session";
 	public static final String PARSER = "parser";
 	public static final String ADAPTER = "adapter";
 	public static final String HEADER = "header";
@@ -37,7 +39,5 @@ public interface IMessage extends Cloneable {
 	public boolean hasChildren(String idField);
 	public List<String> getIdChildren(String idField);
 	public List<Field> getRootFields();
-	public String toJsonPretty();
-	public String toJson();
 	public IMessage clone() throws CloneNotSupportedException;
 }

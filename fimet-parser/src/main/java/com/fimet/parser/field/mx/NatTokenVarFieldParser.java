@@ -1,15 +1,15 @@
 package com.fimet.parser.field.mx;
 
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class NatTokenVarFieldParser extends VarFieldParser {
 
-	public NatTokenVarFieldParser(EFieldFormat fieldFormat) {
+	public NatTokenVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

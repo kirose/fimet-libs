@@ -11,6 +11,7 @@ import com.fimet.parser.IMessage;
 import com.fimet.usecase.ISessionListener;
 import com.fimet.usecase.IUseCase;
 import com.fimet.usecase.Session;
+import static com.fimet.parser.IMessage.SESSION;
 
 public class SessionManager extends AbstractManager implements ISessionManager {
 	private Map<Long, Session> sessions;
@@ -19,13 +20,16 @@ public class SessionManager extends AbstractManager implements ISessionManager {
 		sessions = new ConcurrentHashMap<Long,Session>();
 	}
 	@Override
+	public boolean hasSession(IMessage message) {
+		return message != null && message.hasProperty(SESSION);
+	}
+	@Override
 	public Session getSession(IMessage message) {
 		if (!sessions.isEmpty() && message != null) {
-			if (message.hasProperty("session")) {
-				return (Session)message.getProperty("session");
+			if (message.hasProperty(SESSION)) {
+				return (Session)message.getProperty(SESSION);
 			} else {
 				Long key = calculateKey(message);
-				//System.out.println("ASSIGN:"+key);
 				if (sessions.containsKey(key)) {
 					return sessions.get(key);
 				}
@@ -39,7 +43,7 @@ public class SessionManager extends AbstractManager implements ISessionManager {
 			Session session = new Session(useCase, listener);
 			thread.queue.add(session);
 			Long key = calculateKey(useCase.getMessage());
-			useCase.getMessage().setProperty("session", session);
+			useCase.getMessage().setProperty(SESSION, session);
 			sessions.put(key, session);
 			return session;
 		}
@@ -96,13 +100,10 @@ public class SessionManager extends AbstractManager implements ISessionManager {
 		if (message != null) {
 			String stan = message.getValue(11);
 			String rrn = message.getValue(37);
-			//String adata = message.getValue(48);
 			final int prime = 31;
 			long key = 1;
 			key = prime * key + ((stan == null) ? 0 : stan.hashCode());
 			key = prime * key + ((rrn == null) ? 0 : rrn.hashCode());
-			//key = prime * key + ((adata == null) ? 0 : adata.hashCode());
-			//System.out.println("KEY:"+key);
 			return key;
 		} else {
 			return 0L;

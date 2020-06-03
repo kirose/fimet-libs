@@ -1,4 +1,0 @@
-{"address":"127.0.0.1","port":9128,"model":"Visa","time":1590566058119,"type":"O","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123456","3":"000000","4":"000000012300","11":"123456","38":"176315","39":"00"}}}
-{"address":"127.0.0.1","port":9128,"model":"National","time":1590566058120,"type":"I","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123456","3":"000000","4":"000000012300","11":"123456","38":"176315","39":"00"}}}
-{"address":"127.0.0.1","port":9128,"model":"National","time":1590566058120,"type":"O","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123456","3":"000000","4":"000000012300","11":"123456","39":"00"}}}
-{"address":"127.0.0.1","port":9128,"model":"Visa","time":1590566058121,"type":"I","message":{"adapter":"Exclusive","parser":"National","fields":{"2":"1234567890123456","3":"000000","4":"000000012300","11":"123456","39":"00"}}}

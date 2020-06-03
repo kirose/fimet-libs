@@ -4,6 +4,8 @@ import static com.fimet.IClassLoaderManager.BIN_PATH;
 import static com.fimet.IClassLoaderManager.SRC_PATH;
 
 import java.io.File;
+
+import com.fimet.FimetLogger;
 /**
  * 
  * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
@@ -35,6 +37,7 @@ public class ClassLoaderBin extends ClassLoader {
 			File file = new File(BIN_PATH, className.replace('.', File.separatorChar) + ".class");
 			FileUtils.createSubdirectories(file);
 			FileUtils.writeContents(file, clazz);
+			FimetLogger.debug(ClassLoaderBin.class,"Class installed: "+className);
 		} else {
 			if (wasInstalled(className)) {
 				throw new ClassLoaderException("The class "+className+" was installed previusly");
@@ -42,6 +45,7 @@ public class ClassLoaderBin extends ClassLoader {
 				File file = new File(BIN_PATH, className.replace('.', File.separatorChar) + ".class");
 				FileUtils.createSubdirectories(file);
 				FileUtils.writeContents(file, clazz);
+				FimetLogger.debug(ClassLoaderBin.class,"Class installed: "+className);
 			}
 		}
 	}

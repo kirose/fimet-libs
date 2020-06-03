@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 //@XmlType(propOrder={"properties"})
 public class ManagerXml {
-	@XmlAttribute(name="id")
-	private String id;
+	@XmlAttribute(name="name")
+	private String name;
 	@XmlAttribute(name="class")
 	private String className;
 	@XmlAttribute(name="autostart")
@@ -21,14 +21,14 @@ public class ManagerXml {
 	}
 	public ManagerXml(String id, String className) {
 		super();
-		this.id = id;
+		this.name = id;
 		this.className = className;
 	}
-	public String getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setName(String id) {
+		this.name = id;
 	}
 	public String getClassName() {
 		return className;
@@ -43,6 +43,6 @@ public class ManagerXml {
 		this.autostart = autostart;
 	}
 	public String toString() {
-		return id;
+		return name;
 	}
 }

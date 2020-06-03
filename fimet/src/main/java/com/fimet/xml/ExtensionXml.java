@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="extension")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ExtensionXml {
-	@XmlAttribute(name="id")
-	private String id;
+	@XmlAttribute(name="name")
+	private String name;
 	@XmlAttribute(name="class")
 	private String className;
 	public ExtensionXml() {
@@ -19,14 +19,14 @@ public class ExtensionXml {
 	}
 	public ExtensionXml(String id, String className) {
 		super();
-		this.id = id;
+		this.name = id;
 		this.className = className;
 	}
-	public String getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setName(String id) {
+		this.name = id;
 	}
 	public String getClassName() {
 		return className;
@@ -35,6 +35,6 @@ public class ExtensionXml {
 		this.className = className;
 	}
 	public String toString() {
-		return id;
+		return name;
 	}
 }

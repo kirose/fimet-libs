@@ -1,18 +1,22 @@
 package com.fimet.simulator;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fimet.AbstractManager;
-import com.fimet.FimetException;
+import com.fimet.IClassLoaderManager;
 import com.fimet.ISimulatorManager;
+import com.fimet.ISimulatorModelManager;
 import com.fimet.Manager;
+import com.fimet.dao.ISimulatorDAO;
+import com.fimet.parser.ParserException;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorThread;
-import com.fimet.simulator.PSimulator;
 import com.fimet.simulator.field.*;
-import com.fimet.xml.FimetXml;
+import com.fimet.utils.FileUtils;
 
 /**
  * 
@@ -20,29 +24,32 @@ import com.fimet.xml.FimetXml;
  * @email marcoasb99@ciencias.unam.mx
  */
 public class SimulatorManager extends AbstractManager implements ISimulatorManager {
-	static final int DEFAULT_NUMBER_OF_THREADS = 5;
-	private Map<Integer, ISimulator> simulators = new ConcurrentHashMap<>();
-	private Map<String, PSimulator> externals = new ConcurrentHashMap<>();
+
+	private Map<String, ISimulator> mapNameSimulator = new ConcurrentHashMap<>();
+	private ISimulatorDAO dao = Manager.getExtension(ISimulatorDAO.class,SimulatorDAO.class);
 	private SimulatorThread next;
 	private SimulatorThread head;
 	private SimulatorStoreWrapper store;
 	public SimulatorManager() {
-		ISimulatorStore wrapped = Manager.getExtension(ISimulatorStore.class, NullSimulatorStore.INSTANCE);
-		store = new SimulatorStoreWrapper(wrapped);
-		loadExternals();
 		initThreads();
+		store = new SimulatorStoreWrapper(NullSimulatorStore.INSTANCE);
 	}
-	private void loadExternals() {
-		FimetXml model = Manager.getModel();
-		List<PSimulator> pSimulators = model.getPSimulators();
-		if (pSimulators != null) {
-			for (PSimulator p : pSimulators) {
-				externals.put(p.getExternalId(), p);
-			}
+	@Override
+	public void start() {
+		reload();
+	}
+	@Override
+	public void reload() {
+		boolean removeExtensions = Manager.getPropertyBoolean("simulator.removeExtensions",true);
+		if (removeExtensions) {
+			File path = new File(IClassLoaderManager.BIN_PATH, PACKAGE_EXTENSIONS.replace(".", File.separator));
+			FileUtils.deleteFiles(path);
 		}
+		ISimulatorStore wrapped = Manager.getExtension(ISimulatorStore.class, NullSimulatorStore.INSTANCE);
+		store.setWrapped(wrapped);
 	}
 	private void initThreads() {
-		Integer numberOfThreads = Manager.getPropertyInteger("simulator.numberOfThreads", DEFAULT_NUMBER_OF_THREADS);
+		Integer numberOfThreads = Manager.getPropertyInteger("simulator.numberOfThreads", 5);
 		next = head = new SimulatorThread(0);
 		if (numberOfThreads > 1) {
 			SimulatorThread prev = head;
@@ -56,53 +63,70 @@ public class SimulatorManager extends AbstractManager implements ISimulatorManag
 		next = head;
 	}
 	@Override
-	public ISimulator getSimulator(String externalId) {
-		if (externals.containsKey(externalId)) {
-			PSimulator p = externals.get(externalId);
-			return getSimulator(p);
-		}
-		throw new FimetException("Unkown simulator with external id "+externalId);
-	}
-	@Override
-	public ISimulator getSimulator(PSimulator simulator) {
-		if (simulator.getExternalId() != null) {
-			simulator = externals.get(simulator.getExternalId());
-		}
-		if (simulators.containsKey(simulator.hashCode())) {
-			return simulators.get(simulator.hashCode());	
+	public ISimulator getSimulator(String name) {
+		if (mapNameSimulator.containsKey(name)) {
+			return mapNameSimulator.get(name);
 		} else {
-			Simulator s = new Simulator(simulator);
+			IESimulator entity = findEntity(name);
+			Simulator s = new Simulator(entity);
 			s.setStore(store);
-			simulators.put(simulator.hashCode(), s);
+			mapNameSimulator.put(s.getName(), s);
+			return s;
 		}
-		return simulators.get(simulator.hashCode());
 	}
 	@Override
-	public ISimulator connect(PSimulator simulator) {
-		ISimulator messenger = getSimulator(simulator);
+	public ISimulator getSimulator(IESimulator entity) {
+		if (entity.getName() != null) {
+			if (mapNameSimulator.containsKey(entity.getName())) {
+				return mapNameSimulator.get(entity.getName());
+			} else {
+				Simulator s = new Simulator(entity);
+				s.setStore(store);
+				mapNameSimulator.put(s.getName(), s);
+				return s;
+			}
+		} else {
+			throw new ParserException("Simulator name is null, invalid entity "+entity);
+		}
+	}
+	@Override
+	public ISimulator connect(IESimulator entity) {
+		ISimulator messenger = getSimulator(entity);
 		messenger.connect();
 		return messenger;
 	}
 	@Override
-	public void disconnect(PSimulator simulator) {
-		if (simulators.containsKey(simulator.hashCode())) {
-			simulators.get(simulator.hashCode()).disconnect();
-			simulators.remove(simulator.hashCode());
+	public void disconnect(String name) {
+		if (mapNameSimulator.containsKey(name)) {
+			mapNameSimulator.remove(name).disconnect();
 		}
 	}
 	@Override
 	public void disconnectAll() {
-		for (Map.Entry<Integer, ISimulator> e : simulators.entrySet()) {
+		for (Map.Entry<String, ISimulator> e : mapNameSimulator.entrySet()) {
 			e.getValue().disconnect();
 		}
-		simulators.clear();
+		mapNameSimulator.clear();
 	}
 	@Override
 	synchronized public ISimulatorThread getNextSimulatorThread() {
 		return next = next.next;
 	}
+	@Override
+	public void reload(String simulator) {
+		ISimulator s = mapNameSimulator.remove(simulator);
+		Manager.get(ISimulatorModelManager.class).reload(s.getModel().getName());
+	}
 	public void setStore(ISimulatorStore store) {
 		this.store.setWrapped(store);
+	}
+	private IESimulator findEntity(String name) {
+		IESimulator entity = dao.getByName(name);
+		if (entity != null) {
+			return entity;
+		} else {
+			throw new ParserException("Unknow simulator: "+name);
+		}
 	}
 	@Override
 	public Class<?>[] getSimulatorFieldClasses() {
@@ -132,5 +156,14 @@ public class SimulatorManager extends AbstractManager implements ISimulatorManag
 			SetNewDatehhmmss.class,
 			SetNewDateMMdd.class
 		};
+	}
+	@Override
+	public List<ISimulator> getSimulators() {
+		List<IESimulator> entities = dao.getAll();
+		List<ISimulator> simulators = new ArrayList<>();
+		for (IESimulator e : entities) {
+			simulators.add(getSimulator(e));
+		}
+		return simulators;
 	}
 }

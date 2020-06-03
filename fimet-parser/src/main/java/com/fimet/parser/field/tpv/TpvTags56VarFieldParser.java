@@ -2,16 +2,16 @@ package com.fimet.parser.field.tpv;
 
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class TpvTags56VarFieldParser extends VarFieldParser {
 
-	public TpvTags56VarFieldParser(EFieldFormat fieldFormat) {
+	public TpvTags56VarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	protected void parseChilds(byte[] value, IMessage message) {
@@ -23,10 +23,10 @@ public class TpvTags56VarFieldParser extends VarFieldParser {
 				}
 				parseTags(message, reader);
 			} catch (Exception e) {
-				if (getFailOnError()) {
+				if (failOnErrorParseField) {
 					throw e;
 				} else {
-					FimetLogger.warning("Parsing tokens "+idField,e);
+					FimetLogger.warning(this+" error parsing tokens "+idField,e);
 				}
 			}
 		}

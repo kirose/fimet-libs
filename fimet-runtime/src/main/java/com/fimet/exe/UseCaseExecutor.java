@@ -5,7 +5,6 @@ import com.fimet.ISessionManager;
 import com.fimet.ISimulatorManager;
 import com.fimet.ISocketManager;
 import com.fimet.Manager;
-import com.fimet.entity.ECodeStore;
 import com.fimet.exe.UseCaseResult.Status;
 import com.fimet.exe.usecase.FolderIterator;
 import com.fimet.exe.usecase.IFinishListener;
@@ -20,9 +19,10 @@ import com.fimet.socket.IConnectable;
 import com.fimet.socket.MultiConnector;
 import com.fimet.socket.IMultiConnectable;
 import com.fimet.socket.MultiConnector.IMultiConnectorListener;
-import com.fimet.usecase.CodeStore;
 import com.fimet.usecase.ISessionListener;
 import com.fimet.usecase.IUseCase;
+import com.fimet.usecase.CodeStoreDefault;
+import com.fimet.usecase.ICode;
 import com.fimet.usecase.ICodeStore;
 import com.fimet.usecase.IUseCaseExecutor;
 import com.fimet.usecase.IUseCaseExecutorListener;
@@ -48,7 +48,7 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 	private Queue<Task> queue = new ConcurrentLinkedQueue<Task>();
 	private Task executing;
 	public UseCaseExecutor() {
-		codeStore = Manager.getExtension(ICodeStore.class, CodeStore.class);
+		codeStore = Manager.getExtension(ICodeStore.class, CodeStoreDefault.class);
 		folderExecutor = new FolderExecutor();
 		folderExecutor.setFinishListener(this);
 		singleExecutor = new SingleExecutor();
@@ -136,13 +136,22 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 			super.execute(useCase);
 		}
 		public void execute(File folder) {
-			this.iterator = new FolderIterator(folder);
-			this.result = new UseCaseFolderResult();
-			result.setName(folder.getName());
-			this.result.setStartTime(System.currentTimeMillis());
-			if(iterator.hasNext()) {
-				execute(iterator.next());
-			} else {
+			try {
+				this.result = new UseCaseFolderResult();
+				result.setName(folder.getName());
+				result.status = UseCaseFolderResult.Status.START;
+				this.result.setStartTime(System.currentTimeMillis());
+				this.iterator = new FolderIterator(folder);
+				System.out.println("");
+				if(iterator.hasNext()) {
+					execute(iterator.next());
+				} else {
+					result.status = UseCaseFolderResult.Status.COMPLETE;
+					finishListener.onFinish(result);
+				}
+			} catch(Exception e) {
+				FimetLogger.error(UseCaseExecutor.class, e);
+				result.status = UseCaseFolderResult.Status.ERROR;
 				finishListener.onFinish(result);
 			}
 		}
@@ -153,7 +162,7 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 				Status status = ((UseCaseResult)result).getStatus();
 				if (status == Status.COMPLETE) {
 					this.result.getNumOfCompleteAndIncrement();
-				} else if (status == Status.ERROR) {
+				} else if (status == Status.ERROR || status == Status.CONNECTION_REFUSED) {
 					this.result.getNumOfErrorAndIncrement();
 				} else if (status == Status.TIMEOUT) {
 					this.result.getNumOfTimeoutAndIncrement();
@@ -185,13 +194,12 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 			listener = NullUseCaseExecutorListener.INSTANCE;
 		}
 		public void cancel() {
-			
 		}
 		public void execute(UseCase useCase) {
 			doPrepareExecution(useCase);
 		}
 		public void execute(File useCaseFile) {
-			UseCase useCase = UseCaseUtils.parseForExecutionFromFile(useCaseFile);
+			UseCase useCase = UseCaseUtils.fromFile(useCaseFile);
 			doPrepareExecution(useCase);
 		}
 		private void doPrepareExecution(UseCase useCase) {
@@ -208,13 +216,18 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 				onError(useCase);
 			}
 		}
+		@Override
+		public void onConnectorConnectAll(IMultiConnectable connectable) {
+			doExecute((UseCase)connectable);
+		}
 		private void doExecute(UseCase useCase) {
 			try {
+				FimetLogger.debug(UseCaseExecutor.class,"Start "+useCase.getName());
 				for (ISimulator s : useCase.getSimulators()) s.setListener(this);
-				sessionManager.createSession(useCase, this);
+				useCase.getMessage().setProperty(IMessage.USECASE, useCase);
 				useCase.getAcquirer().writeMessage(useCase.getMessage());
 			} catch (Exception e) {
-				FimetLogger.error("Execution error", e);
+				FimetLogger.error(UseCaseExecutor.class,"Execution error", e);
 				onError(useCase);
 			}
 		}
@@ -223,9 +236,13 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 		}
 		@Override
 		public byte[] onSimulatorWriteMessage(ISimulator simulator, IMessage message) {
-			Session session = sessionManager.getSession(message);
-			if (session != null && session.getUseCase() != null) {
-				IUseCase useCase = session.getUseCase();
+			IUseCase useCase = null;
+			if (message.hasProperty(IMessage.USECASE)) { 
+				useCase = (IUseCase)message.removeProperty(IMessage.USECASE);
+			} else if (sessionManager.hasSession(message)) {
+				useCase = sessionManager.getSession(message).getUseCase();
+			}
+			if (useCase != null) {
 				try {
 					message = useCase.getSimulatorExtension().simulateOutgoingMessage(simulator, message);
 				} catch (Throwable e) {
@@ -233,6 +250,11 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 				}
 				if (message == null) {
 					return null;
+				}
+				// Session must be created after simulators execution
+				// Simulators can change fields and Session-hash can be different
+				if (!sessionManager.hasSession(message)) {
+					sessionManager.createSession(useCase, this);
 				}
 				byte[] iso = simulator.getParser().formatMessage(message);
 				return iso;
@@ -260,16 +282,27 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 				}
 			}
 		}
-
+		@Override
+		public void onConnectorConnect(IConnectable simulator) {}
+		@Override
+		public void onConnectorTimeout(IMultiConnectable connectable) {
+			if (connectable instanceof UseCase) {
+				UseCase useCase = (UseCase)connectable;
+				FimetLogger.debug(UseCaseExecutor.class, "Connection Refused "+useCase);
+				useCase.getResult().setStatus(Status.CONNECTION_REFUSED);
+				onFinish(useCase);				
+			}
+		}
 		@Override
 		public void onSessionExpire(IUseCase useCase) {
 			onTimeout(useCase);
 		}
 		private void onStart(UseCase useCase) {
+			FimetLogger.debug(UseCaseExecutor.class, "Start "+useCase);
 			useCase.getResult().setStatus(Status.START);
 			useCase.getResult().setStartTime(System.currentTimeMillis());
 			if (useCase.getAuthorization() != null) {
-				ECodeStore code = codeStore.get(useCase.getAuthorization());
+				ICode code = codeStore.get(useCase.getAuthorization());
 				if (code != null) {
 					useCase.getMessage().setValue("38", code.getAuthCode());
 					useCase.getMessage().setValue("39", code.getResponseCode());	
@@ -278,29 +311,26 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 			listener.onStart(useCase);
 		}
 		private void onTimeout(IUseCase useCase) {
-			FimetLogger.debug(UseCaseExecutor.class, "Timeout "+useCase+" "+this);
 			useCase.getResult().setStatus(Status.TIMEOUT);
 			onFinish(useCase);
 		}
-		private void onStop(IUseCase useCase) {
-			FimetLogger.debug(UseCaseExecutor.class, "Stop "+useCase+" "+this);
-			useCase.getResult().setStatus(Status.STOPPED);
-			onFinish(useCase);
-		}
+//		public void onStop(IUseCase useCase) {
+//			FimetLogger.debug(UseCaseExecutor.class, "Stop "+useCase);
+//			useCase.getResult().setStatus(Status.STOPPED);
+//			onFinish(useCase);
+//		}
 		private void onError(UseCase useCase) {
-			FimetLogger.debug(UseCaseExecutor.class, "Error "+useCase+" "+this);
 			useCase.getResult().setStatus(Status.ERROR);
 			onFinish(useCase);
 		}
 		private void onComplete(IUseCase useCase) {
-			FimetLogger.debug(UseCaseExecutor.class, "Complete "+useCase+" "+this);
 			useCase.getResult().setStatus(Status.COMPLETE);
 			onFinish(useCase);
 		}
 		private void onFinish(IUseCase useCase) {
 			sessionManager.deleteSession(useCase);
 			useCase.getResult().setFinishTime(System.currentTimeMillis());
-			FimetLogger.debug(UseCaseExecutor.class, "Finish "+useCase+" "+this);
+			FimetLogger.debug(UseCaseExecutor.class, "Finish "+useCase+" with status "+useCase.getResult().getStatus());
 			try {
 				store.storeUseCase(useCase);
 			} catch (Throwable e) {
@@ -326,20 +356,6 @@ public class UseCaseExecutor implements IUseCaseExecutor, IFinishListener {
 				}
 			}
 			return true;
-		}
-		@Override
-		public void onConnectorConnect(IConnectable simulator) {}
-		@Override
-		public void onConnectorTimeout(IMultiConnectable connectable) {
-			if (connectable instanceof UseCase) {
-				UseCase useCase = (UseCase)connectable;
-				FimetLogger.error(UseCaseExecutor.class, "Cannot connect simulators for use case "+useCase.getName());
-				onStop(useCase);
-			}
-		}
-		@Override
-		public void onConnectorConnectAll(IMultiConnectable connectable) {
-			doExecute((UseCase)connectable);
 		}
 		public void setFinishListener(IFinishListener finishListener) {
 			this.finishListener = finishListener!=null?finishListener:NullFinishListener.INSTANCE;

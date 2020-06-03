@@ -2,12 +2,12 @@ package com.fimet.stress;
 
 import java.util.List;
 
-import com.fimet.exe.InjectorResult;
+import com.fimet.exe.SocketResult;
 
 public interface IStressExecutorListener {
-	void onInjectorFinishCycle(InjectorResult result);
-	void onInjectorStart(InjectorResult result);
-	void onInjectorFinish(InjectorResult result);
+	void onInjectorFinishCycle(SocketResult result);
+	void onInjectorStart(SocketResult result);
+	void onInjectorFinish(SocketResult result);
 	void onStressStart(IStress stress);
-	void onStressFinish(IStress stress, List<InjectorResult> results);
+	void onStressFinish(IStress stress, List<SocketResult> results);
 }

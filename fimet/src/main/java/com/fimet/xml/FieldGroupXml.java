@@ -7,26 +7,34 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="parser")
+@XmlRootElement(name="fieldGroup")
 @XmlAccessorType(XmlAccessType.NONE)
 public class FieldGroupXml {
-	@XmlAttribute(name="id")
-	private String id;
+	@XmlAttribute(name="name")
+	private String name;
 	@XmlAttribute(name="path")
 	private String path;
+	@XmlAttribute(name="parent")
+	private String parent;
 	public FieldGroupXml() {
 		super();
 	}
-	public String getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getPath() {
 		return path;
 	}
 	public void setPath(String path) {
 		this.path = path;
+	}
+	public String getParent() {
+		return parent;
+	}
+	public void setParent(String parent) {
+		this.parent = parent;
 	}
 }

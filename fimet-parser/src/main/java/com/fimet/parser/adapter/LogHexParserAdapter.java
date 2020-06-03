@@ -3,8 +3,8 @@ package com.fimet.parser.adapter;
 import com.fimet.parser.AdapterException;
 import com.fimet.parser.IByteArrayAdapter;
 import com.fimet.parser.IStringAdapter;
+import com.fimet.utils.ByteBuilder;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.ByteBuilder;
 
 public class LogHexParserAdapter extends Adapter implements IStringAdapter, IByteArrayAdapter {
 

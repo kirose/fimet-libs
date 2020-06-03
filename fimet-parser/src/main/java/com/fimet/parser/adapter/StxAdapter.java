@@ -8,8 +8,8 @@ import com.fimet.parser.AdapterException;
 import com.fimet.parser.IByteArrayAdapter;
 import com.fimet.parser.IStreamAdapter;
 import com.fimet.parser.IStringAdapter;
-import com.fimet.utils.data.ByteBuilder;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.ByteBuilder;
+import com.fimet.utils.IWriter;
 
 public class StxAdapter extends Adapter implements IStreamAdapter, IByteArrayAdapter, IStringAdapter {
 

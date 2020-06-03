@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="MNational">
+	<message mti="0100" type="Request">
+		<add id="37" class="com.fimet.simulator.field.SetRandom6AN"/>
+	</message>
+	<message mti="0200" type="Request">
+		<add id="37" class="com.fimet.simulator.field.SetRandom6AN"/>
+	</message>
+	<message mti="0400" type="Request">
+		<add id="37" class="com.fimet.simulator.field.SetRandom6AN"/>
+	</message>
+	<message mti="0800" header="ISO025000077" type="Request">
+		<add id="7" class="com.fimet.simulator.field.SetNewDateMMddhhmmss"/>
+		<add id="11" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="37" class="com.fimet.simulator.field.SetRandom6AN"/>
+	</message>
+	<message mti="0100" type="Response">
+		<del>10</del>
+		<del>13</del>
+		<add id="37" value="            "/>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0200" type="Response">
+		<del>10</del>
+		<del>13</del>
+		<add id="37" value="            "/>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0420" type="Response">
+		<del>10</del>
+		<del>13</del>
+		<add id="37" value="            "/>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0800" type="Response">
+		<add id="39" value="00"/>
+	</message>
+</model>

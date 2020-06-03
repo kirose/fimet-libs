@@ -13,6 +13,7 @@ import com.fimet.parser.IMessage;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorStore;
 import com.fimet.stress.StressStoreCsv;
+import com.fimet.utils.MessageUtils;
 
 public class SimulatorStoreTxt implements ISimulatorStore {
 	private ISessionManager sessionManager = Manager.get(ISessionManager.class);
@@ -52,7 +53,7 @@ public class SimulatorStoreTxt implements ISimulatorStore {
 					+"["+(session != null ? session.getUseCase().getName() : null)+"]"
 					+"["+simulator.getModel().getName()+"]"
 					+"["+simulator.getSocket().getPort()+"]"
-					+"["+message.toJson()+"]\n"
+					+"["+MessageUtils.toJson(message)+"]\n"
 					//+"["+new String(Converter.asciiToHex(bytes))+"]\n"
 				 );
 				simulatorWriter.flush();

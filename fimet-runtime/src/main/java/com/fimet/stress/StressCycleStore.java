@@ -7,16 +7,15 @@ import java.util.UUID;
 
 import com.fimet.FimetException;
 import com.fimet.FimetLogger;
-import com.fimet.exe.InjectorResult;
+import com.fimet.exe.SocketResult;
 import com.fimet.utils.JsonUtils;
-import com.fimet.entity.EStressCycleStore;
 
 public class StressCycleStore {
 	File STORE_PATH = new File("store/task");
 	FileWriter store;
 	public StressCycleStore() {
 	}
-	public void storeCycleResults(InjectorResult result) {
+	public void storeCycleResults(SocketResult result) {
 		if (store != null) { 
 			try {
 				EStressCycleStore e = new EStressCycleStore();
@@ -54,4 +53,49 @@ public class StressCycleStore {
 			store = null;
 		}
 	}
+	public class EStressCycleStore {
+		private Long numOfCycle;
+		private String address;
+		private Integer port;
+		private Long numOfWrite;
+		private Long numOfRead;
+		private Long numOfApprovals;
+		public Long getNumOfCycle() {
+			return numOfCycle;
+		}
+		public void setNumOfCycle(Long numOfCycle) {
+			this.numOfCycle = numOfCycle;
+		}
+		public String getAddress() {
+			return address;
+		}
+		public void setAddress(String address) {
+			this.address = address;
+		}
+		public Integer getPort() {
+			return port;
+		}
+		public void setPort(Integer port) {
+			this.port = port;
+		}
+		public Long getNumOfApprovals() {
+			return numOfApprovals;
+		}
+		public void setNumOfApprovals(Long numOfApprovals) {
+			this.numOfApprovals = numOfApprovals;
+		}
+		public Long getNumOfWrite() {
+			return numOfWrite;
+		}
+		public void setNumOfWrite(Long numOfWrite) {
+			this.numOfWrite = numOfWrite;
+		}
+		public Long getNumOfRead() {
+			return numOfRead;
+		}
+		public void setNumOfRead(Long numOfRead) {
+			this.numOfRead = numOfRead;
+		}
+	}
+
 }

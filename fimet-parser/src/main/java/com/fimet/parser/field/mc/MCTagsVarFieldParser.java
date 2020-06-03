@@ -1,18 +1,18 @@
 package com.fimet.parser.field.mc;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class MCTagsVarFieldParser extends VarFieldParser {
 
-	public MCTagsVarFieldParser(EFieldFormat fieldFormat) {
+	public MCTagsVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override
@@ -22,10 +22,10 @@ public class MCTagsVarFieldParser extends VarFieldParser {
 				IReader reader = new ByteBuffer(value);
 				parseTags(message, reader);
 			} catch (Exception e) {
-				if (getFailOnError()) {
+				if (failOnErrorParseField) {
 					throw e;
 				} else {
-					FimetLogger.warning("Parsing tags "+idField,e);
+					FimetLogger.warning(this+" error parsing tags "+idField,e);
 				}
 			}
 		}

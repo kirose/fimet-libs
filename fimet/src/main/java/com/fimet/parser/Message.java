@@ -2,8 +2,8 @@ package com.fimet.parser;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.fimet.FimetException;
-import com.fimet.json.JsonAdapterFactory;
 import com.fimet.json.MessageAdapter;
+import com.fimet.utils.MessageUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -41,15 +41,9 @@ public class Message implements Serializable, Cloneable, IMessage {
 	public List<Field> getRootFields() {
 		return new FieldTree(fields).getRoots();
 	}
-	public String toJsonPretty() {
-		return JsonAdapterFactory.GSON_PRETTY.toJson(this);
-	}
-	public String toJson() {
-		return JsonAdapterFactory.GSON.toJson(this);
-	}
 	@Override
 	public String toString() {
-		return toJsonPretty();
+		return MessageUtils.toJsonPretty(this);
 	}
 	@Override
 	public boolean hasField(int idField) {

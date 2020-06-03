@@ -5,17 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.fimet.AbstractManager;
-import com.fimet.FimetException;
+import com.fimet.IClassLoaderManager;
 import com.fimet.ISimulatorModelManager;
 import com.fimet.Manager;
-import com.fimet.dao.SimulatorDAO;
-import com.fimet.dao.SimulatorMessageDAO;
-import com.fimet.entity.ESimulator;
-import com.fimet.entity.ESimulatorMessage;
+import com.fimet.dao.ISimulatorModelDAO;
 import com.fimet.simulator.ISimulatorModel;
 import com.fimet.utils.SimulatorUtils;
-import com.fimet.xml.FimetXml;
-import com.fimet.xml.SimulatorModelXml;
 
 /**
  * 
@@ -23,60 +18,41 @@ import com.fimet.xml.SimulatorModelXml;
  * @email marcoasb99@ciencias.unam.mx
  */
 public class SimulatorModelManager extends AbstractManager implements ISimulatorModelManager {
-	private Map<String, SimulatorModelWrapper> models = new HashMap<>();
+	private Map<String, SimulatorModelWrapper> mapNameSimulator = new HashMap<>();
 	private Map<String, Class<ISimulatorModel>> classes = new HashMap<>();
+	private ISimulatorModelDAO dao = Manager.getExtension(ISimulatorModelDAO.class, SimulatorModelDAO.class);
+	private boolean recompileModels = Manager.getPropertyBoolean("simulatorModel.recompileModels",true);
 	public SimulatorModelManager() {
-		loadInternalClases();
-		loadExternalClases();
-		models.put("None", new SimulatorModelWrapper(NullSimulatorModel.INSTANCE));
-	}
-	@SuppressWarnings("unchecked")
-	private void loadExternalClases() {
-		FimetXml model = Manager.getModel();
-		List<SimulatorModelXml> models = model.getModels();
-		if (
-			models != null 
-			&& !models.isEmpty()
-		) {
-			for (SimulatorModelXml m : models) {
-				try {
-					Class<ISimulatorModel> clazz = (Class<ISimulatorModel>)Class.forName(m.getClassName());
-					this.classes.put(m.getId(), clazz);
-				} catch (ClassNotFoundException e) {
-					throw new FimetException("SimulatorModel Class not found "+m.getClassName(),e);
-				}
-			}
-		}
-	}
-	private void loadInternalClases() {
-		List<ESimulator> entities = getEntities();
-		Boolean recompile = Manager.getPropertyBoolean("simulator.recompileModelsAtStartup", Boolean.FALSE);
-		if (recompile) {
-			for (ESimulator s : entities) {
-				Class<ISimulatorModel> sm = SimulatorUtils.getClassSimulatorModel(s);
-				classes.put(s.getName(), sm);
-			}
-		} else {
-			for (ESimulator s : entities) {
-				Class<ISimulatorModel> sm = SimulatorUtils.installClassSimulatorModel(s);
-				classes.put(s.getName(), sm);
-			}
-		}
-	} 
-	
-	public List<ESimulator> getEntities(){
-		return SimulatorDAO.getInstance().findAll();
-	}
-	public  List<ESimulatorMessage> getEntityMessages(int id) {
-		return SimulatorMessageDAO.getInstance().findByIdSimulator(id);
+		reload();
+		mapNameSimulator.put("None", new SimulatorModelWrapper(NullSimulatorModel.INSTANCE));
 	}
 	@Override
-	public void reloadSimulator(String name) {
-		ESimulator entity = getEntity(name);
+	public void reload() {
+		mapNameSimulator.clear();
+		classes.clear();
+		loadClases();
+	}
+	@SuppressWarnings("unchecked")
+	private void loadClases() {
+		IClassLoaderManager loaderManager = Manager.get(IClassLoaderManager.class);
+		List<IESimulatorModel> entities = dao.getAll();
+		for (IESimulatorModel s : entities) {
+			Class<ISimulatorModel> clazz = null;
+			if (recompileModels || !loaderManager.wasInstalled(s.getClassModel())) {
+				clazz = SimulatorUtils.installClassSimulatorModel(s);
+			} else {
+				clazz = (Class<ISimulatorModel>)loaderManager.loadClass(s.getClassModel());
+			}
+			classes.put(s.getName(), clazz);
+		}
+	} 
+	@Override
+	public void reload(String name) {
+		IESimulatorModel entity = getEntity(name);
 		if (entity != null) {
 			Class<ISimulatorModel> clazz = SimulatorUtils.installClassSimulatorModel(entity);
 			classes.put(name, clazz);
-			SimulatorModelWrapper wrapper = models.get(name);
+			SimulatorModelWrapper wrapper = mapNameSimulator.get(name);
 			if (wrapper != null) {
 				ISimulatorModel instance;
 				try {
@@ -86,64 +62,16 @@ public class SimulatorModelManager extends AbstractManager implements ISimulator
 				}
 				wrapper.setWapped(instance);
 			}
+		} else if (mapNameSimulator.containsKey(name)) {
+			mapNameSimulator.remove(name).setWapped(NullSimulatorModel.INSTANCE);
 		}
 	}
-	@Override
-	public void reloadSimulators(List<String> names) {
-		for (String name: names) {
-			reloadSimulator(name);
-		}
-	}
-	public ESimulator getEntity(String name) {
-		return SimulatorDAO.getInstance().findByName(name);
-	}
-	public  ESimulator getEntity(Integer id) {
-		return SimulatorDAO.getInstance().findById(id);
-	}
-	public ESimulator saveSimulator(ESimulator simulator) {
-		SimulatorDAO.getInstance().insertOrUpdate(simulator);
-		if (simulator.getId() == null) {
-			ESimulator last = SimulatorDAO.getInstance().findLast();
-			if (last != null)
-				simulator.setId(last.getId());
-		}
-		return simulator;
-	}
-	public ESimulator deleteSimulator(ESimulator simulator) {
-		SimulatorDAO.getInstance().delete(simulator);
-		SimulatorMessageDAO.getInstance().deleteByIdSimulator(simulator.getId());
-		return simulator;
-	}
-	public ESimulatorMessage saveSimulatorMessage(ESimulatorMessage message) {
-		SimulatorMessageDAO.getInstance().insertOrUpdate(message);
-		if (message.getId() == null) {
-			ESimulatorMessage last = SimulatorMessageDAO.getInstance().findLast();
-			if (last != null)
-				message.setId(last.getId());
-		}
-		return message;
-	}
-	public ESimulatorMessage deleteSimulatorMessage(ESimulatorMessage message) {
-		SimulatorMessageDAO.getInstance().delete(message);
-		return message;
-	}
-	public Integer getNextIdSimulator() {
-		return SimulatorDAO.getInstance().getNextSequenceId();
-	}
-	public Integer getPrevIdSimulator() {
-		return SimulatorDAO.getInstance().getPrevSequenceId();
-	}
-	@Override
-	public List<ESimulator> getAcquirerEntities() {
-		return SimulatorDAO.getInstance().findAllAcquirers();
-	}
-	@Override
-	public List<ESimulator> getIssuerEntities() {
-		return SimulatorDAO.getInstance().findAllIssuers();
+	private IESimulatorModel getEntity(String name) {
+		return dao.getByName(name);
 	}
 	public ISimulatorModel getSimulatorModel(String name) {
-		if (models.containsKey(name)) {
-			return models.get(name);
+		if (mapNameSimulator.containsKey(name)) {
+			return mapNameSimulator.get(name);
 		} else if (classes.containsKey(name)){
 			ISimulatorModel instance;
 			try {
@@ -152,10 +80,10 @@ public class SimulatorModelManager extends AbstractManager implements ISimulator
 				throw new SimulatorException("Invalid simulator model "+name,e);
 			}
 			SimulatorModelWrapper wapper = new SimulatorModelWrapper(instance);
-			models.put(name, wapper);
+			mapNameSimulator.put(name, wapper);
 			return wapper;
 		} else {
-			throw new FimetException("Unkown simulator model "+name);
+			throw new SimulatorException("Unkown simulator model "+name);
 		}
 	}
 }

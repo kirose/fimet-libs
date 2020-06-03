@@ -10,10 +10,10 @@ import java.util.Date;
 import com.fimet.FimetException;
 import com.fimet.FimetLogger;
 import com.fimet.Version;
+import com.fimet.utils.ByteBuilder;
 import com.fimet.utils.ByteUtils;
 import com.fimet.utils.DateUtils;
 import com.fimet.utils.FileUtils;
-import com.fimet.utils.data.ByteBuilder;
 
 public class HttpParser {
 

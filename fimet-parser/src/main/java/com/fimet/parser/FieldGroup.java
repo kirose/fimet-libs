@@ -8,99 +8,81 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.fimet.FimetException;
 import com.fimet.Manager;
-import com.fimet.dao.FieldFormatDAO;
-import com.fimet.entity.EFieldFormat;
-import com.fimet.entity.EFieldFormatGroup;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.dao.IFieldFormatDAO;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class FieldGroup implements IFieldGroup {
-	static final String loadingMode = Manager.getProperty("parser.modelLoadingMode", "lazy");
+	static final String mode = Manager.getProperty("fieldGroup.mode", "lazy");
 	static Comparator<IFieldParser> comparatorIdOrder = (IFieldParser f1, IFieldParser f2)->{
 		return f1.getIdOrder().compareTo(f2.getIdOrder());
 	}; 
-	private Map<String, FieldParserWapper> fields;
-	private Integer idGroup;
+	private Map<String, IFieldParser> fields;
 	private String name;
 	private FieldGroup parent;
+	private List<FieldGroup> children;
 	private IFieldLoader loader;
-	public FieldGroup(String externalName, List<EFieldFormat> externals) {
-		fields = new HashMap<String, FieldParserWapper>();
-		this.name = externalName;
-		for (EFieldFormat f : externals) {
-			loadFieldWrapper(f);
-		}
-		loader = new Earge();
-	}
-	public FieldGroup(EFieldFormatGroup egroup) {
-		fields = new HashMap<String, FieldParserWapper>();
+	private IFieldFormatDAO dao = Manager.getExtension(IFieldFormatDAO.class, FieldFormatDAO.class);
+	public FieldGroup(IEFieldGroup egroup) {
+		fields = new HashMap<String, IFieldParser>();
 		this.name = egroup.getName();
-		this.idGroup = egroup.getId();
-		loader = "eager".equalsIgnoreCase(loadingMode) ? new Earge() : new Lazy();
+		loader = "eager".equalsIgnoreCase(mode) ? new Eager() : new Lazy();
 	}
 	@Override
 	public byte[] parse(int idField, IMessage message, IReader reader) {
-		return getFieldParserWrapper(""+idField).parse(reader, message);
+		return getFieldParser(""+idField).parse(reader, message);
 	}
 	@Override
 	public byte[] parse(String idField, IMessage message, IReader reader) {
-		return getFieldParserWrapper(idField).parse(reader, message);
+		return getFieldParser(idField).parse(reader, message);
 	}
 	@Override
 	public void format(String idField, IMessage message, IWriter writer) {
-		getFieldParserWrapper(idField).format(writer, message);
+		getFieldParser(idField).format(writer, message);
 	}
 	@Override
 	public void format(int idField, IMessage message, IWriter writer) {
-		getFieldParserWrapper(""+idField).format(writer, message);
+		getFieldParser(""+idField).format(writer, message);
 	}
 	@Override
 	public short[] getAddress(String idField) {
-		return getFieldParserWrapper(idField).getAddress();
+		IFieldParser field = getFieldParser(idField);
+		return field!=null?field.getAddress():null;
 	}
 	void setParent(FieldGroup parent) {
 		this.parent = parent;
 	}
+	FieldGroup getParent() {
+		return parent;
+	}
+	public void addChild(FieldGroup child) {
+		if (children == null)
+			children = new ArrayList<>();
+		children.add(child);
+	}
 	public IFieldParser getFieldParser(String idField) {
-		return loader.getFieldParserWrapper(idField).getWrapped();
+		return loader.getFieldParser(idField);
 	}
-	FieldParserWapper getFieldParserWrapper(String idField) {
-		return loader.getFieldParserWrapper(idField);
-	}
-	FieldParserWapper loadFieldWrapper(EFieldFormat f) {
+	IFieldParser loadFieldParser(IEFieldFormat f) {
 		try {
 			Class<?> classParser = Class.forName(f.getClassParser());
-			IFieldParser fieldParser = (IFieldParser) classParser.getConstructor(EFieldFormat.class).newInstance(f);
-			FieldParserWapper wrapper = new FieldParserWapper(fieldParser);
-			fields.put(f.getIdField(), wrapper);
-			return wrapper;
+			IFieldParser fieldParser = (IFieldParser) classParser.getConstructor(IEFieldFormat.class).newInstance(f);
+			fields.put(f.getIdField(), fieldParser);
+			return fieldParser;
 		} catch (Exception e) {
 			throw new ParserException("Invalid field parser for group "+name+": "+f.getClassParser(),e);
 		}
 	}
-	void addParentFields() {
-		if (parent != null) {
-			parent.addParentFields();
-			for (Entry<String, FieldParserWapper> e : parent.getFields().entrySet()) {
-				if (!fields.containsKey(e.getKey())) {
-					fields.put(e.getKey(), e.getValue());
-				}
-			}
-		}
-	}
-	Map<String, FieldParserWapper> getFields(){
+	Map<String, IFieldParser> getFields(){
 		return fields;
 	}
 	@Override
 	public List<IFieldParser> getRoots() {
-		if (loader instanceof Lazy) {
-			loadFieldWrappers();
-		}
+		loader.load();
 		List<IFieldParser> roots = new ArrayList<IFieldParser>();
-		for (Map.Entry<String, FieldParserWapper> e : fields.entrySet()) {
-			if (e.getKey().indexOf('.') == -1) {
+		for (Map.Entry<String, IFieldParser> e : fields.entrySet()) {
+			if (!e.getValue().hasChildren()) {
 				roots.add(e.getValue());
 				
 			}
@@ -108,84 +90,114 @@ public class FieldGroup implements IFieldGroup {
 		Collections.sort(roots, comparatorIdOrder);
 		return roots;
 	}
-	private void loadFieldWrappers() {
-		if (fields.isEmpty() && idGroup != null) {
-			if (parent != null) {
-				parent.loadFieldWrappers();
-			}
-			List<EFieldFormat> formats = FieldFormatDAO.getInstance().findByGroup(idGroup);
-			for (EFieldFormat f : formats) {
-				loadFieldWrapper(f);
-			}
-			addParentFields();
-		}
-	}
-	private interface IFieldLoader {
-		FieldParserWapper getFieldParserWrapper(String idField);
-	}
-	private class Earge implements IFieldLoader {
-		@Override
-		public FieldParserWapper getFieldParserWrapper(String idField) {
-			return fields.get(idField);
-		}
-	}
-	private class Lazy implements IFieldLoader {
-		@Override
-		public FieldParserWapper getFieldParserWrapper(String idField) {
-			if (fields.containsKey(idField)) {
-				return fields.get(idField);
-			}
-			EFieldFormat f = FieldFormatDAO.getInstance().findByGroupAndIdField(idGroup, idField);
-			if (f != null) {
-				FieldParserWapper fp = loadFieldWrapper(f);
-				fields.put(fp.getIdField(), fp);
-				return fp;
-			}
-			if (parent != null){
-				FieldParserWapper fp = parent.getFieldParserWrapper(idField);
-				if (fp != null) {
-					fields.put(fp.getIdField(), fp);
-					return fp;
-				}
-			}
-			throw new ParserException("Unkown field "+idField+" for group "+name);
-		}
-	}
-	public void reload() {
-		if (loader instanceof Lazy) {
-			FieldFormatDAO dao = FieldFormatDAO.getInstance();
-			for (Entry<String, FieldParserWapper> e : fields.entrySet()) {
-				reloadField(e.getValue(), dao.findByGroupAndIdField(idGroup, e.getKey()));
-			}
-		} else {
-			if (idGroup != null) {
-				List<EFieldFormat> all = FieldFormatDAO.getInstance().findByGroup(idGroup);
-				for (EFieldFormat f : all) {
-					if (fields.containsKey(f.getIdField())) {
-						reloadField(fields.get(f.getIdField()), f);
-					}
-				}
-			} else {
-				throw new FimetException("No implemented yet");
-			}
-		}
-	}
-	FieldParserWapper reloadField(FieldParserWapper wrapper, EFieldFormat f) {
-		try {
-			Class<?> classParser = Class.forName(f.getClassParser());
-			IFieldParser fieldParser = (IFieldParser) classParser.getConstructor(EFieldFormat.class).newInstance(f);
-			wrapper.setWrapped(fieldParser);
-			return wrapper;
-		} catch (Exception e) {
-			throw new ParserException("Reload exception for field parser in group "+name+": "+wrapper.getWrapped().getClass(),e);
-		}
+	@Override
+	public String getName() {
+		return name;
 	}
 	@Override
 	public String toString() {
 		return name;
 	}
-	@Override
-	public String getName() {
-		return name;
+	public void load() {
+		loader.load();
+	}
+	public void reload() {
+		loader.reload();
+	}
+	private interface IFieldLoader {
+		/**
+		 * Return the Field identified by idField
+		 * @param idField
+		 * @return
+		 */
+		IFieldParser getFieldParser(String idField);
+		/**
+		 * Load parent then own fields
+		 */
+		void load();
+		/**
+		 * Load own then children fields
+		 */
+		void reload();
+	}
+	private class Eager implements IFieldLoader {
+		@Override
+		public IFieldParser getFieldParser(String idField) {
+			return fields.get(idField);
+		}
+		private void loadFields() {
+			fields.clear();
+			List<IEFieldFormat> formats = dao.getByGroup(name);// Own Fields
+			for (IEFieldFormat f : formats) {
+				loadFieldParser(f);
+			}
+			if (parent != null) {// Inherit Fields
+				for (Entry<String, IFieldParser> e : parent.getFields().entrySet()) {
+					if (!fields.containsKey(e.getKey())) {
+						fields.put(e.getKey(), e.getValue());
+					}
+				}
+			}
+		}
+		@Override
+		public void reload() {
+			loadFields();
+			if (children!=null) {
+				for (FieldGroup g : children) {
+					g.loader.reload();
+				}
+			}
+		}
+		@Override
+		public void load() {}
+	}
+	private class Lazy implements IFieldLoader {
+		@Override
+		public IFieldParser getFieldParser(String idField) {
+			if (fields.containsKey(idField)) {
+				return fields.get(idField);
+			}
+			if (fields.isEmpty()) {
+				load();
+			}
+			if (fields.containsKey(idField)) {
+				return fields.get(idField);
+			}
+			throw new ParserException("Unkown field "+idField+" for group "+name);
+		}
+		@Override
+		public void load() {
+			if (fields.isEmpty()) {
+				if (parent!=null&&parent.fields.isEmpty()) {
+					parent.loader.load();
+				}
+				loadFields();
+			}
+		}
+		private void loadFields() {
+			fields.clear();
+			List<IEFieldFormat> formats = dao.getByGroup(name);// Own Fields
+			for (IEFieldFormat f : formats) {
+				loadFieldParser(f);
+			}
+			if (parent != null) {// Inherit Fields
+				for (Entry<String, IFieldParser> e : parent.getFields().entrySet()) {
+					if (!fields.containsKey(e.getKey())) {
+						fields.put(e.getKey(), e.getValue());
+					}
+				}
+			}
+		}
+		@Override
+		public void reload() {
+			if (!fields.isEmpty()) {
+				loadFields();
+			}
+			if (children!=null) {
+				for (FieldGroup g : children) {
+					g.loader.reload();
+				}
+			}
+		}
 	}
 }

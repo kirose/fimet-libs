@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.fimet.FimetException;
 import com.fimet.FimetLogger;
-import com.fimet.exe.InjectorResult;
+import com.fimet.exe.SocketResult;
 import com.fimet.exe.Task;
 
 public class StressStoreCsv implements IStressStore {
@@ -36,14 +36,14 @@ public class StressStoreCsv implements IStressStore {
 	}
 	private void writeHeaders() {
 		try {
-			outCycle.write(InjectorResult.getHeadersCycleStats()+System.lineSeparator());
+			outCycle.write(SocketResult.getHeadersCycleStats()+System.lineSeparator());
 			outCycle.flush();
 		} catch (IOException e) {
 			FimetLogger.error(StressStoreCsv.class, "Error writing cycle results", e);
 		}
 		if (outGlobal != null) {
 			try {
-				outGlobal.write(InjectorResult.getHeadersGlobalStats()+System.lineSeparator());
+				outGlobal.write(SocketResult.getHeadersGlobalStats()+System.lineSeparator());
 				outGlobal.flush();
 			} catch (IOException e) {
 				FimetLogger.error(StressStoreCsv.class, "Error writing cycle results", e);
@@ -51,7 +51,7 @@ public class StressStoreCsv implements IStressStore {
 		}
 	}
 	@Override
-	public void storeCycleResults(InjectorResult result) {
+	public void storeCycleResults(SocketResult result) {
 		try {
 			String line = result.getCycleStats()+"\n";
 			outCycle.write(line);
@@ -62,7 +62,7 @@ public class StressStoreCsv implements IStressStore {
 	}
 
 	@Override
-	public void storeGlobalResults(InjectorResult result) {
+	public void storeGlobalResults(SocketResult result) {
 		if (fileGlobal != null) {
 			try {
 				String line = result.getGlobalStats()+"\n";

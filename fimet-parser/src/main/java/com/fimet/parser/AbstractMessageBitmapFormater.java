@@ -1,10 +1,10 @@
 package com.fimet.parser;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EParser;
+import com.fimet.Manager;
+import com.fimet.utils.ByteBuilder;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.ByteBuilder;
-import com.fimet.utils.data.IWriter;
 /**
  * 
  * @author Marco A. Salazar
@@ -12,11 +12,11 @@ import com.fimet.utils.data.IWriter;
  *
  */
 public abstract class AbstractMessageBitmapFormater extends BaseMessageParser {
-
+	protected static final boolean failOnErrorFormatField = Manager.getPropertyBoolean("parser.failOnErrorFormatField", false);
 	private static final int SIZE_BITMAP = 4*16;
 	private static final String EMPTY_BITMAP = "1000000000000000000000000000000000000000000000000000000000000000";
 	
-	public AbstractMessageBitmapFormater(EParser entity) {
+	public AbstractMessageBitmapFormater(IEParser entity) {
 		super(entity);
 	}
 
@@ -81,8 +81,11 @@ public abstract class AbstractMessageBitmapFormater extends BaseMessageParser {
 			try {
 				getFieldGroup().format(field, msg, writer);
 			} catch (Exception e) {
-				FimetLogger.error(this+" error formating field "+field,e);
-				throw e;
+				if (failOnErrorFormatField) { 
+					throw e;
+				} else {
+					FimetLogger.error(AbstractMessageBitmapFormater.class, this+" error formating field "+field,e);
+				}
 			}
 		}
 	}

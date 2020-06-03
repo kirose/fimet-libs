@@ -3,11 +3,11 @@ package com.fimet.parser.mx;
 import com.fimet.parser.AbstractMessageBitmapParser;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.Message;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class TpvParser extends AbstractMessageBitmapParser{
-	public TpvParser(com.fimet.entity.EParser entity) {
+	public TpvParser(com.fimet.parser.IEParser entity) {
 		super(entity);
 	}
 	@Override

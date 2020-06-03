@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.fimet.FimetLogger;
 import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
-import com.fimet.exe.InjectorResult;
+import com.fimet.exe.SocketResult;
 import com.fimet.exe.stress.NullStressExecutorListener;
 import com.fimet.parser.Message;
+import com.fimet.simulator.IESimulator;
 import com.fimet.simulator.ISimulator;
-import com.fimet.simulator.PSimulator;
 import com.fimet.socket.ISocket;
 import com.fimet.stress.IStress;
 import com.fimet.stress.IStressExecutorListener;
@@ -41,13 +41,13 @@ public class StressMultiStepBuilder implements IStressExecutorListener {
 		this.listener = listener != null ? listener : NullStressExecutorListener.INSTANCE;
 		return this;
 	}
-	public StressMultiStepBuilder connect(PSimulator ... simulators) {
-		for (PSimulator simulator : simulators) {
+	public StressMultiStepBuilder connect(IESimulator ... simulators) {
+		for (IESimulator simulator : simulators) {
 			this.simulators.add(simulatorManager.getSimulator(simulator));
 		}
 		return this;
 	}
-	public StressMultiStepBuilder connect(PSimulator simulator) {
+	public StressMultiStepBuilder connect(IESimulator simulator) {
 		simulators.add(simulatorManager.getSimulator(simulator));
 		return this;
 	}
@@ -78,7 +78,7 @@ public class StressMultiStepBuilder implements IStressExecutorListener {
     	.setExecutorListener(this)
 		.connect(simulators);
 		for (Entry<File, IStepFileCreator> e : stepFileCreators.entrySet()) {
-			UseCase useCase = UseCaseUtils.parseForExecutionFromFile(e.getKey());
+			UseCase useCase = UseCaseUtils.fromFile(e.getKey());
 			ISimulator simulator = useCase.getAcquirer();
 			ISocket socket = useCase.getAcquirer().getSocket();
 			CartesianCreator creator = new CartesianCreator(new File(output,"stress-"+socket.getPort()+".txt"));
@@ -111,7 +111,7 @@ public class StressMultiStepBuilder implements IStressExecutorListener {
 	private void onMultiStepFinish() {
 		for (Entry<File, IStepFileCreator> e : stepFileCreators.entrySet()) {
 			try {
-				UseCase useCase = UseCaseUtils.parseForExecutionFromFile(e.getKey());
+				UseCase useCase = UseCaseUtils.fromFile(e.getKey());
 				ISocket socket = useCase.getAcquirer().getSocket();
 				File file = new File(output,"stress-"+socket.getPort()+".txt");
 				if (file.exists() && file.isFile()) {
@@ -158,15 +158,15 @@ public class StressMultiStepBuilder implements IStressExecutorListener {
 		}
 	}
 	@Override
-	public void onInjectorFinishCycle(InjectorResult result) {
+	public void onInjectorFinishCycle(SocketResult result) {
 		listener.onInjectorFinishCycle(result);
 	}
 	@Override
-	public void onInjectorStart(InjectorResult result) {
+	public void onInjectorStart(SocketResult result) {
 		listener.onInjectorStart(result);
 	}
 	@Override
-	public void onInjectorFinish(InjectorResult result) {
+	public void onInjectorFinish(SocketResult result) {
 		listener.onInjectorFinish(result);
 	}
 	@Override
@@ -174,7 +174,7 @@ public class StressMultiStepBuilder implements IStressExecutorListener {
 		listener.onStressStart(stress);
 	}
 	@Override
-	public void onStressFinish(IStress stress, List<InjectorResult> results) {
+	public void onStressFinish(IStress stress, List<SocketResult> results) {
 		listener.onStressFinish(stress, results);
 		executeNextStep();
 	}

@@ -1,34 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <fimet>
-	<!-- The path to FIMET data base -->
-	<source name="fimet" path="resources/fimet.db" />
-	<!-- The application properties -->
-	<properties>
-		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_91\jre"/><!-- The CompilerManager will use this path to get the SystemJavaCompiler -->
-		<property name="simulator.numberOfThreads" value="5"/>
-		<property name="simulator.recompileModelsAtStartup" value="true"/><!-- If true all Simulator Models will be compiled at startup -->
-		<property name="usecase.maxExecutionTime" value="9000"/><!-- In milliseconds scale -->
-		<property name="parser.modelLoadingMode" value="EAGER"/><!-- EAGER or LAZY -->
-	</properties>
-	<!-- You can declare a new manager or override an existent -->
-	<managers>
-		<manager id="com.fimet.ICommandManager" class="com.fimet.cmd.CommandManager"/>
-		<manager id="com.fimet.IExecutorManager" class="com.fimet.exe.ExecutorManager"/>
-		<manager id="com.fimet.ISocketManager" class="com.fimet.net.SocketManager"/>
-		<manager id="com.fimet.ISimulatorManager" class="com.fimet.simulator.SimulatorManager"/>
-	</managers>
-	<!-- You can extend a extension-point for a custom functionality -->
-	<extensions>
-		<extension id="com.fimet.usecase.IUseCaseStore" class="com.fimet.usecase.UseCaseStoreCsv" />
-		<extension id="com.fimet.stress.IStressStore" class="com.fimet.stress.StressStoreCsv" />
-		<extension id="com.fimet.simulator.ISimulatorStore" class="com.fimet.simulator.SimulatorStoreTxt" />
-	</extensions>
-	<!-- This simulators will be loaded but not connected -->
-	<simulators>
-		<simulator id="SVisa" model="MVisa" parser="National" server="false" address="127.0.0.1" port="9128" adapter="Exclusive" />
-	</simulators>
-	<!-- This simulator models will be loaded but not connected -->
-	<simulatorModels>
-		<simulatorModel id = "MVisa" class="com.fimet.test.SMVisa" />
-	</simulatorModels>
+    <extensions>
+        <extension name="com.fimet.usecase.IUseCaseStore" class="com.fimet.usecase.UseCaseStore"/>
+    </extensions>
+    <managers>
+        <manager name="com.fimet.IClassLoaderManager" class="com.fimet.utils.ClassLoaderManager" autostart="false"/>
+        <manager name="com.fimet.IThreadManager" class="com.fimet.utils.ThreadManager" autostart="false"/>
+    </managers>
+    <parsers>
+        <parser name="PNational" class="com.fimet.parser.National" converter="None" fieldGroup="FNational"/>
+    </parsers>
+    <properties>
+        <property name="name" value="value"/>
+    </properties>
+    <simulatorModels>
+        <model name="MTest" class="com.fimet.test.STest"/>
+    </simulatorModels>
+    <simulators>
+        <simulator name="STest" parser="PNational" model="MTest" address="127.0.0.1" port="8582" server="true" adapter="Exclusive"/>
+    </simulators>
 </fimet>

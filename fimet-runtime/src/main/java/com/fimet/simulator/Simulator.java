@@ -14,13 +14,13 @@ import com.fimet.parser.Message;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorListener;
 import com.fimet.simulator.ISimulatorModel;
-import com.fimet.simulator.PSimulator;
 import com.fimet.socket.IConnectable;
 import com.fimet.socket.IConnectionListener;
 import com.fimet.socket.ISocket;
 import com.fimet.socket.ISocketListener;
 import com.fimet.socket.NullConnectionListener;
 import com.fimet.socket.NullSimulatorListener;
+import com.fimet.socket.PSocket;
 
 /**
  * 
@@ -39,22 +39,25 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	IParser parser;
 	ISimulatorModel model;
 	ISimulatorStore store;
+	String name;
 	AtomicLong numOfApprovals;
-	public Simulator(PSimulator pSimulator) {
-		if (pSimulator == null)
+	public Simulator(IESimulator e) {
+		if (e == null)
 			throw new NullPointerException("Simulator parameters are null");
-		if (pSimulator.getModel() == null) {
-			throw new NullPointerException("Simulator model is null for "+pSimulator);
+		if (e.getModel() == null) {
+			throw new NullPointerException("Simulator model is null for "+e);
 		}
-		if (pSimulator.getParser() == null) {
-			throw new NullPointerException("Simulator initialization parser is null for "+pSimulator);
+		if (e.getParser() == null) {
+			throw new NullPointerException("Simulator initialization parser is null for "+e);
 		}
+		this.name = e.getName();
 		this.numOfApprovals = new AtomicLong(0);
-		this.socket = socketManager.getSocket(pSimulator.getPSocket(), this);
+		PSocket pSocket = new PSocket(e.getAddress(), e.getPort(), e.isServer(), e.getAdapter());
+		this.socket = socketManager.getSocket(pSocket, this);
 		this.listener = NullSimulatorListener.INSTANCE;
 		this.connectionListener = NullConnectionListener.INSTANCE;
-		this.parser = parserManager.getParser(pSimulator.getParser());
-		this.model = simulatorModelManager.getSimulatorModel(pSimulator.getModel());
+		this.parser = parserManager.getParser(e.getParser());
+		this.model = simulatorModelManager.getSimulatorModel(e.getModel());
 		this.store = NullSimulatorStore.INSTANCE;
 	}
 	/**
@@ -115,7 +118,7 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	}
 	@Override
 	public String toString() {
-		return model+" "+socket;
+		return name+" "+model+" "+socket;
 	}
 	@Override
 	public IParser getParser() {
@@ -171,10 +174,12 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 				}
 			} else if (APPROVAL.equals(message.getValue("39"))) {
 				this.numOfApprovals.getAndIncrement();
+			} else if (FimetLogger.isEnabledDebug()) {
+				FimetLogger.debug(getClass(), "Simulator not configured for "+message.getProperty(IMessage.MTI));
 			}
 		} catch (Throwable e) {
 			FimetLogger.error(Manager.class, "Error on read message("+(bytes!= null?bytes.length:0)+") "+this+":\n"+new String(bytes)+"\n",e);
-		}			
+		}
 	}
 	@Override
 	public ISimulatorModel getModel() {
@@ -199,5 +204,9 @@ public class Simulator  implements ISimulator, ISocketListener, IConnectionListe
 	}
 	public long getNumOfApprovals() {
 		return numOfApprovals.get();
+	}
+	@Override
+	public String getName() {
+		return name;
 	}
 }

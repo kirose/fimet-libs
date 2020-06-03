@@ -2,18 +2,18 @@ package com.fimet.parser.field.amex;
 
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class AmexTagsVarFieldParser extends VarFieldParser {
 
-	public AmexTagsVarFieldParser(EFieldFormat fieldFormat) {
+	public AmexTagsVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override
@@ -26,10 +26,10 @@ public class AmexTagsVarFieldParser extends VarFieldParser {
 				}
 				parseTags(message, reader);
 			} catch (Exception e) {
-				if (getFailOnError()) {
+				if (failOnErrorParseField) {
 					throw e;
 				} else {
-					FimetLogger.warning("Error parsing "+idField+" tags childs",e);
+					FimetLogger.warning(this+" error parsing "+idField+" tags childs",e);
 				}
 			}
 		}

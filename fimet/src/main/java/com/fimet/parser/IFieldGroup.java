@@ -2,8 +2,8 @@ package com.fimet.parser;
 
 import java.util.List;
 
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public interface IFieldGroup {
 	public String getName();

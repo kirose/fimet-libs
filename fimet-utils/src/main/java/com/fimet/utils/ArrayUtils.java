@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
 public final class ArrayUtils {
 	private ArrayUtils() {
 	}

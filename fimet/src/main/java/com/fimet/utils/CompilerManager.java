@@ -28,12 +28,16 @@ public class CompilerManager extends AbstractManager implements ICompilerManager
 			System.setProperty("java.home", javaHome);
 		}
 	}
-
 	@Override
-	public Class<?> compile(String className, String source) {
+	public Class<?> compileAndLoad(String className, String source) {
+		compileAndInstall(className, source);
+		return classLoaderManager.loadClass(className);
+	}
+	@Override
+	public String compile(String className, String source) {
 		return compileAndInstall(className, source);
 	}
-	public Class<?> compileAndInstall(String className, String source) {
+	private String compileAndInstall(String className, String source) {
 		try {
 			File sourceFile = new File(SRC_PATH, className.replace('.', File.separatorChar)+".java");
 			File classFile = new File(SRC_PATH, className.replace('.', File.separatorChar)+".class");
@@ -52,11 +56,11 @@ public class CompilerManager extends AbstractManager implements ICompilerManager
 				}
 				throw new CompilationException("Compilation error for class "+className+"\n see log for complete errors:\n"+errors.substring(0,Math.min(100, errors.length())));
 			} else {
-				FimetLogger.debug("Class Compiled: "+className);
+				FimetLogger.debug(CompilerManager.class,"Class compiled: "+className);
 				byte[] contents = FileUtils.readBytesContents(classFile);
 				FileUtils.delete(classFile);
-				classLoaderManager.installClass(className, contents);
-				return classLoaderManager.loadClass(className);
+				classLoaderManager.installClass(className, contents, true);
+				return className;
 			}
 		} catch (Exception e) {
 			if (e instanceof CompilationException) {

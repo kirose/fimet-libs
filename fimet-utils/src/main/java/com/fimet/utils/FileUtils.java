@@ -8,7 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
-
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
 public final class FileUtils {
 	private static final int SIZE_BUFFER = 512;
 	private FileUtils() {
@@ -219,11 +223,4 @@ public final class FileUtils {
 			} catch (IOException ex) {}
 		}		
 	}
-//	public void createFile(File file) {
-//		file = file.getAbsoluteFile();
-//		File parent = file.getParentFile();
-//		if (!parent.exists()) {
-//			parent.mkdirs()
-//		}
-//	}
 }

@@ -3,13 +3,12 @@ package com.fimet.parser;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fimet.entity.EFieldFormat;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.ByteBuilder;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
 import com.fimet.utils.converter.IConverter;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.ByteBuilder;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
 import com.fimet.FimetLogger;
 import com.fimet.IFieldGroupManager;
 import com.fimet.Manager;
@@ -21,23 +20,26 @@ import com.fimet.Manager;
  *
  */
 public abstract class AbstractFieldParser implements IFieldParser {
-
+	
+	protected static final boolean failOnInvalidFormat = Manager.getPropertyBoolean("parser.failOnInvalidFormat", false);
+	protected static final boolean failOnErrorParseField = Manager.getPropertyBoolean("parser.failOnErrorParseField", false);
+	
 	protected final String idFieldParent;
 	protected final String idField;
 	protected final String idOrder;
 	protected final short[] address;
 	protected final String key;
 	protected final String name;
-	protected final String type;
+	protected final String mask;
 	protected final IConverter  converterValue;
 	protected final List<String> childs;
 	protected final int length;
 	protected final IFieldGroup group;
 	private static IFieldGroupManager fieldGroupManager = Manager.get(IFieldGroupManager.class);
 	
-	public AbstractFieldParser(EFieldFormat fieldFormat) {
+	public AbstractFieldParser(IEFieldFormat fieldFormat) {
 		super();
-		if (fieldFormat.getType() == null || "".equals(fieldFormat.getType().trim())) {
+		if (fieldFormat.getMask() == null || "".equals(fieldFormat.getMask().trim())) {
 			throw new ParserException(this+"  FieldFormat.type is null for field: "+fieldFormat.getIdField() + "-" +fieldFormat.getName());
 		}
 		if (fieldFormat.getLength() == null) {
@@ -46,21 +48,26 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		this.length = fieldFormat.getLength();
 		this.idFieldParent = fieldFormat.getIdFieldParent();
 		this.idField = fieldFormat.getIdField();
-		this.idOrder = fieldFormat.getIdOrder();
-		this.key = fieldFormat.getKey();
-		this.type = fieldFormat.getType();
+		this.idOrder = fieldFormat.getOrder();
+		int index = idField.lastIndexOf('.');
+		if (index != -1) {
+			key = idField.substring(index+1);
+		} else {
+			key = idField;
+		}
+		this.mask = fieldFormat.getMask();
 		this.name = fieldFormat.getName();
-		this.group = fieldGroupManager.getGroup(fieldFormat.getIdGroup());
+		this.group = fieldGroupManager.getGroup(fieldFormat.getGroup());
 		this.childs = fieldFormat.getChilds() != null ? Arrays.asList(fieldFormat.getChilds().split(",")) : null;
-		this.converterValue = Converter.get(fieldFormat.getIdConverterValue());
+		this.converterValue = Converter.getConverter(fieldFormat.getConverterValue());
 		String[] orders = idOrder.split("\\.");
 		this.address = new short[orders.length];
 		int i = 0;
 		for (String o : orders) {
 			address[i++] = Short.parseShort(o); 
 		}
-		if (fieldFormat.getType()==null) {
-			throw new ParserException(this+" type is null");
+		if (fieldFormat.getMask()==null) {
+			throw new ParserException(this+" mask is null");
 		}
 	}
 	/**
@@ -95,10 +102,10 @@ public abstract class AbstractFieldParser implements IFieldParser {
 					child = group.parse(idChild, message, reader);
 					message.setValue(idChild, child);
 				} catch (Exception e) {
-					if (getFailOnError()) {
+					if (failOnErrorParseField) {
 						throw e;
 					} else {
-						FimetLogger.warning(this+" parsing subfield '"+idField + "." + childIndex+"'",e);
+						FimetLogger.warning(this+" fail parsing subfield '"+idField + "." + childIndex+"'",e);
 					}
 				}
 			}
@@ -136,28 +143,26 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		for (String child : childs) {
 			idChild = idField+"."+child;
 			if (!message.hasField(idChild)) {
-				throw new FormatException("Expected subfield: "+idChild);
+				throw new FormatException(this+" expected subfield: "+idChild);
 			}
 			group.format(idChild, message, writer);
 		}
 	}
 	protected void applyRuleType(byte[] value) {
-		if (childs == null && !new String(value).matches(type)) {
-			throw new ParserException(this+" - Expected format '"+type+"' found: '"+new String(value)+"' in field "+idField);
+		if (childs == null && !new String(value).matches(mask)) {
+			boolean failOnInvalidFormat = Manager.getPropertyBoolean("parser.failOnInvalidFormat", false);
+			if (failOnInvalidFormat) {
+				throw new FormatException(this+" expected format '"+mask+"' found: '"+new String(value)+"'");
+			} else if (FimetLogger.isWaringEnabled()) {
+				FimetLogger.warning(AbstractFieldParser.class, this+" expected format '"+mask+"' found: '"+new String(value)+"'");
+			}
 		}
-	}
-	protected boolean getFailOnError() {
-		return false;//PreferenceDAO.getBoolean(PreferenceDAO.FAIL_ON_PARSE_FIELD_ERROR, Parser.DEFAUT_FAIL_ON_ERROR);
 	}
 	protected IFieldParser getParent(){
 		return idFieldParent != null ? group.getFieldParser(idFieldParent) : null;
 	}
 	public IFieldGroup getGroup() {
 		return group;
-	}
-	@Override
-	public String toString() {
-		return "Field \""+ idField+"\"" +(group != null ? " in group \""+group+"\"" : ""); 
 	}
 	public boolean hasChild(String idChild) {
 		return childs != null && childs.contains(idChild);
@@ -177,8 +182,8 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	public String getIdOrder() {
 		return idOrder;
 	}
-	public String getType() {
-		return type;
+	public String getMask() {
+		return mask;
 	}
 	public int getLength() {
 		return length;
@@ -186,8 +191,15 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	public short[] getAddress() {
 		return address;
 	}
+	public boolean hasChildren() {
+		return childs != null && !childs.isEmpty();
+	}
 	@Override
 	public boolean isValidValue(String value) {
-		return value != null && value.matches(type); 
+		return value != null && value.matches(mask); 
+	}
+	@Override
+	public String toString() {
+		return "Field \""+ idField+"\" in group \""+group+"\""; 
 	}
 }

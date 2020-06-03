@@ -1,15 +1,15 @@
 package com.fimet.parser.field;
 
 
-import com.fimet.entity.EFieldFormat;
 import com.fimet.parser.AbstractFieldParser;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 /**
- * Parser for MessageFields from the message 
+ * A parser for fixed length field 
  * 
  * @author Marco A. Salazar
  * @email marcoasb99@ciencias.unam.mx
@@ -18,7 +18,7 @@ import com.fimet.utils.data.IWriter;
 public class FixedFieldParser extends AbstractFieldParser {
 
 	private Integer length;
-	public FixedFieldParser(EFieldFormat fieldFormat) {
+	public FixedFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.length = fieldFormat.getLength();
 	}

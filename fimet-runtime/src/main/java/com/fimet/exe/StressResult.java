@@ -9,7 +9,7 @@ public class StressResult {
 	AtomicInteger numOfInjectors = new AtomicInteger(0);
 	AtomicLong startTime = new AtomicLong(0);
 	AtomicLong finishTime = new AtomicLong(0);
-	List<InjectorResult> injectorResults;
+	List<SocketResult> injectorResults;
 	public StressResult() {
 	}
 	public String getName() {
@@ -39,10 +39,10 @@ public class StressResult {
 	void setFinishTime(long finishTime) {
 		this.finishTime.set(finishTime);
 	}
-	public List<InjectorResult> getInjectorResults() {
+	public List<SocketResult> getInjectorResults() {
 		return injectorResults;
 	}
-	void setInjectorResults(List<InjectorResult> injectorResults) {
+	void setInjectorResults(List<SocketResult> injectorResults) {
 		this.injectorResults = injectorResults;
 	}
 }

@@ -3,9 +3,8 @@ package com.fimet.parser;
 import java.util.List;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EParser;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
 /**
  * Una clase abstracta que genera un parseo general de un mensaje ISO-8583 a un Message
  * Unicamente se parsean campos presentes en el Bitmap
@@ -15,7 +14,7 @@ import com.fimet.utils.data.IReader;
  *
  */
 public abstract class AbstractMessageParser extends AbstractMessageFormater {
-	public AbstractMessageParser(EParser entity) {
+	public AbstractMessageParser(IEParser entity) {
 		super(entity);
 	}
 	@Override

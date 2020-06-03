@@ -8,7 +8,5 @@ import com.fimet.parser.IFieldGroup;
  */
 public interface IFieldGroupManager extends IManager {
 	IFieldGroup getGroup(String name);
-	IFieldGroup getGroup(Integer idGroup);
 	void reload(String name);
-	void reload(Integer idGroup);
 }

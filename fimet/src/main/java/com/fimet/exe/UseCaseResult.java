@@ -10,7 +10,7 @@ import com.fimet.simulator.ISimulator;
 
 public class UseCaseResult {
 	public enum Status {
-		START, STOPPED, COMPLETE, TIMEOUT, ERROR
+		START, STOPPED, COMPLETE, TIMEOUT, ERROR, CONNECTION_REFUSED
 	}
 	Status status;
 	AtomicLong startTime = new AtomicLong();

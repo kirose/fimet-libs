@@ -17,4 +17,5 @@ public interface ISocket extends IConnectable {
 	long getNumOfWrite();
 	Integer getPort();
 	String getAddress();
+	boolean server();
 }

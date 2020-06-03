@@ -3,14 +3,13 @@ package com.fimet.utils;
 
 import static com.fimet.json.JsonAdapterFactory.GSON_PRETTY;
 
-import java.lang.reflect.Type;
-import java.util.Map;
+import java.util.Map.Entry;
 
-
-import com.google.gson.reflect.TypeToken;
 import com.fimet.IAdapterManager;
 import com.fimet.IParserManager;
 import com.fimet.Manager;
+import com.fimet.json.JsonAdapterFactory;
+import com.fimet.json.MessageJson;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.IParser;
 import com.fimet.parser.Message;
@@ -29,11 +28,42 @@ public class MessageUtils {
 	public static final String REGEXP_JSON = "(?s)^\\s*\\{\\s*\\\"[a-zA-Z]+.*";
 	private static IAdapterManager adapterManager = Manager.get(IAdapterManager.class);
 	private static IParserManager parserManager = Manager.get(IParserManager.class);
-	public static Message parseJsonMessage(String json) {
-		//gson.toJson(gson.fromJson(json, Message.class))
-		return GSON_PRETTY.fromJson(json, Message.class);
+
+	public static String toJsonPretty(IMessage message) {
+		return JsonAdapterFactory.GSON_PRETTY.toJson(message);
 	}
-	public static byte[] formatMessage(IMessage msg) {
+	public static String toJson(IMessage message) {
+		return JsonAdapterFactory.GSON.toJson(message);
+	}
+	static Message fromJson(MessageJson json, IParser parser) {
+		Message message = new Message();
+		for (Entry<String, String> e : json.getProperties().entrySet()) {
+			if (IMessage.PARSER.equals(e.getKey())) {
+				message.setProperty(e.getKey(), parserManager.getParser(e.getValue()));	
+			} else if (IMessage.ADAPTER.equals(e.getKey())) {
+				message.setProperty(e.getKey(), adapterManager.getAdapter(e.getValue()));
+			} else {
+				message.setProperty(e.getKey(), e.getValue());
+			}
+		}
+		if (parser != null) {
+			message.setParser(parser);
+		}
+		for (Entry<String, String> e : json.getFields().entrySet()) {
+			if (e.getValue() != null) {
+				message.setValue(e.getKey(), e.getValue());
+			}
+		}
+		return message;
+	}
+	public static Message fromJson(MessageJson json) {
+		return fromJson(json, null);
+	}
+	public static Message fromJson(String json) {
+		MessageJson messageJson = GSON_PRETTY.fromJson(json, MessageJson.class);
+		return fromJson(messageJson);
+	}
+	public static byte[] format(IMessage msg) {
 		byte[] bytes = msg.getParser().formatMessage(msg);
 		if (msg.hasProperty(Message.ADAPTER)) {
 			IAdapter adapter = (IAdapter)msg.getProperty(Message.ADAPTER);
@@ -46,22 +76,16 @@ public class MessageUtils {
 			return msg.getParser().formatMessage(msg);
 		}
 	}
-	public static IMessage parseMessage(byte[] bytes, int idParser) {
-		return parseMessage(bytes, parserManager.getParser(idParser));
-	}
-	public static IMessage parseMessage(String message, int idParser) {
+	public static IMessage fromString(String message, String parser) {
 		if (message.matches(REGEXP_JSON)) {
-			return parseJsonMessage(message);
+			return fromJson(message);
 		}
-		return parseMessage(message, parserManager.getParser(idParser));
+		return fromString(message, parserManager.getParser(parser));
 	}
-	public static IMessage parseMessage(String message, String parserName) {
-		return parseMessage(message, parserManager.getParser(parserName));
+	public static IMessage fromBytes(byte[] message, String parserName) {
+		return fromBytes(message, parserManager.getParser(parserName));
 	}
-	public static IMessage parseMessage(byte[] message, String parserName) {
-		return parseMessage(message, parserManager.getParser(parserName));
-	}
-	public static IMessage parseMessage(byte[] message, IParser parser) {
+	public static IMessage fromBytes(byte[] message, IParser parser) {
 		IByteArrayAdapter adapter = adapterManager.adapterFor(message);
 		IMessage parseMessage = parser.parseMessage(adapter.readByteArray(message));
 		parseMessage.setProperty(Message.ADAPTER, adapter);
@@ -73,19 +97,13 @@ public class MessageUtils {
 	 * @param parserName
 	 * @return
 	 */
-	public static IMessage parseMessage(String message, IParser parser) {
+	public static IMessage fromString(String message, IParser parser) {
 		IStringAdapter adapter = adapterManager.adapterFor(message);
 		IMessage parseMessage = parser.parseMessage(adapter.readString(message));
 		parseMessage.setProperty(Message.ADAPTER, adapter);
 		return parseMessage;
 	}
-	public static Map<String,Object> parseJsonAsMap(String json){
-		Type type = new TypeToken<Map<String, Object>>() {}.getType();
-		return GSON_PRETTY.fromJson(json, type);
-	}
-	public static Object parseJson(String json, Type type){
-		return GSON_PRETTY.fromJson(json, type);
-	}
+
 	public static String getPan(IMessage m) {
 		String pan = null;
 		if (m.hasField(35)) {// Nacional

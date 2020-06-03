@@ -6,6 +6,7 @@ package com.fimet.utils.converter;
  */
 public interface IConverter {
 	public int getId();
+	public String getName();
 	public byte[] convert(byte[] bytes);
 	public byte[] deconvert(byte[] bytes);
 }

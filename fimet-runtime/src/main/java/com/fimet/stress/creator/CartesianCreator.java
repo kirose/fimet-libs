@@ -62,7 +62,7 @@ public class CartesianCreator implements IFileCreator {
 				next = iterator.next();
 				try {
 					message = variator.variate(message, next);
-					writer.write(MessageUtils.formatMessage(message));
+					writer.write(MessageUtils.format(message));
 					//writer.write((byte)10);
 				} catch (Exception e){
 					errors.append(e.getMessage()).append('\n');

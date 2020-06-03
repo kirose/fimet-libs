@@ -13,15 +13,15 @@ import com.fimet.Manager;
 public class HttpSocketPool {
 	ServerSocket server;
 	List<HttpSocket> sockets;
-	HttpCommandServer commandServer;
+	HttpServerManager commandServer;
 	int size;
 	int port;
-	public HttpSocketPool(HttpCommandServer commandServer) {
+	public HttpSocketPool(HttpServerManager commandServer) {
 		this.commandServer = commandServer;
-		size = Manager.getPropertyInteger("command.server.poolSize", 2);
-		port = Manager.getPropertyInteger("command.server.port", 80);
+		size = Manager.getPropertyInteger("server.poolSize", 2);
+		port = Manager.getPropertyInteger("server.port", 80);
 		if (size <= 0) {
-			throw new FimetException("command.server.poolSize cannot be negative or zero"); 
+			throw new FimetException("server.poolSize cannot be negative or zero"); 
 		}
 		sockets = new ArrayList<HttpSocket>(size);
 		try {

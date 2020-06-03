@@ -82,4 +82,70 @@ public class FimetLogger {
 	public static boolean isTraceEnabled() {
 		return logger.isTraceEnabled();
 	}
+	public static boolean isWaringEnabled() {
+		return logger.isDebugEnabled();
+	}
+	public static void setLevel(FimetLogger.Level level) {
+		switch (level) {
+		case OFF:
+			logger.setLevel(org.apache.log4j.Level.OFF);
+			break;
+		case FATAL:
+			logger.setLevel(org.apache.log4j.Level.FATAL);
+			break;
+		case ERROR:
+			logger.setLevel(org.apache.log4j.Level.ERROR);
+			break;
+		case WARN:
+			logger.setLevel(org.apache.log4j.Level.WARN);
+			break;
+		case INFO:
+			logger.setLevel(org.apache.log4j.Level.INFO);
+			break;
+		case DEBUG:
+			logger.setLevel(org.apache.log4j.Level.DEBUG);
+			break;
+		case TRACE:
+			logger.setLevel(org.apache.log4j.Level.TRACE);
+			break;
+		case ALL:
+			logger.setLevel(org.apache.log4j.Level.ALL);
+			break;
+		default:
+			logger.setLevel(org.apache.log4j.Level.OFF);
+		}
+	}
+	public static Level getLevel() {
+		org.apache.log4j.Level level = logger.getLevel();
+		switch (level.toInt()) {
+		case org.apache.log4j.Level.OFF_INT:
+			return Level.OFF;
+		case org.apache.log4j.Level.FATAL_INT:
+			return Level.FATAL;
+		case org.apache.log4j.Level.ERROR_INT:
+			return Level.ERROR;
+		case org.apache.log4j.Level.WARN_INT:
+			return Level.WARN;
+		case org.apache.log4j.Level.INFO_INT:
+			return Level.INFO;
+		case org.apache.log4j.Level.DEBUG_INT:
+			return Level.DEBUG;
+		case org.apache.log4j.Level.TRACE_INT:
+			return Level.TRACE;
+		case org.apache.log4j.Level.ALL_INT:
+			return Level.ALL;
+		default:
+			return Level.OFF;
+		}
+	}
+	public enum Level {
+		OFF,
+		FATAL,
+		ERROR,
+		WARN,
+		INFO,
+		DEBUG,
+		TRACE,
+		ALL
+	} 
 }

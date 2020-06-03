@@ -21,7 +21,7 @@ public class StressFileReader extends Thread implements IReader {
 	private StressInjector injector;
 	private byte[] message;
 	private File stressFile;
-	private InjectorResult result;
+	private SocketResult result;
 	private AtomicInteger numberOfMessagesToRead = new AtomicInteger(0);
 	public StressFileReader(StressInjector injector, File stressFile) {
 		super("Reader-"+stressFile.getName());

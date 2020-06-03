@@ -1,4 +1,9 @@
 fimet-cfg/
+fimet-client/
 fimet-eglobal/
 fimet-kanest/
+fimet-server/
+fimet-test-eglobal/
+fimet-test-server/
+fimet-web/
 .metadata/

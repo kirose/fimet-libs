@@ -3,9 +3,8 @@ package com.fimet.parser;
 import java.util.List;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EParser;
-import com.fimet.utils.data.ByteBuilder;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.ByteBuilder;
+import com.fimet.utils.IWriter;
 /**
  * 
  * @author Marco A. Salazar
@@ -14,7 +13,7 @@ import com.fimet.utils.data.IWriter;
  */
 public abstract class AbstractMessageFormater extends BaseMessageParser {
 
-	public AbstractMessageFormater(EParser entity) {
+	public AbstractMessageFormater(IEParser entity) {
 		super(entity);
 	}
 

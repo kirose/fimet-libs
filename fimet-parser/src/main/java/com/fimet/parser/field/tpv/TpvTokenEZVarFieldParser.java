@@ -1,20 +1,19 @@
 package com.fimet.parser.field.tpv;
 
-import com.fimet.entity.EFieldFormat;
-import com.fimet.IPreferencesManager;
 import com.fimet.Manager;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.ParserException;
 import com.fimet.utils.ByteUtils;
 import com.fimet.utils.EncryptionUtils;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.IWriter;
 
 public class TpvTokenEZVarFieldParser extends TpvTokenVarFieldParser {
 
 	private static final String DEFAULT_BDK = "0123456789ABCDEFFEDCBA9876543210";
-	private static IPreferencesManager preferencesManager = Manager.get(IPreferencesManager.class);
-	public TpvTokenEZVarFieldParser(EFieldFormat fieldFormat) {
+	private static final String BDK = Manager.getProperty("encryption.bdk", DEFAULT_BDK);
+	public TpvTokenEZVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override
@@ -37,7 +36,7 @@ public class TpvTokenEZVarFieldParser extends TpvTokenVarFieldParser {
 		byte[] encrypt = Converter.hexToAscii(EncryptionUtils.encrypt(
 			new String(Converter.asciiToHex(ByteUtils.subArray(value, 36, 60))),
 			fKeySerialNumber, 
-			preferencesManager.getString(IPreferencesManager.BDK, DEFAULT_BDK)
+			BDK
 		).substring(0,48).getBytes());
 		
 		return ByteUtils.concat(
@@ -68,7 +67,7 @@ public class TpvTokenEZVarFieldParser extends TpvTokenVarFieldParser {
 			EncryptionUtils.decrypt(
 				new String(Converter.asciiToHex(ByteUtils.subArray(value, 36, 60))),
 				fKeySerialNumber,
-				preferencesManager.getString(IPreferencesManager.BDK, DEFAULT_BDK)
+				BDK
 			).substring(0,48).getBytes()
 		);
 		return ByteUtils.concat(

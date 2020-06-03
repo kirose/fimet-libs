@@ -22,53 +22,53 @@ public class MessageBuilder {
 	public MessageBuilder(IUseCase useCase) {
 		this.message = useCase.getMessage();
 	}
-	public MessageBuilder setMti(String mti) {
+	public MessageBuilder property(String name, Object value) {
+		message.setProperty(name, value);
+		return this;
+	}
+	public MessageBuilder mti(String mti) {
 		message.setProperty(Message.MTI, mti);
 		return this;
 	}
-	public MessageBuilder setHeader(String header) {
+	public MessageBuilder header(String header) {
 		message.setProperty(Message.HEADER, header);
 		return this;
 	}
-	public MessageBuilder setParser(int idParser) {
-		message.setParser(parserManager.getParser(idParser));
-		return this;
-	}
-	public MessageBuilder setParser(String parser) {
+	public MessageBuilder parser(String parser) {
 		message.setParser(parserManager.getParser(parser));
 		return this;
 	}
-	public MessageBuilder setParser(IParser parser) {
+	public MessageBuilder parser(IParser parser) {
 		message.setParser(parser);
 		return this;
 	}
 	
-	public MessageBuilder setAdapter(int idAdapter) {
+	public MessageBuilder adapter(int idAdapter) {
 		message.setProperty(Message.ADAPTER, adapterManager.getAdapter(idAdapter));
 		return this;
 	}
-	public MessageBuilder setAdapter(String adapter) {
+	public MessageBuilder adapter(String adapter) {
 		message.setProperty(Message.ADAPTER, adapterManager.getAdapter(adapter));
 		return this;
 	}
-	public MessageBuilder setAdapter(IAdapter adapter) {
+	public MessageBuilder adapter(IAdapter adapter) {
 		message.setProperty(Message.ADAPTER, adapter);
 		return this;
 	}
-	public MessageBuilder setValue(int idField, String value) {
+	public MessageBuilder value(int idField, String value) {
 		message.setValue(idField, value);
 		return this;
 	}
-	public MessageBuilder setValue(String idField, String value) {
+	public MessageBuilder value(String idField, String value) {
 		message.setValue(idField, value);
 		return this;
 	}
-	public MessageBuilder removeValue(int idField) {
+	public MessageBuilder remove(int idField) {
 		message.remove(idField);
 		message.remove(idField);
 		return this;
 	}
-	public MessageBuilder removeValue(String idField) {
+	public MessageBuilder remove(String idField) {
 		message.remove(idField);
 		return this;
 	}

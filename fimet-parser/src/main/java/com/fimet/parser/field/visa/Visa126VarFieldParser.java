@@ -3,19 +3,19 @@ package com.fimet.parser.field.visa;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
 
 public class Visa126VarFieldParser extends VarFieldParser {
 
 	private static final String EMPTY_BITMAP = "0000000000000000000000000000000000000000000000000000000000000000";
 	
-	public Visa126VarFieldParser(EFieldFormat fieldFormat) {
+	public Visa126VarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

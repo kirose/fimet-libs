@@ -11,6 +11,7 @@ import com.fimet.socket.ISocket;
  *
  */
 public interface ISimulator extends IConnectable {
+	public String getName();
 	public ISimulatorModel getModel();
 	public IParser getParser();
 	public ISocket getSocket();

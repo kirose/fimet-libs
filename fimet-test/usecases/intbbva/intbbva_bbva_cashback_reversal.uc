@@ -1,7 +1,5 @@
 {
   "message": {
-    "parser":"National",
-    "adapter": "Exclusive",
     "header": "ISO023400070",
     "mti": "0200",
     "fields": {
@@ -22,15 +20,17 @@
 	}
   },
   "simulators":[{
-      "model":"National",
-      "parser":"National",
+      "name":"7Eleven",
+      "model":"MNational",
+      "parser":"PNational",
       "address": "127.0.0.1",
       "port": 4691,
       "server":false,
       "adapter":"Exclusive"
     },{
-      "model":"National",
-      "parser":"National",
+	  "name":"7ElevenIss",
+      "model":"MNational",
+      "parser":"PNational",
       "address": "127.0.0.1",
       "port": 4691,
       "server":true,

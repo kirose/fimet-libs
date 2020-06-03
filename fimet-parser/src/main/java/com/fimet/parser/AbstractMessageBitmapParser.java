@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EParser;
+import com.fimet.Manager;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
 /**
  * Una clase abstracta que genera un parseo general de ISO-8583 a un Message
  * Unicamente se parsean campos presentes en el Bitmap
@@ -17,7 +17,8 @@ import com.fimet.utils.data.IReader;
  *
  */
 public abstract class AbstractMessageBitmapParser extends AbstractMessageBitmapFormater {
-	public AbstractMessageBitmapParser(EParser entity) {
+	protected static final boolean failOnErrorParseField = Manager.getPropertyBoolean("parser.failOnErrorParseField", false);
+	public AbstractMessageBitmapParser(IEParser entity) {
 		super(entity);
 	}
 	@Override
@@ -63,14 +64,11 @@ public abstract class AbstractMessageBitmapParser extends AbstractMessageBitmapF
 				getFieldGroup().parse(index = id, message, reader);
 			}
 		} catch (Exception e) {
-			if (getFailOnError()) {
+			if (failOnErrorParseField) {
 				throw e;
 			} else {
 				FimetLogger.warning(AbstractMessageBitmapParser.class, this+" error parsing field "+index,e);
 			}
 		}
-	}
-	private boolean getFailOnError() {
-		return false;//PreferenceDAO.getBoolean(PreferenceDAO.FAIL_ON_PARSE_FIELD_ERROR, Parser.DEFAUT_FAIL_ON_ERROR);
 	}
 }

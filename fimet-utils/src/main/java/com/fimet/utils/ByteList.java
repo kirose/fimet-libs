@@ -2,6 +2,11 @@ package com.fimet.utils;
 
 import java.util.Collection;
 
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
 public class ByteList {
 	private static final int DEFAULT_SIZE = 256;
 	byte[] bytes;

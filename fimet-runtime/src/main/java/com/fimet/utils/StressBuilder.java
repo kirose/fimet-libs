@@ -11,8 +11,8 @@ import com.fimet.ISimulatorManager;
 import com.fimet.ISocketManager;
 import com.fimet.Manager;
 import com.fimet.exe.stress.NullStressExecutorListener;
+import com.fimet.simulator.IESimulator;
 import com.fimet.simulator.ISimulator;
-import com.fimet.simulator.PSimulator;
 import com.fimet.socket.IConnectable;
 import com.fimet.socket.MultiConnector;
 import com.fimet.socket.IMultiConnectable;
@@ -60,14 +60,14 @@ public class StressBuilder implements IMultiConnectorListener, IMultiConnectable
 		}
 		return this;
 	}
-	public StressBuilder connect(PSimulator ... simulators) {
-		for (PSimulator psimulator : simulators) {
+	public StressBuilder connect(IESimulator ... simulators) {
+		for (IESimulator psimulator : simulators) {
 			ISimulator simulator = simulatorManager.getSimulator(psimulator);
 			addConnectableSafe(simulator);
 		}
 		return this;
 	}
-	public StressBuilder connect(PSimulator psimulator) {
+	public StressBuilder connect(IESimulator psimulator) {
 		ISimulator simulator = simulatorManager.getSimulator(psimulator);
 		addConnectableSafe(simulator);
 		return this;
@@ -85,7 +85,7 @@ public class StressBuilder implements IMultiConnectorListener, IMultiConnectable
 		stress.getStressFiles().put(simulator, stressFile);
 		return this;
 	}
-	public StressBuilder addStressFile(PSimulator pSimulator, File stressFile) {
+	public StressBuilder addStressFile(IESimulator pSimulator, File stressFile) {
 		ISimulator simulator = simulatorManager.getSimulator(pSimulator);
 		stress.getStressFiles().put(simulator, stressFile);
 		addConnectableSafe(simulator);

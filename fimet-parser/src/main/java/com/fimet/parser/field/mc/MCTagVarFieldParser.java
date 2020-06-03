@@ -1,14 +1,14 @@
 package com.fimet.parser.field.mc;
 
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.field.VarFieldParser;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 public class MCTagVarFieldParser extends VarFieldParser {
 
-	public MCTagVarFieldParser(EFieldFormat fieldFormat) {
+	public MCTagVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

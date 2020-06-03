@@ -2,13 +2,13 @@ package com.fimet.json;
 
 import java.util.List;
 
-import com.fimet.parser.IMessage;
 import com.fimet.utils.JsonUtils;
 
 public class UseCaseJson {
 	private String name;
 	private String authorization;
-	private IMessage message;
+	private MessageJson message;
+	private String simulatorExtension;
 	private List<SimulatorJson> simulators;
 	public UseCaseJson() {
 	}
@@ -24,11 +24,17 @@ public class UseCaseJson {
 	public void setAuthorization(String authorization) {
 		this.authorization = authorization;
 	}
-	public IMessage getMessage() {
+	public MessageJson getMessage() {
 		return message;
 	}
-	public void setMessage(IMessage message) {
+	public void setMessage(MessageJson message) {
 		this.message = message;
+	}
+	public String getSimulatorExtension() {
+		return simulatorExtension;
+	}
+	public void setSimulatorExtension(String simulatorExtension) {
+		this.simulatorExtension = simulatorExtension;
 	}
 	public List<SimulatorJson> getSimulators() {
 		return simulators;

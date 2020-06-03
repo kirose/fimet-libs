@@ -1,5 +1,10 @@
 package com.fimet.utils;
 
+/**
+ * 
+ * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
+ *
+ */
 public final class ByteUtils {
 	public static final byte[] EMPTY = new byte[0];
 	private ByteUtils() {}

@@ -4,11 +4,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import com.fimet.dao.IFieldFormatDAO;
+import com.fimet.dao.IFieldGroupDAO;
+import com.fimet.dao.IParserDAO;
+import com.fimet.dao.ISimulatorDAO;
+import com.fimet.dao.ISimulatorModelDAO;
+import com.fimet.parser.FieldFormatDAO;
+import com.fimet.parser.FieldGroupDAO;
+import com.fimet.parser.ParserDAO;
+import com.fimet.simulator.SimulatorDAO;
+import com.fimet.simulator.SimulatorModelDAO;
 import com.fimet.xml.FimetXml;
 import com.fimet.xml.ManagerXml;
 
@@ -21,7 +32,7 @@ public final class Manager {
 	private Map<Class<?>, String> managers;
 	private Map<Class<?>, Object> instances;
 	private Map<String,String> properties;
-	private Map<String,String> extensions;
+	private Map<Class<?>,String> extensions;
 	private Map<Class<?>, Object> singletons;
 	private Set<Class<?>> autostart;
 	private String source;
@@ -63,14 +74,18 @@ public final class Manager {
 	void loadConfiguration() {
 		loadDefaultManagers();
 		loadDefaultAutostarts();
+		loadDefaultExtensions();
 		try {
 			FimetXml cfg = getModel();
 			properties = cfg.getPropertiesMap();
-			extensions = cfg.getExtensionsMap();
+			Map<Class<?>,String> extensions = cfg.getExtensionsMap();
+			for (Entry<Class<?>, String> e : extensions.entrySet()) {
+				this.extensions.put(e.getKey(), e.getValue());
+			}
 		    if (cfg.getManagers() != null && !cfg.getManagers().isEmpty()) {
 		    	List<ManagerXml> managers = cfg.getManagers();
 		    	for (ManagerXml mgr : managers) {
-		    		Class<?> iManager = findIManagerClass(mgr.getId());
+		    		Class<?> iManager = findIManagerClass(mgr.getName());
 		    		this.managers.put(iManager, mgr.getClassName());
 		    		if(mgr.isAutostart()) {
 		    			autostart.add(iManager);
@@ -87,13 +102,19 @@ public final class Manager {
 		autostart.add(IParserManager.class);
 		autostart.add(IFieldGroupManager.class);
 	}
+	private void loadDefaultExtensions() {
+		extensions = new HashMap<Class<?>,String>();
+		extensions.put(IParserDAO.class, ParserDAO.class.getName());
+		extensions.put(IFieldGroupDAO.class, FieldGroupDAO.class.getName());
+		extensions.put(IFieldFormatDAO.class, FieldFormatDAO.class.getName());
+		extensions.put(ISimulatorDAO.class, SimulatorDAO.class.getName());
+		extensions.put(ISimulatorModelDAO.class, SimulatorModelDAO.class.getName());
+	}
 	private void loadDefaultManagers() {
 		managers.put(ITimerManager.class, "com.fimet.utils.TimerManager");
 		managers.put(IClassLoaderManager.class, "com.fimet.utils.ClassLoaderManager");
 		managers.put(ICompilerManager.class, "com.fimet.utils.CompilerManager");
 		managers.put(IThreadManager.class, "com.fimet.utils.ThreadManager");
-		managers.put(ISQLiteManager.class, "com.fimet.sqlite.SQLiteManager");
-		managers.put(IPreferencesManager.class, "com.fimet.preferences.PreferencesManager");
 		managers.put(IAdapterManager.class, "com.fimet.parser.adapter.AdapterManager");
 		managers.put(IFieldGroupManager.class, "com.fimet.parser.FieldGroupManager");
 		managers.put(IParserManager.class, "com.fimet.parser.ParserManager");
@@ -254,7 +275,7 @@ public final class Manager {
 	}
 	@SuppressWarnings("unchecked")
 	private <T> T _newExtension(Class<T> iClazz) {
-		String extensionClassName = extensions.get(iClazz.getName());
+		String extensionClassName = extensions.get(iClazz);
 		if (extensionClassName != null) {
 			try {
 				Class<?> clazz = Class.forName(extensionClassName);
@@ -266,6 +287,9 @@ public final class Manager {
 				}
 			} catch (Exception e) {
 				FimetLogger.error(Manager.class,"Invalid extension "+extensionClassName,e);
+				if (e instanceof FimetException) {
+					throw (FimetException)e;
+				}
 				throw new FimetException("Invalid extension "+extensionClassName,e);
 			}
 		}
@@ -276,7 +300,7 @@ public final class Manager {
 		if (instances.containsKey(iClazz)) {
 			return (T)instances.get(iClazz);
 		}
-		return null;
+		throw new ExtensionException("Not declared extension "+iClazz.getName());
 	}
 	@SuppressWarnings("unchecked")
 	private <E extends T,T> T _getExtension(Class<T> iClazz, E defaultInstance) {

@@ -1,0 +1,1 @@
+{"name":"Compra","status":"COMPLETE","startTime":1591032039869,"executionTime":6,"data":{},"simulators":[{"model":"Visa","address":"127.0.0.1","port":8583,"validations":[{"validation":"Approved","success":true}]},{"model":"Visa","address":"127.0.0.1","port":8583}]}

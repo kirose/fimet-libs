@@ -29,7 +29,8 @@ import com.fimet.utils.converter.IConverter;
  */
 public abstract class Converter implements IConverter {
 
-	public static final Map<Integer, IConverter> converters = new HashMap<>();
+	public static final Map<String, IConverter> mapNameConverter = new HashMap<>();
+	public static final Map<Integer, String> mapIdName = new HashMap<>();
 	public static final IConverter NONE               = new ConverterNone            (0,"None");
 	public static final IConverter ASCII_TO_HEX       = new ConverterAsciiToHex      (1,"AsciiToHex");
 	public static final IConverter ASCII_TO_BINARY    = new ConverterAsciiToBinary   (2,"AsciiToBinary");
@@ -46,12 +47,23 @@ public abstract class Converter implements IConverter {
 	public static final IConverter BINARY_TO_EBCDIC   = new ConverterBinaryToEbcdic  (13,"BinaryToEbcdic");
 	
 	
-	public static IConverter get(int id) {
-		return converters.get(id);
+	public static IConverter getConverter(int id) {
+		if (mapIdName.containsKey(id)) {
+			return mapNameConverter.get(mapIdName.get(id));
+		} else {
+			throw new ConverterException("Unknow converter "+id);
+		}
+	}
+	public static IConverter getConverter(String name) {
+		if (mapNameConverter.containsKey(name)) {
+			return mapNameConverter.get(name);
+		} else {
+			throw new ConverterException("Unknow converter "+name);
+		}
 	}
 	public static List<IConverter> getConverters() {
-		List<IConverter> list = new ArrayList<>(converters.size());
-		for (Map.Entry<Integer, IConverter> c : converters.entrySet()) {
+		List<IConverter> list = new ArrayList<>(mapNameConverter.size());
+		for (Map.Entry<String, IConverter> c : mapNameConverter.entrySet()) {
 			list.add(c.getValue());
 		}
 		return list;
@@ -64,7 +76,12 @@ public abstract class Converter implements IConverter {
 	Converter(int id, String name) {
 		this.id = id;
 	    this.name = name;
-	    converters.put(id, this);
+	    mapNameConverter.put(name, this);
+	    mapIdName.put(id, name);
+	}
+	@Override
+	public String getName() {
+		return name;
 	}
 	@Override
 	public String toString() {

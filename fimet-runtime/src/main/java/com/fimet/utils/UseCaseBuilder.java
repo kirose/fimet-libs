@@ -4,17 +4,17 @@ import com.fimet.IExecutorManager;
 import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
 import com.fimet.parser.Message;
+import com.fimet.simulator.IESimulator;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorExtension;
 import com.fimet.simulator.NullSimulatorExtension;
-import com.fimet.simulator.PSimulator;
 import com.fimet.usecase.UseCase;
 
 public class UseCaseBuilder {
 	static ISimulatorManager simulatorManager = Manager.get(ISimulatorManager.class);
 	static IExecutorManager executorManager = Manager.get(IExecutorManager.class);
 	UseCase useCase;
-	public UseCaseBuilder(String name, PSimulator acquirer) {
+	public UseCaseBuilder(String name, IESimulator acquirer) {
 		this(name, simulatorManager.getSimulator(acquirer));
 	}
 	public UseCaseBuilder(String name, String idSimulator) {
@@ -30,44 +30,48 @@ public class UseCaseBuilder {
 		m.setProperty(Message.PARSER, simulator.getParser());
 		useCase.setMessage(m);		
 	}
-	public UseCaseBuilder setAuthorization(String authorization) {
+	public UseCaseBuilder authorization(String authorization) {
 		useCase.setAuthorization(authorization);
 		return this;
 	}
-	public UseCaseBuilder setMessageMti(String mti) {
+	public UseCaseBuilder mti(String mti) {
 		useCase.getMessage().setProperty(Message.MTI, mti);
 		return this;
 	}
-	public UseCaseBuilder setMessageHeader(String header) {
+	public UseCaseBuilder header(String header) {
 		useCase.getMessage().setProperty(Message.HEADER, header);
 		return this;
 	}
-	public UseCaseBuilder setMessage(Message message) {
+	public UseCaseBuilder message(Message message) {
 		useCase.setMessage(message);
 		return this;
 	}
-	public UseCaseBuilder setMessageValue(int idField, String value) {
+	public UseCaseBuilder value(int idField, String value) {
 		useCase.getMessage().setValue(idField, value);
 		return this;
 	}
-	public UseCaseBuilder setMessageValue(String idField, String value) {
+	public UseCaseBuilder value(String idField, String value) {
 		useCase.getMessage().setValue(idField, value);
 		return this;
 	}
-	public UseCaseBuilder removeMessageValue(int idField) {
+	public UseCaseBuilder remove(int idField) {
 		useCase.getMessage().remove(idField);
 		useCase.getMessage().remove(idField);
 		return this;
 	}
-	public UseCaseBuilder removeMessageValue(String idField) {
+	public UseCaseBuilder remove(String idField) {
 		useCase.getMessage().remove(idField);
 		return this;
 	}
-	public UseCaseBuilder addConnection(PSimulator simulator) {
+	public UseCaseBuilder addSimulator(ISimulator simulator) {
+		useCase.addSimulator(simulator);
+		return this;
+	}
+	public UseCaseBuilder addSimulator(IESimulator simulator) {
 		useCase.addSimulator(simulatorManager.getSimulator(simulator));
 		return this;
 	}
-	public UseCaseBuilder setSimulatorExtension(ISimulatorExtension extension) {
+	public UseCaseBuilder simulatorExtension(ISimulatorExtension extension) {
 		useCase.setSimulatorExtension(extension != null ? extension : NullSimulatorExtension.INSTANCE);
 		return this;
 	}

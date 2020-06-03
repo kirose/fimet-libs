@@ -1,15 +1,9 @@
 package com.fimet.xml;
 
-import java.io.FileOutputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyAttribute;
@@ -19,8 +13,13 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
-import com.fimet.simulator.PSimulator;
-import com.fimet.sqlite.FimetCreator;
+import com.fimet.FimetException;
+import com.fimet.FimetLogger;
+import com.fimet.parser.EFieldGroup;
+import com.fimet.parser.EParser;
+import com.fimet.simulator.ESimulator;
+import com.fimet.simulator.ESimulatorModel;
+import com.fimet.utils.XmlUtils;
 
 @XmlRootElement(name = "fimet")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -39,11 +38,11 @@ public class FimetXml {
 	private List<DatabaseXml> databases;
 	private List<ManagerXml> managers;
 	private List<PropertyXml> properties;
-	private List<SimulatorXml> simulators;
-	private List<SimulatorModelXml> models;
+	private List<ESimulator> simulators;
+	private List<ESimulatorModel> simulatorModels;
 	private List<ExtensionXml> extensions;
-	private List<ParserXml> parsers;
-	private List<FieldGroupXml> fieldGroups;
+	private List<EParser> parsers;
+	private List<EFieldGroup> fieldGroups;
 	public FimetXml() {}
 	@XmlAnyAttribute
 	public Map<QName,Object> getAny() {
@@ -57,6 +56,14 @@ public class FimetXml {
 	public void setDatabases(List<DatabaseXml> databases) {
 		this.databases = databases;
 	}
+	@XmlElementWrapper(name = "properties")
+	@XmlElement(name="property")
+	public List<PropertyXml> getProperties() {
+		return properties;
+	}
+	public void setProperties(List<PropertyXml> properties) {
+		this.properties = properties;
+	}
 	@XmlElementWrapper(name = "managers")
 	@XmlElement(name = "manager")
 	public List<ManagerXml> getManagers() {
@@ -67,36 +74,19 @@ public class FimetXml {
 	}
 	@XmlElementWrapper(name="simulators")
 	@XmlElement(name = "simulator")
-	public List<SimulatorXml> getSimulators() {
+	public List<ESimulator> getSimulators() {
 		return simulators;
 	}
-	public void setSimulators(List<SimulatorXml> simulators) {
+	public void setSimulators(List<ESimulator> simulators) {
 		this.simulators = simulators;
 	}
-	public List<PSimulator> getPSimulators(){
-		List<PSimulator> list = new ArrayList<>();
-		if (simulators != null && !simulators.isEmpty()) {
-			for (SimulatorXml s : simulators) {
-				list.add(s.toPSimulator());
-			} 
-		}
-		return list;
-	}
 	@XmlElementWrapper(name="simulatorModels")
-	@XmlElement(name = "simulatorModel")
-	public List<SimulatorModelXml> getModels() {
-		return models;
+	@XmlElement(name = "model")
+	public List<ESimulatorModel> getSimulatorModels() {
+		return simulatorModels;
 	}
-	public void setModels(List<SimulatorModelXml> models) {
-		this.models = models;
-	}
-	@XmlElementWrapper(name = "properties")
-	@XmlElement(name="property")
-	public List<PropertyXml> getProperties() {
-		return properties;
-	}
-	public void setProperties(List<PropertyXml> properties) {
-		this.properties = properties;
+	public void setSimulatorModels(List<ESimulatorModel> models) {
+		this.simulatorModels = models;
 	}
 	public Map<String, String> getPropertiesMap(){
 		Map<String,String> map = new HashMap<String, String>();
@@ -115,29 +105,35 @@ public class FimetXml {
 	public void setExtensions(List<ExtensionXml> extensions) {
 		this.extensions = extensions;
 	}
-	public Map<String, String> getExtensionsMap(){
-		Map<String,String> map = new HashMap<String, String>();
+	public Map<Class<?>, String> getExtensionsMap(){
+		Map<Class<?>,String> map = new HashMap<Class<?>, String>();
 		if (extensions != null && !extensions.isEmpty()) {
 			for (ExtensionXml p : extensions) {
-				map.put(p.getId(), p.getClassName());
+				try {
+					Class<?> clazz = Class.forName(p.getName());
+					map.put(clazz, p.getClassName());
+				} catch (ClassNotFoundException e) {
+					FimetLogger.error(getClass(), e);
+					throw new FimetException("Unknow extension name "+p.getName(), e);
+				}
 			}
 		}
 		return map;
 	}
 	@XmlElementWrapper(name = "parsers")
 	@XmlElement(name="parser")
-	public List<ParserXml> getParsers() {
+	public List<EParser> getParsers() {
 		return parsers;
 	}
-	public void setParsers(List<ParserXml> parsers) {
+	public void setParsers(List<EParser> parsers) {
 		this.parsers = parsers;
 	}
 	@XmlElementWrapper(name = "fieldGroups")
-	@XmlElement(name="fieldGroup")
-	public List<FieldGroupXml> getFieldGroups() {
+	@XmlElement(name="group")
+	public List<EFieldGroup> getFieldGroups() {
 		return fieldGroups;
 	}
-	public void setFieldGroups(List<FieldGroupXml> fieldGroups) {
+	public void setFieldGroups(List<EFieldGroup> fieldGroups) {
 		this.fieldGroups = fieldGroups;
 	}
 	public String getXmlns() {
@@ -161,49 +157,7 @@ public class FimetXml {
 	public Map<QName, Object> getAttrs() {
 		return attrs;
 	}
-	public static void main(String[] args) throws Exception {
-		read();
-		write();
-	}
-	private static void read() throws Exception {
-		//File xmlFile = new File("C:\\eclipse\\wsfimetapp\\fimet-core\\src\\main\\resources\\fimet.xml");
-		//InputStream stream = Manager.class.getClass().getResourceAsStream("fimet.xml");
-		java.io.File xmlFile = new java.io.File("C:\\eclipse\\wsfimetlibs\\fimet-test\\resources\\fimet.xml");
-		JAXBContext jaxbContext = JAXBContext.newInstance(FimetXml.class);              
-	    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-	    FimetXml fimet = (FimetXml) jaxbUnmarshaller.unmarshal(xmlFile);
-	    //FimetXml fimet = (FimetXml) jaxbUnmarshaller.unmarshal(stream);
-	    System.out.println("xml parsed:");
-	    System.out.println(fimet);
-	}
-	private static void write() throws Exception {
-		FimetXml fimet = new FimetXml();
-		List<ManagerXml> managers = new ArrayList<>();
-		managers.add(new ManagerXml("MessengerManager","com.fimet.net.MessengerManager"));
-		managers.add(new ManagerXml("ParserManager","com.fimet.iso8583.ParserManager"));
-		fimet.setManagers(managers);
-		List<DatabaseXml> databases = new ArrayList<>();
-		DatabaseXml database = new DatabaseXml();
-		database.setId("fimet");
-		database.setPath("resources/fimet.db");
-		database.setCreator(FimetCreator.class.getName());
-		databases.add(database);
-		fimet.setDatabases(databases);
-		JAXBContext context = JAXBContext.newInstance(FimetXml.class);  
-	    Marshaller marshaller = context.createMarshaller();  
-	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);  
-	    marshaller.marshal(fimet, new FileOutputStream("C:\\eclipse\\wsfimetapp\\fimet-core\\src\\main\\resources\\fimet2.xml"));
-	}
 	public String toString() {
-		try {
-			JAXBContext context = JAXBContext.newInstance(FimetXml.class);  
-		    Marshaller marshaller = context.createMarshaller();  
-		    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		    StringWriter sw = new StringWriter();
-		    marshaller.marshal(this, sw);
-		    return sw.toString();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return XmlUtils.toXml(this);
 	}
 }

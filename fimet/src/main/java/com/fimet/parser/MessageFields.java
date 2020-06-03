@@ -70,7 +70,7 @@ public class MessageFields implements Cloneable {
 		int[] bitmap = new int[size()];
 		int i = 0;
 		while((node = node.next)!=null) {
-			bitmap[i++] = node.id;
+			bitmap[i++] = Integer.parseInt(node.idField);
 		}
 		return bitmap;
 	}
@@ -166,7 +166,7 @@ public class MessageFields implements Cloneable {
 		short[] address = getAddress(idField);
 		if (address == null) {
 			//throw new ParserException("Unknow field id "+idField);
-			FimetLogger.warning(MessageFields.class, "Unknow field id "+idField);
+			FimetLogger.warning(MessageFields.class, "Unknow field id "+idField+" for group "+fieldGroup);
 			//FimetLogger.warning("Unknow field id "+idField);
 			return null;
 		}

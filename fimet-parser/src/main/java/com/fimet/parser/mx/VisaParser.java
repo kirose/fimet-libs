@@ -3,12 +3,12 @@ package com.fimet.parser.mx;
 import com.fimet.parser.AbstractMessageBitmapParser;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.Message;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
 
 public class VisaParser extends AbstractMessageBitmapParser {
-	public VisaParser(com.fimet.entity.EParser entity) {
+	public VisaParser(com.fimet.parser.IEParser entity) {
 		super(entity);
 	}
 

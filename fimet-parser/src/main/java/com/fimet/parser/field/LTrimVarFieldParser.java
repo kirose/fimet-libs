@@ -2,12 +2,12 @@ package com.fimet.parser.field;
 
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.utils.ByteUtils;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 /**
  * Useful for visa and tpv's
@@ -18,7 +18,7 @@ import com.fimet.utils.data.IWriter;
  */
 public class LTrimVarFieldParser extends VarFieldParser {
 
-	public LTrimVarFieldParser(EFieldFormat fieldFormat) {
+	public LTrimVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override

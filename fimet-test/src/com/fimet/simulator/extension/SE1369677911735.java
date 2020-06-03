@@ -4,7 +4,7 @@ import com.fimet.simulator.AbstractSimulatorExtension;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ValidationResult;
 import com.fimet.simulator.IValidator;
-import com.fimet.usecase.UseCase;
+import com.fimet.usecase.IUseCase;
 import com.fimet.parser.Message;
 import com.fimet.parser.IMessage;
 /**

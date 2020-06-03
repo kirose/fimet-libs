@@ -126,7 +126,7 @@ implements
 			e.getValue().getResult().numOfRead.set(socket.getNumOfRead()-e.getValue().getResult().initialReadSocket.get());
 			e.getValue().getResult().numOfWrite.set(socket.getNumOfWrite()-e.getValue().getResult().initialWriteSocket.get());
 		}
-		List<InjectorResult> results = getInjectorResults();
+		List<SocketResult> results = getInjectorResults();
 		this.result.setFinishTime(System.currentTimeMillis());
 		this.result.setInjectorResults(results);
 		this.result.setNumOfInjectors(results.size());
@@ -156,7 +156,7 @@ implements
 		injector.getResult().numOfWrite.set(injector.getResult().getInjectorMessagesInjected());
 		listener.onInjectorFinish(injector.getResult());
 		toComplete.remove(simulator);
-		InjectorResult ir = injector.getResult();
+		SocketResult ir = injector.getResult();
 		ir.numOfApprovals.set(simulator.getNumOfApprovals()-ir.initialApprovalsSimulator.get());
 		ir.numOfRead.set(socket.getNumOfRead()-ir.initialReadSocket.get());
 		ir.hasFinished.set(true);
@@ -171,7 +171,7 @@ implements
 	public void onInjectorStartCycle(IInjector injector) {}
 	@Override
 	public void onInjectorFinishCycle(IInjector injector) {
-		InjectorResult ir = injector.getResult();
+		SocketResult ir = injector.getResult();
 		ISocket socket = injector.getSocket();
 		ISimulator simulator = injector.getSimulator();
 		ir.numOfCycle.incrementAndGet();
@@ -187,8 +187,8 @@ implements
 		store.storeCycleResults(injector.getResult());
 		listener.onInjectorFinishCycle(injector.getResult());
 	}
-	public List<InjectorResult> getInjectorResults() {
-		List<InjectorResult> results = new ArrayList<>();
+	public List<SocketResult> getInjectorResults() {
+		List<SocketResult> results = new ArrayList<>();
 		for (Entry<ISimulator, StressInjector> e : injectors.entrySet()) {
 			results.add(e.getValue().getResult());
 		}

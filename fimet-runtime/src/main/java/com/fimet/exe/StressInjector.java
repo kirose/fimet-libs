@@ -23,7 +23,7 @@ public class StressInjector extends Thread implements IInjector {
 	private ConcurrentLinkedQueue<byte[]> queue;
 	StressFileReader reader;
 	StressTimer timer;
-	InjectorResult result;
+	SocketResult result;
 	AtomicInteger numberOfMessagesToInject = new AtomicInteger(0);
 	IInjectorListener listener;
 	public StressInjector(Stress stress, ISimulator simulator, File stressFile) {
@@ -31,7 +31,7 @@ public class StressInjector extends Thread implements IInjector {
 		this.simulator = simulator; 
 		this.socket = simulator.getSocket();
 		this.queue = new ConcurrentLinkedQueue<byte[]>();
-		this.result = new InjectorResult(socket.getParameters());
+		this.result = new SocketResult(socket.getParameters());
 		this.result.cycleTime = stress.getCycleTime();
 		this.result.name = stress.getName();
 		this.result.initialReadSocket.set(socket.getNumOfRead());
@@ -130,7 +130,7 @@ public class StressInjector extends Thread implements IInjector {
 	public void setListener(IInjectorListener listener) {
 		this.listener = listener!= null ? listener : NullInjectorListener.INSTANCE; 
 	}
-	public InjectorResult getResult() {
+	public SocketResult getResult() {
 		return result;
 	}
 	public String toString() {

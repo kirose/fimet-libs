@@ -13,7 +13,7 @@ public class SimulatorModelWrapper implements ISimulatorModel {
 	}
 
 	void setWapped(ISimulatorModel wrapped) {
-		this.wrapped = wrapped;
+		this.wrapped = wrapped!=null?wrapped:NullSimulatorModel.INSTANCE;
 	}
 
 	@Override

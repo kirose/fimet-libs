@@ -1,9 +1,0 @@
-package com.fimet.server;
-
-import java.util.UUID;
-
-import com.fimet.server.Command.Status;
-
-public interface ICommandListener {
-	void reply(UUID idCommand, Status status, Object response);
-}

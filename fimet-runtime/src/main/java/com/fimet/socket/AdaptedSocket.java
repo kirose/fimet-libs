@@ -56,7 +56,7 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 			throw new SocketException("Invalid Port: " + pSocket.getPort());
 		}
 		if (pSocket.getAdapter() == null)
-			throw new NullPointerException();
+			throw new NullPointerException("Socket Adapter is null");
 		adapter = (IStreamAdapter)pSocket.getAdapter();
 		reconnect = false;
 		status = Status.DISCONNECTED;
@@ -78,6 +78,10 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 	abstract void close();
 	abstract protected java.net.Socket newSocket() throws IOException;
 	@Override
+	public boolean server() {
+		return this instanceof AdaptedSocketServer;
+	}
+	@Override
 	public void disconnect() {
 		status = Status.DISCONNECTED;
 		alive = false;
@@ -86,7 +90,7 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 			socketManager.onSocketDisconnected(this.pSocket);
 			connectionListener.onDisconnected(this);
 		} catch (Throwable e) {
-			FimetLogger.error(AdaptedSocket.class, "Error Socket Disconnected Listener", e);
+			FimetLogger.error(AdaptedSocket.class, "Error Socket Disconnected Listener "+AdaptedSocket.this, e);
 		}
 	}
 	public void setAutoReconnect(boolean reconnect) {
@@ -163,10 +167,10 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 			}
 			out.incrementAndGet();
 			if (FimetLogger.isEnabledDebug()) {
-				FimetLogger.debug(AdaptedSocket.class,"Written message ("+message.length+" bytes) to "+ this);
+				FimetLogger.debug(AdaptedSocket.class,"Written to "+ this+" ("+message.length+" bytes)");
 			}
 		} catch (IOException e) {
-			FimetLogger.error("Fail to write message ("+message.length+" bytes) to "+ this, e);
+			FimetLogger.error(AdaptedSocket.class, "Socket write error  ("+message.length+" bytes), "+ this, e);
 			close();
 			try {
 				socketManager.onSocketDisconnected(this.pSocket);
@@ -186,10 +190,10 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 				while(alive) {
 					byte[] message = adapter.readStream(socket.getInputStream());
 					if (FimetLogger.isEnabledDebug()) {
-						FimetLogger.debug(AdaptedSocket.class,"Read message ("+(message != null ? message.length : null)+" bytes) from "+ AdaptedSocket.this);
+						FimetLogger.debug(AdaptedSocket.class,"Read from "+ AdaptedSocket.this+" ("+(message != null ? message.length : null)+" bytes)");
 					}
 					if (message == null || message.length == 0) {
-						FimetLogger.debug(AdaptedSocket.class, "Socket port ocuppied: "+AdaptedSocket.this);
+						FimetLogger.debug(AdaptedSocket.class, "Socket port ocuppied "+AdaptedSocket.this);
 						disconnect();
 					} else {
 						in.incrementAndGet();
@@ -198,14 +202,14 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 					}
 				}
 			} catch (Exception e) {// Fallo la conexion
-				FimetLogger.error("Socket Read Error ... disconnecting", e);
+				FimetLogger.error(AdaptedSocket.class,"Socket Read Error ... disconnecting "+AdaptedSocket.this, e);
 				close();// El servidor se desconecto no se puede leer del socket
 				status = Status.DISCONNECTED;
 				try {
 					socketManager.onSocketDisconnected(AdaptedSocket.this.pSocket);
 					connectionListener.onDisconnected(AdaptedSocket.this);
 				} catch (Throwable ex) {
-					FimetLogger.error(AdaptedSocket.class, "Error Socket Connected Listener", ex);
+					FimetLogger.error(AdaptedSocket.class, "Error Socket Connected Listener "+AdaptedSocket.this, ex);
 				}
 				if (alive && reconnect) {
 					new ThreadConnector().start();
@@ -229,7 +233,7 @@ public abstract class AdaptedSocket implements ISocket, IConnectable {
 				try {
 					socket = newSocket();
 					status = Status.CONNECTED;
-					FimetLogger.debug(AdaptedSocket.class,"Connected to "+ AdaptedSocket.this);
+					FimetLogger.debug(AdaptedSocket.class,"Connected "+ AdaptedSocket.this);
 					new ThreadReader().start();
 				} catch (Exception e) {
 					socket = null;

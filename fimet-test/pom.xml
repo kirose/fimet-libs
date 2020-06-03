@@ -48,5 +48,15 @@
     	<artifactId>fimet-server</artifactId>
     	<version>1.0.0</version>
     </dependency>
+    <dependency>
+    	<groupId>com.fimet</groupId>
+    	<artifactId>fimet-client</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.fimet</groupId>
+    	<artifactId>fimet-sqlite</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
   </dependencies>
 </project>

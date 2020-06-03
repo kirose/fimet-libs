@@ -1,10 +1,12 @@
 package com.fimet.json;
 
 
-import com.fimet.simulator.PSimulator;
+import com.fimet.simulator.ESimulator;
+import com.fimet.simulator.IESimulator;
 
 public class SimulatorJson {
-	private String id;
+	private Integer id;
+	private String name;
 	private String parser;
 	private String model;
 	private String address;
@@ -15,11 +17,17 @@ public class SimulatorJson {
 
 	public SimulatorJson() {
 	}
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(String name) {
-		this.id = name;
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getModel() {
 		return model;
@@ -63,8 +71,8 @@ public class SimulatorJson {
 	public void setExtension(SimulatorExtensionJson extension) {
 		this.extension = extension;
 	}
-	public PSimulator toPSimulator() {
-		return new PSimulator(id, model, parser, address, port, server, adapter);
+	public IESimulator toESimulator() {
+		return new ESimulator(name, model, parser, address, port, server, adapter);
 	}
 
 }

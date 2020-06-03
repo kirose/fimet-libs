@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.fimet.AbstractManager;
+import com.fimet.FimetException;
+import com.fimet.FimetLogger;
+import com.fimet.FimetLogger.Level;
 import com.fimet.IExecutorManager;
 import com.fimet.Manager;
 import com.fimet.exe.IExecutorListener;
@@ -51,8 +54,15 @@ public class ExecutorManager extends AbstractManager implements IExecutorManager
 				case USECASE:
 					useCaseExecutor.execute(executing);
 					break;
-				case STRESS:	
+				case STRESS:
+					if (FimetLogger.isEnabledDebug()) {
+						FimetLogger.debug(ExecutorManager.class, "Stress test ... disabling DEBUG level");
+						FimetLogger.setLevel(Level.ERROR);
+					}
 					stressExecutor.execute(executing);
+					break;
+				default:
+					throw new FimetException("Invalid type "+executing.type);
 			}
 		}
 	}

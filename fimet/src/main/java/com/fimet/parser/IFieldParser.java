@@ -1,7 +1,7 @@
 package com.fimet.parser;
 
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 /**
  * 
  * @author Marco A. Salazar
@@ -14,7 +14,7 @@ public interface IFieldParser {
 	String getIdField();
 	String getIdOrder();
 	
-	String getType();
+	String getMask();
 	int getLength();
 	boolean isValidValue(String value);
 	boolean isValidLength(String value);
@@ -23,6 +23,7 @@ public interface IFieldParser {
 	byte[] parse(IReader reader, IMessage message) throws ParserException;
 	byte[] format(IWriter writer, IMessage message) throws FormatException;
 	
+	boolean hasChildren();
 	boolean hasChild(String idChild);
 	int indexOfChild(String idChild);
 	String getIdChild(int index);

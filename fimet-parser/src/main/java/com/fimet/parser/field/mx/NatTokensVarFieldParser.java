@@ -3,19 +3,19 @@ package com.fimet.parser.field.mx;
 import java.util.List;
 
 import com.fimet.FimetLogger;
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.ParserException;
 import com.fimet.parser.field.VarFieldParser;
+import com.fimet.utils.ByteBuffer;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 import com.fimet.utils.StringUtils;
-import com.fimet.utils.data.ByteBuffer;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
 
 public class NatTokensVarFieldParser extends VarFieldParser {
 	
-	public NatTokensVarFieldParser(EFieldFormat fieldFormat) {
+	public NatTokensVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override
@@ -29,10 +29,10 @@ public class NatTokensVarFieldParser extends VarFieldParser {
 						parseTokens(reader, message);
 					}
 				} catch (Exception e) {
-					if (getFailOnError()) {
+					if (failOnErrorParseField) {
 						throw e;
 					} else {
-						FimetLogger.warning("Parsing tokens "+idField,e);
+						FimetLogger.warning(this+" error parsing tokens "+idField,e);
 					}
 				}
 			}

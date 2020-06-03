@@ -1,12 +1,12 @@
 package com.fimet.parser.field;
 
 
-import com.fimet.entity.EFieldFormat;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.FormatException;
 import com.fimet.parser.IMessage;
 import com.fimet.utils.ByteUtils;
-import com.fimet.utils.data.IReader;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IReader;
+import com.fimet.utils.IWriter;
 
 /**
  * Parser for MessageFields from the message 
@@ -18,7 +18,7 @@ import com.fimet.utils.data.IWriter;
 public class RTrimFixedFieldParser extends FixedFieldParser {
 
 	private Integer length;
-	public RTrimFixedFieldParser(EFieldFormat fieldFormat) {
+	public RTrimFixedFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 		this.length = fieldFormat.getLength();
 	}

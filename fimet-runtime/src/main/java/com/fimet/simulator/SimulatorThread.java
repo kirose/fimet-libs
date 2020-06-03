@@ -37,11 +37,11 @@ public class SimulatorThread extends Thread implements ISimulatorThread {
 					next.simulator.doWriteMessage((IMessage)next.message);
 					break;
 				default:
-					throw new FimetException("Invalid messenger operation type "+next.type);
+					throw new FimetException("Invalid operation type "+next.type);
 				}
 			}
-		} catch (Exception e) {
-			FimetLogger.error("Thread error", e);
+		} catch (Throwable e) {
+			FimetLogger.error(SimulatorThread.class,"Simulator processing error", e);
 		}
 	}
 	private class Operation {

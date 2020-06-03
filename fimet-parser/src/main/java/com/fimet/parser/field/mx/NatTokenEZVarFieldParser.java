@@ -1,19 +1,18 @@
 package com.fimet.parser.field.mx;
 
-import com.fimet.entity.EFieldFormat;
-import com.fimet.IPreferencesManager;
 import com.fimet.Manager;
+import com.fimet.parser.IEFieldFormat;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.ParserException;
 import com.fimet.utils.ByteUtils;
 import com.fimet.utils.EncryptionUtils;
-import com.fimet.utils.data.IWriter;
+import com.fimet.utils.IWriter;
 
 public class NatTokenEZVarFieldParser extends NatTokenVarFieldParser {
 
 	private static final String DEFAULT_BDK = "0123456789ABCDEFFEDCBA9876543210";
-	private static IPreferencesManager preferencesManager = Manager.get(IPreferencesManager.class);
-	public NatTokenEZVarFieldParser(EFieldFormat fieldFormat) {
+	private static final String BDK = Manager.getProperty("encryption.bdk", DEFAULT_BDK);
+	public NatTokenEZVarFieldParser(IEFieldFormat fieldFormat) {
 		super(fieldFormat);
 	}
 	@Override
@@ -35,7 +34,7 @@ public class NatTokenEZVarFieldParser extends NatTokenVarFieldParser {
 		byte[] encrypt = EncryptionUtils.encrypt(
 			new String(ByteUtils.subArray(value, 38, 86)),
 			fKeySerialNumber, 
-			preferencesManager.getString(IPreferencesManager.BDK, DEFAULT_BDK)
+			BDK
 		).substring(0,48).getBytes();
 		
 		return ByteUtils.concat(
@@ -65,7 +64,7 @@ public class NatTokenEZVarFieldParser extends NatTokenVarFieldParser {
 		byte[] decrypt = EncryptionUtils.decrypt(
 			new String(ByteUtils.subArray(value, 38, 86)),
 			fKeySerialNumber,
-			preferencesManager.getString(IPreferencesManager.BDK, DEFAULT_BDK)
+			BDK
 		).substring(0,48).getBytes();
 		return ByteUtils.concat(
 			ByteUtils.subArray(value, 0,38),

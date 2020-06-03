@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="database")
 @XmlAccessorType(XmlAccessType.NONE)
 public class DatabaseXml {
-	@XmlAttribute(name="id")
+	@XmlAttribute(name="name")
 	private String id;
 	@XmlAttribute(name="path")
 	private String path;

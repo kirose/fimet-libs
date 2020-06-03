@@ -16,7 +16,7 @@ import com.fimet.parser.Field;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.Message;
 import com.fimet.parser.ParserException;
-import com.fimet.utils.data.ByteBuilder;
+import com.fimet.utils.ByteBuilder;
 
 public class MessageAdapter extends TypeAdapter<Message>{
 	private static IParserManager parserManager = Manager.get(IParserManager.class);
@@ -95,14 +95,18 @@ public class MessageAdapter extends TypeAdapter<Message>{
 	}
 	@Override
 	public void write(JsonWriter out, Message msg) throws IOException {
-		 out.beginObject();
-		 for (Entry<String, Object> e : msg.getProperties().entrySet()) {
-			 if (e.getValue() != null && ("parser".equals(e.getKey()) || "adapter".equals(e.getKey()))) {
-				 out.name(e.getKey()).value(e.getValue().toString());
-			 }
+		if (msg != null) {
+			out.beginObject();
+			for (Entry<String, Object> e : msg.getProperties().entrySet()) {
+				 if (e.getValue() != null && ("mti".equals(e.getKey()) || "parser".equals(e.getKey()) || "adapter".equals(e.getKey()))) {
+					 out.name(e.getKey()).value(e.getValue().toString());
+				 }
+			}
+			writeFields(out, msg);
+			out.endObject();
+		} else {
+			out.nullValue();
 		}
-		 writeFields(out, msg);
-		 out.endObject();
 	}
 	private void writeFields(JsonWriter out, Message message) throws IOException{
  		out.name("fields");
