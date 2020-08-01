@@ -1,6 +1,6 @@
 # FIMET
 
-## fimet-libs 1.0.0
+## fimet-libs 2.2.0
 
 This project is a java libray for ISO8583 tests automation
 
@@ -17,17 +17,17 @@ This project is a java libray for ISO8583 tests automation
 
 ## Examples
 
-See some examples [here](https://github.com/kirose/fimet-libs/tree/master/fimet-test/src/main/java/com/fimet/test)
+See usecase examples [here](https://github.com/kirose/fimet-libs/blob/master/fimet-test-xml/src/main/java/com/fimet/test/UseCaseTest.java)
+See stress example [here](https://github.com/kirose/fimet-libs/blob/master/fimet-test-xml/src/main/java/com/fimet/test/StressTest.java)
 
 ## Use Case Model
 
-![usecase-model](https://user-images.githubusercontent.com/6531429/80854861-07af3400-8c01-11ea-85bd-b3393651d2cd.jpg)
+![UseCaseModel](https://user-images.githubusercontent.com/6531429/80854933-b94e6500-8c01-11ea-8a1d-7ea908a8234a.PNG)
 
 ## Stress Model 
 
 I'll upload some documentation soon
 
-![UseCaseModel](https://user-images.githubusercontent.com/6531429/80854933-b94e6500-8c01-11ea-8a1d-7ea908a8234a.PNG)
 
 ## Stress Model 
 
