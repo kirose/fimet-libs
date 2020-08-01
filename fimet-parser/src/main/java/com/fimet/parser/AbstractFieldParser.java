@@ -3,6 +3,7 @@ package com.fimet.parser;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fimet.utils.Args;
 import com.fimet.utils.ByteBuffer;
 import com.fimet.utils.ByteBuilder;
 import com.fimet.utils.IReader;
@@ -39,12 +40,13 @@ public abstract class AbstractFieldParser implements IFieldParser {
 	
 	public AbstractFieldParser(IEFieldFormat fieldFormat) {
 		super();
-		if (fieldFormat.getMask() == null || "".equals(fieldFormat.getMask().trim())) {
-			throw new ParserException(this+"  FieldFormat.type is null for field: "+fieldFormat.getIdField() + "-" +fieldFormat.getName());
-		}
-		if (fieldFormat.getLength() == null) {
-			throw new ParserException(this+"  FieldFormat.length is null for field: "+fieldFormat.getIdField() + "-" +fieldFormat.getName());
-		}
+		Args.notNull("FieldParser Entity", fieldFormat);
+		Args.notBlank("FieldParser Mask", fieldFormat.getMask());
+		Args.notBlank("FieldParser IdField", fieldFormat.getIdField());
+		Args.notBlank("FieldParser Name", fieldFormat.getName());
+		Args.notNull("FieldParser Length", fieldFormat.getLength());
+		Args.notNull("FieldParser Order", fieldFormat.getOrder());
+		
 		this.length = fieldFormat.getLength();
 		this.idFieldParent = fieldFormat.getIdFieldParent();
 		this.idField = fieldFormat.getIdField();
@@ -59,15 +61,12 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		this.name = fieldFormat.getName();
 		this.group = fieldGroupManager.getGroup(fieldFormat.getGroup());
 		this.childs = fieldFormat.getChilds() != null ? Arrays.asList(fieldFormat.getChilds().split(",")) : null;
-		this.converterValue = Converter.getConverter(fieldFormat.getConverterValue());
+		this.converterValue = fieldFormat.getConverterValue()!=null?Converter.getConverter(fieldFormat.getConverterValue()):Converter.NONE;
 		String[] orders = idOrder.split("\\.");
 		this.address = new short[orders.length];
 		int i = 0;
 		for (String o : orders) {
 			address[i++] = Short.parseShort(o); 
-		}
-		if (fieldFormat.getMask()==null) {
-			throw new ParserException(this+" mask is null");
 		}
 	}
 	/**
@@ -80,7 +79,8 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		byte[] value = parseValue(reader, message);
 		return posParseValue(value, message);
 	}
-	abstract protected byte[] parseValue(IReader reader, IMessage message);
+	
+	abstract public byte[] parseValue(IReader reader, IMessage message);
 	
 	protected void preParseValue(IReader reader, IMessage message) {}
 	
@@ -122,7 +122,7 @@ public abstract class AbstractFieldParser implements IFieldParser {
 		return value;
 	}
 	
-	abstract protected byte[] formatValue(IWriter writer, IMessage message, byte[] value);
+	abstract public byte[] formatValue(IWriter writer, IMessage message, byte[] value);
 
 	protected byte[] preFormatValue(IWriter writer, IMessage message) {
 		byte[] value;

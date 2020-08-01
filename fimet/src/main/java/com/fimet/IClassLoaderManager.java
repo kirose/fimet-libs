@@ -1,6 +1,5 @@
 package com.fimet;
 
-import java.io.File;
 
 import com.fimet.utils.ClassLoaderException;
 
@@ -11,11 +10,8 @@ import com.fimet.utils.ClassLoaderException;
  */
 public interface IClassLoaderManager extends IManager {
 	
-	public static final File BIN_PATH = new File("bin");
-	public static final File SRC_PATH = new File("src");
-	public static final File LIB_PATH = new File("lib");
-	
 	public boolean wasInstalled(String className);
+	public Class<?> reloadClass(String className) throws ClassLoaderException;
 	public Class<?> loadClass(String className) throws ClassLoaderException;
 	public ClassLoader getClassLoaderBin();
 	public ClassLoader getClassLoaderLib();
@@ -23,4 +19,8 @@ public interface IClassLoaderManager extends IManager {
 	public void installClass(String className, byte[] contents) throws ClassLoaderException;
 	public void reloadClassLoader();
 	public void uninstallClasses();
+	public Class<?> forName(String className) throws ClassLoaderException;
+	public <I,E extends I> Class<E> forName(String className,Class<I> interfaz) throws ClassLoaderException;
+	public <I>I reloadAndInstantiate(String className, Class<I> interfaz) throws ClassLoaderException;
+	public <I>I loadAndInstantiate(String className, Class<I> interfaz) throws ClassLoaderException;
 }

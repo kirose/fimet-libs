@@ -6,14 +6,9 @@ package com.fimet;
  *
  */
 public abstract class AbstractManager implements IManager {
-
 	@Override
 	public void start() {}
 
 	@Override
 	public void reload() {}
-
-	@Override
-	public void saveState() {}
-
 }

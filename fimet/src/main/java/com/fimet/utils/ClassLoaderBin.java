@@ -1,7 +1,7 @@
 package com.fimet.utils;
 
-import static com.fimet.IClassLoaderManager.BIN_PATH;
-import static com.fimet.IClassLoaderManager.SRC_PATH;
+import static com.fimet.Paths.BIN_PATH;
+import static com.fimet.Paths.SRC_PATH;
 
 import java.io.File;
 
@@ -13,7 +13,7 @@ import com.fimet.FimetLogger;
  */
 public class ClassLoaderBin extends ClassLoader {
 	public ClassLoaderBin() {
-		super();
+		super(ClassLoaderBin.class.getClassLoader());
 	}
 	public ClassLoaderBin(ClassLoader parent) {
 		super(parent);
@@ -26,7 +26,7 @@ public class ClassLoaderBin extends ClassLoader {
 			return defineClass(className, contents, 0, contents.length);
 		} else {
 			//return PluginUtils.loadClass(className);
-			return Class.forName(className);
+			return getParent().loadClass(className);
 		}
 	}
 	public boolean wasInstalled(String className) {
@@ -53,10 +53,10 @@ public class ClassLoaderBin extends ClassLoader {
 		installClass(className, clazz, true);
 	}
 	public void uninstallClasses() {
-		System.out.println("deleting..."+BIN_PATH);
+		FimetLogger.debug(ClassLoaderBin.class, "deleting..."+BIN_PATH);
 		FileUtils.deleteFiles(BIN_PATH);
-		System.out.println("deleting..."+SRC_PATH);
+		FimetLogger.debug(ClassLoaderBin.class, "deleting..."+SRC_PATH);
 		FileUtils.deleteFiles(SRC_PATH);
-		System.out.println("unistalled classes"+BIN_PATH);
+		FimetLogger.debug(ClassLoaderBin.class, "unistalled classes"+BIN_PATH);
 	}
 }

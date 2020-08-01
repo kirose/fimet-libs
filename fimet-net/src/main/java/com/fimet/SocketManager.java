@@ -1,0 +1,141 @@
+package com.fimet;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.fimet.IEventManager;
+import com.fimet.ISocketManager;
+import com.fimet.Manager;
+import com.fimet.dao.ISocketDAO;
+import com.fimet.dao.SocketXmlDAO;
+import com.fimet.event.Event;
+import com.fimet.event.NetEvent;
+import com.fimet.socket.AdaptedSocket;
+import com.fimet.socket.AdaptedSocketClient;
+import com.fimet.socket.AdaptedSocketServer;
+import com.fimet.socket.IESocket;
+import com.fimet.socket.ISocket;
+import com.fimet.socket.ISocketListener;
+import com.fimet.socket.ISocketStore;
+import com.fimet.socket.NullSocketStore;
+import com.fimet.socket.SocketStoreWrapper;
+import com.fimet.utils.ArrayUtils;
+
+public class SocketManager implements ISocketManager {
+	private Map<String, ISocket> connections;
+	private SocketStoreWrapper store;
+	public SocketManager() {
+		store = new SocketStoreWrapper(NullSocketStore.INSTANCE);
+		reload(true);
+	}
+	@Override
+	public ISocket getSocket(IESocket socket, ISocketListener listener) {
+		if (!connections.containsKey(socket.getName())) {
+			if (socket.isServer()) {
+				AdaptedSocketServer socketServer = new AdaptedSocketServer(socket, listener);
+				socketServer.setStore(store);
+				connections.put(socket.getName(), socketServer);
+			} else {
+				AdaptedSocketClient socketClient = new AdaptedSocketClient(socket, listener);
+				socketClient.setStore(store);
+				connections.put(socket.getName(), socketClient);
+			} 
+		}
+		return connections.get(socket.getName());
+	}
+	@Override
+	public ISocket getSocket(IESocket socket) {
+		return getSocket(socket, null);
+	}
+	@Override
+	public ISocket connect(IESocket socket, ISocketListener listener) {
+		ISocket messenger = getSocket(socket, listener);
+		messenger.connect();
+		return messenger;
+	}
+	@Override
+	public void disconnect(String name) {
+		if (connections.containsKey(name)) {
+			connections.get(name).disconnect();
+		}
+	}
+	@Override
+	public void disconnectAll() {
+		for (Map.Entry<String, ISocket> e : connections.entrySet()) {
+			e.getValue().disconnect();
+		}
+		connections.clear();
+	}
+	public void setSocketTimeReconnect(int sec) {
+		AdaptedSocket.RECONNECTION_TIME = sec*1000;
+	}
+	@Override
+	public void setStore(ISocketStore store) {
+		this.store.setWrapped(store);
+	}
+	@Override
+	public ISocket remove(String name) {
+		if (connections.containsKey(name)) {
+			ISocket socket = connections.remove(name);
+			if (!socket.isConnected()) {
+				socket.disconnect();
+			}
+			Manager.get(IEventManager.class).fireEvent(Event.SOCKET_REMOVED, this, socket);
+			return socket;
+		}
+		return null;
+	}
+	@Override
+	public ISocket reload(String name) {
+		if (connections.containsKey(name)) {
+			connections.get(name).disconnect();
+			connections.get(name).connect();
+		}
+		return null;
+	}
+	@Override
+	public List<ISocket> getSockets() {
+		return ArrayUtils.copyValuesAsList(this.connections);
+	}
+	@Override
+	public void start() {
+	}
+	@Override
+	public void reload() {
+		reload(true);
+	}
+	private void reload(boolean fireEvent) {
+		if (connections!=null&&!connections.isEmpty()) {
+			for (Entry<String, ISocket> e : connections.entrySet()) {
+				e.getValue().disconnect();
+			}
+		}
+		connections = new ConcurrentHashMap<>();
+		ISocketDAO dao = Manager.get(ISocketDAO.class,SocketXmlDAO.class);
+		List<IESocket> all = dao.findAll();
+		if (all!=null&&!all.isEmpty()) {
+			for (IESocket e : all) {
+				getSocket(e);
+			}
+		}
+		if (fireEvent) {
+			Manager.get(IEventManager.class).fireEvent(NetEvent.SOCKET_MANAGER_RELOADED, this, getSockets());
+		}
+	}
+	@Override
+	public ISocket getSocket(String name) {
+		return connections.get(name);
+	}
+	@Override
+	public ISocket getSocket(String name, ISocketListener listener) {
+		if (connections.containsKey(name)) {
+			ISocket socket = connections.get(name);
+			socket.setListener(listener);
+			return socket;
+		} else {
+			return null;
+		}
+	}
+}

@@ -14,7 +14,7 @@ public class Scheduled implements Delayed {
 	long timeout;
 	Object object;
 	ITimerListener listener;
-	Scheduled(Object object, long time, ITimerListener listener) {
+	public Scheduled(Object object, long time, ITimerListener listener) {
 		this.listener = listener;
 		this.object = object;
 		if (time < MIN_WAITING_TIME) {
@@ -30,6 +30,9 @@ public class Scheduled implements Delayed {
 	}
 	public Object getObject() {
 		return object;
+	}
+	public ITimerListener getListener() {
+		return listener;
 	}
 	@Override
 	public int compareTo(Delayed o) {

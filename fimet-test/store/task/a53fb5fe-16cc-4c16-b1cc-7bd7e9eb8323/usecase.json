@@ -1,1 +1,0 @@
-{"name":"Compra","status":"COMPLETE","startTime":1591036074619,"executionTime":6,"data":{},"simulators":[{"model":"MNational","address":"127.0.0.1","port":8583,"validations":[{"validation":"Approved","success":true}]},{"model":"MNational","address":"127.0.0.1","port":8583}]}

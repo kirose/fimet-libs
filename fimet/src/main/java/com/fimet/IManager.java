@@ -8,5 +8,4 @@ package com.fimet;
 public interface IManager {
 	public void start();
 	public void reload();
-	public void saveState();
 }

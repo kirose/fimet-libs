@@ -1,8 +1,5 @@
 package com.fimet;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -13,11 +10,13 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class FimetLogger {
 	static {
-		File file = new File("resources/log4j.properties");
 		try {
-			PropertyConfigurator.configure(new FileInputStream(file.getAbsoluteFile()));
-		} catch (FileNotFoundException e) {
-			throw new FimetException("Cannot found "+file.getAbsolutePath()); 
+			//File file = new File("resources/log4j.properties");
+			String pathProperties = Manager.getProperty("logger.properties","fimet/log4j.properties");
+			PropertyConfigurator.configure(pathProperties);
+		} catch(Exception e) {
+			PropertyConfigurator.configure("fimet/log4j.properties");
+			Logger.getLogger(FimetLogger.class).error("Initialization Error", e);
 		}
 	}
 	static Logger logger = Logger.getLogger(FimetLogger.class);
@@ -57,6 +56,9 @@ public class FimetLogger {
 	}
 	public static void warning(String message, Throwable e) {
 		logger.warn(message, e);
+	}
+	public static void warning(Class<?> clazz, Throwable e) {
+		logger.warn(clazz, e);
 	}
 	public static void error(Class<?> clazz, String message) {
 		Logger.getLogger(clazz).error(message);

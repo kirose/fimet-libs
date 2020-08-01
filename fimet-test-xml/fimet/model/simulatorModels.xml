@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulatorModels>
+	<model name="MVisa" class="com.fimet.test.SMVisa" />
+	<model name="MNational" class="com.fimet.simulator.model.SMNational" path="fimet/model/simulators/MNational.xml"/>
+</simulatorModels>

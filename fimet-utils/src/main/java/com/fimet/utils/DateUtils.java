@@ -16,6 +16,8 @@ public final class DateUtils {
 	public static final SimpleDateFormat yyyyMMdd_FMT = new SimpleDateFormat("yyyyMMdd");
 	public static final SimpleDateFormat hh_mm_ss_FMT = new SimpleDateFormat("hh:mm:ss");
 	public static final SimpleDateFormat hhmmss000_FMT = new SimpleDateFormat("hh:mm:ss.000");
+	public static final SimpleDateFormat yyyyMMdd_hhmmssSSS_FMT = new SimpleDateFormat("yyyyMMdd hh:mm:ss.SSS");
+	public static final SimpleDateFormat hhmmssSSS_FMT = new SimpleDateFormat("hh:mm:ss.SSS");
 	public static final SimpleDateFormat TIMESTAMP_FMT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.0");
 	public static final SimpleDateFormat TIMESTAMP_DAY_FMT = new SimpleDateFormat("yyyy-MM-dd 00:00:00.0");
 	public static final SimpleDateFormat DATE_TIME_FMT = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
@@ -118,7 +120,7 @@ public final class DateUtils {
 	public static Date addMinutes(Date date, int minutes) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
-		calendar.add(Calendar.HOUR, minutes);
+		calendar.add(Calendar.MINUTE, minutes);
 		return calendar.getTime();
 	}
 	public static String formatTimestamp(String timestamp) {
@@ -162,6 +164,26 @@ public final class DateUtils {
 		calendar.set(Calendar.MILLISECOND, 0);
 		return calendar.getTime();
 	}
+	public static int getMinute(Date date) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(date);
+		return calendar.get(Calendar.MINUTE);
+	}
+	public static int getHourOfDay(Date date) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(date);
+		return calendar.get(Calendar.HOUR_OF_DAY);
+	}
+	public static int getDayOfYear(Date date) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(date);
+		return calendar.get(Calendar.DAY_OF_YEAR);
+	}
+	public static int getYear(Date date) {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(date);
+		return calendar.get(Calendar.YEAR);
+	}
 	@SuppressWarnings("deprecation")
 	public static Date addHours(Date date, Date hours) {
 		return addMinutes(addHours(date, hours.getHours()), hours.getMinutes());
@@ -198,11 +220,31 @@ public final class DateUtils {
 	}
 	public static void main(String[] args) {
 		try {
-			if (timeIsLessThan("11:32:51.000","16:24:45.000")) {
-				System.out.println("ok");
-			}
+			Date date = parseyyyyMMddhhmmssSSS("20200705 11:09:40.481");
+			System.out.println(date);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	public static final String PATTERN_TIME = "[0-9]{8} [0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}";
+	public static Date parseyyyyMMddhhmmssSSS(String dateText) throws ParseException {
+		if (!StringUtils.isBlank(dateText) && dateText.matches(PATTERN_TIME)) {
+			return yyyyMMdd_hhmmssSSS_FMT.parse(dateText);
+		} else {
+			throw new ParseException("Invalid Date "+dateText+" for format 'yyyyMMdd hh:mm:ss.SSS'", 0);
+		}
+	}
+	public static long parsehhmmssSSSAsTime(String yyyyMMdd, String time) {
+		String dateText = yyyyMMdd+" "+time;
+		try {
+			Date date = parseyyyyMMddhhmmssSSS(dateText);
+			return date != null ? date.getTime() : -1;
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	public static long parsehhmmssSSSAsTime(String time) {
+		String yyyyMMdd = yyyyMMdd_FMT.format(new Date());
+		return parsehhmmssSSSAsTime(yyyyMMdd, time);
 	}
 }

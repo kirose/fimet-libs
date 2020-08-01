@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.fimet</groupId>
+  <artifactId>fimet-module</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <name>fimet-module</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <modules>
+        <module>../fimet-utils</module>
+        <module>../fimet</module>
+        <module>../fimet-net</module>
+        <module>../fimet-parser</module>
+        <module>../fimet-simulator</module>
+        <module>../fimet-exe</module>
+        <module>../fimet-enviroment</module>
+  </modules>
+</project>

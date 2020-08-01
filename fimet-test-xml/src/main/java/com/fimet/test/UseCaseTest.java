@@ -19,16 +19,16 @@ public class UseCaseTest {
 		new UseCaseTest().test();
 	}
 	private void test() {
-		// Execute all use cases in the folder usecases/ and use a executor listener
+		// Execute all use cases in the folder fimet/usecases/
 		// Use cases execution is sequential
-		// See logs/socket.log and logs/validatios.log for results execution
-		executorManager.execute("usecases/");
+		// See store/task/* for results execution
+		executorManager.executeUseCase("fimet/usecases/");
 
-		// Simulator Parameters
+		// Simulators
 		ISimulator sAquirer = new SimulatorBuilder()
-			.name("Aquirer")
-			.parser("PNational")
-			.model("MNational")
+			.name("Aquirer") // Use a unique name
+			.parser("PNational") // fimet/model/parsers.xml
+			.model("MNational") // fimet/model/simulatorModels.xml
 			.address("127.0.0.1")
 			.port(8583)
 			.server(false)

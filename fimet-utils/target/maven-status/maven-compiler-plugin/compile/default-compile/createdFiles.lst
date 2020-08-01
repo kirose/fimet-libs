@@ -5,6 +5,7 @@ com\fimet\utils\converter\ConverterAsciiToHex.class
 com\fimet\utils\EncryptionUtils$DES.class
 com\fimet\utils\converter\ConverterBinaryToEbcdic.class
 com\fimet\utils\ByteUtils.class
+com\fimet\utils\XmlUtils.class
 com\fimet\utils\converter\ConverterHexToEbcdic.class
 com\fimet\utils\converter\ConverterEbcdicToHex.class
 com\fimet\utils\converter\ConverterHexEbcdicToAscii.class
@@ -15,6 +16,7 @@ com\fimet\utils\converter\ConverterEbcdicToAscii.class
 com\fimet\utils\IReader.class
 com\fimet\utils\PanUtils.class
 com\fimet\utils\parser\INumericParser.class
+com\fimet\utils\Args.class
 com\fimet\utils\converter\ConverterException.class
 com\fimet\utils\EncodeException.class
 com\fimet\utils\converter\Converter.class
@@ -23,6 +25,7 @@ com\fimet\utils\ByteBuffer.class
 com\fimet\utils\parser\NumericParserHex.class
 com\fimet\utils\concurrent\AtomicDouble.class
 com\fimet\utils\converter\ConverterAsciiToBinary.class
+com\fimet\utils\JsonUtils$1.class
 com\fimet\utils\converter\ConverterHexToBinary.class
 com\fimet\utils\SocketUtils.class
 com\fimet\utils\converter\ConverterEbcdicToBinary.class
@@ -44,6 +47,7 @@ com\fimet\utils\parser\NumericParser.class
 com\fimet\utils\IWriter.class
 com\fimet\utils\converter\ConverterBinaryToHex.class
 com\fimet\utils\parser\NumericParserDecHalf.class
+com\fimet\utils\JsonUtils.class
 com\fimet\utils\EncryptionException.class
 com\fimet\utils\ArrayUtils.class
 com\fimet\utils\ReflectUtils.class

@@ -1,10 +1,10 @@
 package com.fimet.parser;
 
+import com.fimet.utils.Args;
 import com.fimet.utils.IReader;
 import com.fimet.utils.IWriter;
 import com.fimet.utils.converter.Converter;
 import com.fimet.utils.converter.IConverter;
-import com.fimet.FimetException;
 import com.fimet.IFieldGroupManager;
 import com.fimet.Manager;
 
@@ -29,13 +29,13 @@ public abstract class BaseMessageParser implements IParser {
 	private boolean validateTypes = true;
 	private IFieldGroup group;
 	public BaseMessageParser(IEParser entity){
+		Args.notNull("Parser Entity", entity);
+		Args.notNull("Parser Name", entity.getName());
+		Args.notNull("Parser FieldGroup", entity.getFieldGroup());
+		
 		this.name = entity.getName();
-		this.converter = Converter.getConverter(entity.getConverter());
-		if (entity.getFieldGroup() != null) {
-			this.group = fieldGroupManager.getGroup(entity.getFieldGroup());
-		} else {
-			throw new FimetException("Parser Initialization exception, invalid parser model "+entity);
-		}
+		this.converter = entity.getConverter()!=null?Converter.getConverter(entity.getConverter()):Converter.NONE;
+		this.group = fieldGroupManager.getGroup(entity.getFieldGroup());
 	}
 	public String getName() {
 		return name;

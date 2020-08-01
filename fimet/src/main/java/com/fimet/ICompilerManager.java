@@ -9,5 +9,6 @@ import com.fimet.utils.CompilationException;
  */
 public interface ICompilerManager extends IManager {
 	String compile(String className, String source) throws CompilationException;
+	Class<?> compileAndReload(String className, String source) throws CompilationException;
 	Class<?> compileAndLoad(String className, String source) throws CompilationException;
 }

@@ -22,7 +22,7 @@ public class LTrimVarFieldParser extends VarFieldParser {
 		super(fieldFormat);
 	}
 	@Override
-	protected byte[] parseValue(IReader reader, IMessage mesage) {
+	public byte[] parseValue(IReader reader, IMessage mesage) {
 		int length = parserLength.parse(converterLength.convert(reader.read(this.length)));
 		if (length % 2 == 0) {
 			byte[] bytes = reader.read(length);
@@ -37,7 +37,7 @@ public class LTrimVarFieldParser extends VarFieldParser {
 		}
 	}
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		int index = writer.length(); 
 		writer.move(length);
 		int length = value.length;

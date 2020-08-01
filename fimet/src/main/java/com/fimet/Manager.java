@@ -1,25 +1,20 @@
 package com.fimet;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
-import com.fimet.dao.IFieldFormatDAO;
-import com.fimet.dao.IFieldGroupDAO;
-import com.fimet.dao.IParserDAO;
-import com.fimet.dao.ISimulatorDAO;
-import com.fimet.dao.ISimulatorModelDAO;
-import com.fimet.parser.FieldFormatDAO;
-import com.fimet.parser.FieldGroupDAO;
-import com.fimet.parser.ParserDAO;
-import com.fimet.simulator.SimulatorDAO;
-import com.fimet.simulator.SimulatorModelDAO;
+import com.fimet.preferences.PreferenceStore;
+import com.fimet.utils.ArrayUtils;
+import com.fimet.utils.ManagerUtils;
+import com.fimet.utils.XmlUtils;
+import com.fimet.xml.ExtensionXml;
 import com.fimet.xml.FimetXml;
 import com.fimet.xml.ManagerXml;
 
@@ -28,106 +23,123 @@ import com.fimet.xml.ManagerXml;
  * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
  *
  */
-public final class Manager {
-	private Map<Class<?>, String> managers;
-	private Map<Class<?>, Object> instances;
-	private Map<String,String> properties;
-	private Map<Class<?>,String> extensions;
-	private Map<Class<?>, Object> singletons;
-	private Set<Class<?>> autostart;
+public final class Manager implements IManagerVisitor {
+	private Map<Class<?>, Object> managers = new HashMap<>();
+	private Map<String, String> managersString = new LinkedHashMap<>();
+	private Map<Class<?>, Object> instances = new HashMap<>();
+	private Map<Class<?>,List<?>> extensions = new HashMap<>();
+	private Map<String,List<String>> extensionsString = new LinkedHashMap<>();
+	private Map<Class<?>, Object> singletons = new HashMap<>();
+	private Set<String> autostart = new HashSet<>();
 	private String source;
+	private IPreferenceStore store;
 	public static final String FIMET = "FIMET";
-	public static final String VERSION = "2.1.4"; 
+	public static final String VERSION = "2.2.0"; 
 	private static final Manager INSTANCE = new Manager();
+	private IClassLoaderManager loader; 
 	static {
-		INSTANCE.start();
+		INSTANCE.init();
 	}
 	private Manager() {
-		managers = new HashMap<>();
-		instances = new HashMap<>();
-		properties = new HashMap<>();
-		extensions = new HashMap<>();
-		singletons = new HashMap<>();
-		autostart = new HashSet<>();
+		store = new PreferenceStore();
 		loadConfiguration();
 	}
-	private void start() {
-		if (!autostart.isEmpty()) {
-			for (Class<?> clazz : autostart) {
-				_get(clazz);
+	@SuppressWarnings("unchecked")
+	private void init() {
+		loader = new ClassLoaderManager();
+		instances.put(IClassLoaderManager.class, loader);
+		if (!extensionsString.isEmpty()) {
+			for (Entry<String, List<String>> e : extensionsString.entrySet()) {
+				Class<? extends IExtension> iExtensionClass = (Class<? extends IExtension>)findIExtensionClass(e.getKey());
+				extensions.put(iExtensionClass, e.getValue());
 			}
 		}
+		if (!managersString.isEmpty()) {
+			for (Entry<String, String> e : managersString.entrySet()) {
+				Class<? extends IManager> iManagerClass = (Class<? extends IManager>)findIManagerClass(e.getKey());
+				ManagerUtils.acceptManager(iManagerClass, e.getValue(), this);
+			}
+		}
+		if (!autostart.isEmpty()) {
+			for (String clazz : autostart) {
+				Class<? extends IManager> iManagerClass = findIManagerClass(clazz);
+				_get(iManagerClass);
+			}
+		}
+		extensionsString = null;
+		managersString = null;
+		autostart = null;
+	}
+	@Override
+	public <T extends IManager> void visitManager(Class<T> iManagerClass, Object manager) {
+		managers.put(iManagerClass, manager);
 	}
 	public static FimetXml getModel() {
-		try {
-			//InputStream xmlFile = Manager.class.getClass().getResourceAsStream("resources/fimet.xml");
-			java.io.File xmlFile = new java.io.File("resources/fimet.xml");
-			JAXBContext jaxbContext = JAXBContext.newInstance(FimetXml.class);              
-		    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		    FimetXml cfg = (FimetXml) jaxbUnmarshaller.unmarshal(xmlFile);
-		    return cfg;
-		} catch (Exception e) {
-			FimetLogger.error(Manager.class,"Loading fimet.xml",e);
-			throw new FimetException("Cannot found fimet.xml file",e);
-		}
+		FimetXml fimetXml = XmlUtils.fromFile(new File("fimet.xml"), FimetXml.class);
+		return fimetXml;
 	}
-	void loadConfiguration() {
+	private void loadConfiguration() {
 		loadDefaultManagers();
 		loadDefaultAutostarts();
-		loadDefaultExtensions();
+		loadDefaultProperties();
 		try {
 			FimetXml cfg = getModel();
-			properties = cfg.getPropertiesMap();
-			Map<Class<?>,String> extensions = cfg.getExtensionsMap();
-			for (Entry<Class<?>, String> e : extensions.entrySet()) {
-				this.extensions.put(e.getKey(), e.getValue());
-			}
-		    if (cfg.getManagers() != null && !cfg.getManagers().isEmpty()) {
-		    	List<ManagerXml> managers = cfg.getManagers();
-		    	for (ManagerXml mgr : managers) {
-		    		Class<?> iManager = findIManagerClass(mgr.getName());
-		    		this.managers.put(iManager, mgr.getClassName());
-		    		if(mgr.isAutostart()) {
-		    			autostart.add(iManager);
-		    		}
+			Map<String, String> prop = cfg.getPropertiesMap();
+			if (prop!=null&&!prop.isEmpty()) {
+				for (Entry<String, String> e : prop.entrySet()) {
+					store.setValue(e.getKey(), e.getValue());
 				}
-		    }
+			}
+			List<ExtensionXml> ext = cfg.getExtensions();
+			if (ext!=null&&!ext.isEmpty()) {
+				for (ExtensionXml e : ext) {
+					if (extensionsString.containsKey(e.getName())) {
+						extensionsString.get(e.getName()).add(e.getClassName());
+					} else {
+						List<String> list = new ArrayList<>();
+						list.add(e.getClassName());
+						extensionsString.put(e.getName(), list);
+					}
+				}
+			}
+			if (cfg.getManagers() != null && !cfg.getManagers().isEmpty()) {
+				List<ManagerXml> managers = cfg.getManagers();
+				for (ManagerXml mgr : managers) {
+					this.managersString.put(mgr.getName(), mgr.getClassName());
+					if(mgr.isAutostart()) {
+						autostart.add(mgr.getName());
+					}
+				}
+			}
 		} catch (Exception e) {
 			FimetLogger.error(Manager.class,"Loading fimet.xml",e);
 			throw new FimetException("Cannot found fimet.xml file",e);
 		}
 	}
-	private void loadDefaultAutostarts() {
-		autostart.add(IAdapterManager.class);
-		autostart.add(IParserManager.class);
-		autostart.add(IFieldGroupManager.class);
+	private void loadDefaultProperties() {
+		store.setValue("classpath.bin", "fimet/bin");
+		store.setValue("classpath.lib", "fimet/lib");
+		store.setValue("classpath.src", "fimet/src");
 	}
-	private void loadDefaultExtensions() {
-		extensions = new HashMap<Class<?>,String>();
-		extensions.put(IParserDAO.class, ParserDAO.class.getName());
-		extensions.put(IFieldGroupDAO.class, FieldGroupDAO.class.getName());
-		extensions.put(IFieldFormatDAO.class, FieldFormatDAO.class.getName());
-		extensions.put(ISimulatorDAO.class, SimulatorDAO.class.getName());
-		extensions.put(ISimulatorModelDAO.class, SimulatorModelDAO.class.getName());
+	private void loadDefaultAutostarts() {
 	}
 	private void loadDefaultManagers() {
-		managers.put(ITimerManager.class, "com.fimet.utils.TimerManager");
-		managers.put(IClassLoaderManager.class, "com.fimet.utils.ClassLoaderManager");
-		managers.put(ICompilerManager.class, "com.fimet.utils.CompilerManager");
-		managers.put(IThreadManager.class, "com.fimet.utils.ThreadManager");
-		managers.put(IAdapterManager.class, "com.fimet.parser.adapter.AdapterManager");
-		managers.put(IFieldGroupManager.class, "com.fimet.parser.FieldGroupManager");
-		managers.put(IParserManager.class, "com.fimet.parser.ParserManager");
+		//managersString.put("com.fimet.IEventManager", "com.fimet.EventManager");
+		//managersString.put("com.fimet.ITimerManager", "com.fimet.TimerManager");
+		//managersString.put("com.fimet.IClassLoaderManager", "com.fimet.ClassLoaderManager");
+		//managersString.put("com.fimet.ICompilerManager", "com.fimet.CompilerManager");
+		//managersString.put("com.fimet.IThreadManager", "com.fimet.ThreadManager");
 	}
-	private Class<?> findIManagerClass(String className) {
+	@SuppressWarnings("unchecked")
+	private Class<? extends IManager> findIManagerClass(String className) {
 		try {
-			Class<?> extension = Class.forName(className);			
+			Class<?> extension = loader.forName(className);			
 			if (extension == null) {
 				throw new FimetException("Cannot found class "+className);
 			} else if (!IManager.class.isAssignableFrom(extension)) {
 				throw new FimetException("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
 			} else {
-				return extension;
+				return (Class<? extends IManager>)extension;
 			}
 		} catch (Throwable ex) {
 			FimetLogger.error(Manager.class,"Error Manager load extensions",ex);
@@ -136,7 +148,7 @@ public final class Manager {
 	}
 	private Class<?> findManagerClass(Class<?> extension, String className) {
 		try {
-			Class<?> clazz = Class.forName(className);			
+			Class<?> clazz = loader.forName(className);
 			if (clazz == null) {
 				throw new FimetException("Cannot found class "+className);
 			} else if (!IManager.class.isAssignableFrom(extension)) {
@@ -147,8 +159,40 @@ public final class Manager {
 				return clazz;
 			}
 		} catch (Throwable ex) {
-			FimetLogger.error(Manager.class,"Error Manager load extensions",ex);
-			throw new FimetException("Error Manager load extensions",ex);
+			FimetLogger.error(Manager.class,"Error Load Manager",ex);
+			throw new FimetException("Error Load Manager",ex);
+		}
+	}
+	private Class<?> findExtensionClass(Class<?> extension, String className) {
+		try {
+			Class<?> clazz = loader.forName(className);
+			if (clazz == null) {
+				throw new FimetException("Cannot found class "+className);
+			} else if (!IExtension.class.isAssignableFrom(extension)) {
+				throw new FimetException("Interface "+extension.getName()+" is not assignable from "+IManager.class.getName());
+			} else if (!extension.isAssignableFrom(clazz)) {
+				throw new FimetException("Class "+clazz.getName()+" is not assignable from "+extension.getName());
+			} else {
+				return clazz;
+			}
+		} catch (Throwable ex) {
+			FimetLogger.error(Manager.class,"Error Load Extension",ex);
+			throw new FimetException("Error Load Extension",ex);
+		}
+	}
+	private Class<?> findIExtensionClass(String className) {
+		try {
+			Class<?> extension = loader.forName(className);			
+			if (extension == null) {
+				throw new FimetException("Cannot found class "+className);
+			} else if (!IExtension.class.isAssignableFrom(extension)) {
+				throw new FimetException("Interface "+extension.getName()+" is not assignable from "+IExtension.class.getName());
+			} else {
+				return extension;
+			}
+		} catch (Throwable ex) {
+			FimetLogger.error(Manager.class,"Extension Error",ex);
+			throw new FimetException("Extension Error",ex);
 		}
 	}
 	public static boolean isLoaded(Class<?> clazz) {
@@ -157,55 +201,91 @@ public final class Manager {
 	public static boolean isManaged(Class<?> iManagerClass) {
 		return INSTANCE.managers.containsKey(iManagerClass);
 	}
-	private <T> T _get(Class<T> iManagerClass) {
+	private <E extends T,T extends IManager> T _get(Class<T> iManagerClass) {
+		return _get(iManagerClass, (Class<? extends T>)null);
+	}
+	@SuppressWarnings("unchecked")
+	private <E extends T,T extends IManager> T _get(Class<T> iManagerClass, Class<E> defaultIClass) {
 		if (instances.containsKey(iManagerClass)) {
 			return iManagerClass.cast(instances.get(iManagerClass));
 		} else {
-			String managerClassName = managers.get(iManagerClass);
-			if (managerClassName == null) {
-				FimetLogger.error(Manager.class,"Class "+iManagerClass.getName()+" is not managed, you must declare it as a manager in fimet.xml");
-				throw new FimetException("Class "+iManagerClass.getName()+" is not managed, you must declare it as a manager in fimet.xml");
+			Object managerDeclaration = managers.get(iManagerClass);
+			if (managerDeclaration == null) {
+				if (defaultIClass != null) {
+					try {
+						T instance = defaultIClass.newInstance();
+						instances.put(iManagerClass, instance);
+						return instance;
+					} catch (Exception e) {
+						FimetLogger.error(Manager.class,"Invalid manager "+defaultIClass,e);
+						if (e instanceof FimetException) {
+							throw (FimetException)e;
+						}
+						throw new FimetException("Invalid manager "+defaultIClass,e);
+					}
+				} else {
+					FimetLogger.error(Manager.class,"Class "+iManagerClass.getName()+" is not managed, you must declare it as a manager in fimet.xml");
+					throw new FimetException("Class "+iManagerClass.getName()+" is not managed, you must declare it as a manager in fimet.xml");
+				}
+			} else if (managerDeclaration instanceof String) {
+				String managerClassName = (String)managerDeclaration;
+				Class<?> classManager = findManagerClass(iManagerClass, managerClassName);
+				IManager newManagerInstance = null;
+				try {
+					newManagerInstance = (IManager)classManager.newInstance();
+				} catch (Exception e) {
+					FimetLogger.error(Manager.class,"Manager Instantiation Exception for "+classManager.getName(),e);
+					throw new FimetException("Manager Instantiation Exception for "+classManager.getName(), e);
+				}
+				instances.put(iManagerClass, newManagerInstance);
+				newManagerInstance.start();
+				return iManagerClass.cast(newManagerInstance);
+			} else if (managerDeclaration instanceof Class) {
+				T instance = _get((Class<T>)managerDeclaration, defaultIClass);
+				instances.put(iManagerClass, instance);
+				return instance;
+			} else {
+				FimetLogger.error(Manager.class,"Class "+iManagerClass.getName()+" invalid source declaration "+managerDeclaration.getClass());
+				throw new FimetException("Class "+iManagerClass.getName()+" invalid source declaration "+managerDeclaration.getClass());
 			}
-			Class<?> classManager = findManagerClass(iManagerClass, managerClassName);
-			IManager newManagerInstance = null;
-			try {
-				newManagerInstance = (IManager)classManager.newInstance();
-			} catch (Exception e) {
-				FimetLogger.error(Manager.class,"Manager Instantiation Exception for "+classManager.getName(),e);
-				throw new FimetException("Manager Instantiation Exception for "+classManager.getName(), e);
-			}
-			instances.put(iManagerClass, newManagerInstance);
-			newManagerInstance.start();
-			return iManagerClass.cast(newManagerInstance);
+		}
+	}
+	@SuppressWarnings("unchecked")
+	private <E extends T, T extends IManager> T _get(Class<T> iClazz, E defaultInstance) {
+		if (instances.containsKey(iClazz)) {
+			return (E)instances.get(iClazz);
+		} else if (managers.containsKey(iClazz)) {
+			return _get(iClazz, (Class<? extends T>)null);
+		} else if (defaultInstance != null) {
+			instances.put(iClazz, defaultInstance);
+			return defaultInstance;
+		} else {
+			throw new ExtensionException("Not declared manager "+iClazz.getName()+", you must declare it as a manager in fimet.xml");			
 		}
 	}
 	@SuppressWarnings("unchecked")
 	public static <T extends IManager> T get(String className) {
 		try {
-			Class<?> clazz = Class.forName(className);
-			return INSTANCE._get((Class<T>)clazz);
-		} catch (ClassNotFoundException e) {
+			Class<?> clazz = INSTANCE.loader.forName(className);
+			return INSTANCE._get((Class<T>)clazz, (Class<? extends T>)null);
+		} catch (Exception e) {
 			FimetLogger.error(Manager.class,"Invalid manager class "+className,e);
 			throw new FimetException("Invalid manager class "+className, e);
 		}
 	}
 	public static <T extends IManager> T get(Class<T> clazz) {
-		return INSTANCE._get(clazz);
+		return INSTANCE._get(clazz, (Class<? extends T>)null);
 	}
-	public static void saveAll() {
-		for(Map.Entry<Class<?>, Object> e : INSTANCE.instances.entrySet()) {
-			try {
-				((IManager)e.getValue()).saveState();
-			} catch (Exception ex) {
-				FimetLogger.error(Manager.class,"Manager save state exception ",ex);
-			}
-		}
+	public static <E extends T,T extends IManager> T get(Class<T> clazz, Class<E> defaultClass) {
+		return INSTANCE._get(clazz, defaultClass);
+	}
+	public static <E extends T,T extends IManager> T get(Class<T> clazz, E defaultInstance) {
+		return INSTANCE._get(clazz, defaultInstance);
 	}
 	public static void reloadAll() {
 		for(Map.Entry<Class<?>, Object> e : INSTANCE.instances.entrySet()) {
 			try {
 				IManager manager = (IManager)e.getValue();
-				manager.saveState();
 				manager.reload();
 			} catch (Exception ex) {
 				FimetLogger.error(Manager.class,"Manager reload exception ",ex);
@@ -216,140 +296,80 @@ public final class Manager {
 		return INSTANCE.source;
 	}
 	public static String getProperty(String name) {
-		return INSTANCE.properties.get(name);
+		return INSTANCE.store.getString(name);
 	}
 	public static String getProperty(String name, String defaultValue) {
-		String value = getProperty(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
+		return INSTANCE.store.getString(name, defaultValue);
 	}
 	public static Integer getPropertyInteger(String name) {
-		String value = getProperty(name);
-		if (value != null) {
-			try {
-				return Integer.valueOf(value);
-			} catch (Exception e) {}
-		}
-		return null;
+		return INSTANCE.store.getInteger(name);
 	}
 	public static Integer getPropertyInteger(String name, Integer defaultValue) {
-		Integer value = getPropertyInteger(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
+		return INSTANCE.store.getInteger(name, defaultValue);
 	}
 	public static Long getPropertyLong(String name) {
-		String value = getProperty(name);
-		if (value != null) {
-			try {
-				return Long.valueOf(value);
-			} catch (Exception e) {}
-		}
-		return null;
+		return INSTANCE.store.getLong(name);
 	}
 	public static Long getPropertyLong(String name, Long defaultValue) {
-		Long value = getPropertyLong(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
+		return INSTANCE.store.getLong(name, defaultValue);
 	}
 	public static Boolean getPropertyBoolean(String name) {
-		String value = getProperty(name);
-		if (value != null) {
-			try {
-				return Boolean.valueOf(value);
-			} catch (Exception e) {}
-		}
-		return null;
+		return INSTANCE.store.getBoolean(name);
 	}
 	public static Boolean getPropertyBoolean(String name, Boolean defaultValue) {
-		Boolean value = getPropertyBoolean(name);
-		if (value == null) {
-			return defaultValue;
-		}
-		return value;
+		return INSTANCE.store.getBoolean(name, defaultValue);
 	}
 	@SuppressWarnings("unchecked")
-	private <T> T _newExtension(Class<T> iClazz) {
-		String extensionClassName = extensions.get(iClazz);
-		if (extensionClassName != null) {
-			try {
-				Class<?> clazz = Class.forName(extensionClassName);
-				if (iClazz.isAssignableFrom(clazz)) {
-					return (T) clazz.newInstance();
+	private <E extends T, T extends IExtension> List<T> _getExtensions(Class<T> iClazz) {
+		if (extensions.containsKey(iClazz)) {
+			List<?> list = extensions.get(iClazz);
+			if (list != null && !list.isEmpty()) {
+				if (list.get(0) instanceof String) {
+					List<T> instances = new ArrayList<>(list.size());
+					for (Object object : list) {
+						String className = (String)object;
+						Class<?> extensionClass = findExtensionClass(iClazz, className);
+						T instance;
+						try {
+							instance = (T)extensionClass.newInstance();
+							instances.add(instance);
+						} catch (Exception e) {
+							throw new FimetException("Instantiation exception for "+extensionClass.getName(),e);
+						}
+					}
+					extensions.put(iClazz, instances);	
+					return ArrayUtils.copy(instances);
 				} else {
-					FimetLogger.error(Manager.class,"Extension error, "+extensionClassName+" must implements "+iClazz.getName());
-					throw new FimetException("Extension error, "+extensionClassName+" must implements "+iClazz.getName());
+					List<T> instances = new ArrayList<>(list.size());
+					for (Object object : list) {
+						instances.add((T)object);
+					}
+					return instances; 
 				}
-			} catch (Exception e) {
-				FimetLogger.error(Manager.class,"Invalid extension "+extensionClassName,e);
-				if (e instanceof FimetException) {
-					throw (FimetException)e;
-				}
-				throw new FimetException("Invalid extension "+extensionClassName,e);
 			}
-		}
-		return null;
-	}
-	@SuppressWarnings("unchecked")
-	private <T> T _getExtension(Class<T> iClazz) {
-		if (instances.containsKey(iClazz)) {
-			return (T)instances.get(iClazz);
-		}
-		throw new ExtensionException("Not declared extension "+iClazz.getName());
-	}
-	@SuppressWarnings("unchecked")
-	private <E extends T,T> T _getExtension(Class<T> iClazz, E defaultInstance) {
-		if (instances.containsKey(iClazz)) {
-			return (T)instances.get(iClazz);
+			return null;
 		} else {
-			T instance = _newExtension(iClazz);
-			if (instance != null) {
-				INSTANCE.instances.put(iClazz, instance);
-				return instance;
-			} else if (defaultInstance != null) {
-				INSTANCE.instances.put(iClazz, defaultInstance);
-				return defaultInstance;
-			} else {
-				throw new NullPointerException();
-			}
+			return null;			
 		}
 	}
-	@SuppressWarnings("unchecked")
-	private <E extends T,T> T _getExtension(Class<T> iClazz, Class<E> defaultClass) {
-		if (instances.containsKey(iClazz)) {
-			return (T)instances.get(iClazz);
-		} else {
-			T instance = _newExtension(iClazz);
-			if (instance != null) {
-				INSTANCE.instances.put(iClazz, instance);
-				return instance;
-			} else if (defaultClass != null) {
-				E einstance;
-				try {
-					einstance = defaultClass.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					throw new FimetException(e); 
-				}
-				INSTANCE.instances.put(iClazz, einstance);
-				return einstance;
-			} else {
-				throw new NullPointerException();
+	public static <M extends I,I> void setManager(Class<I> iClazz, Class<M> mClass) {
+		INSTANCE._setManager(iClazz, mClass);
+	}
+	public <M extends I,I> void _setManager(Class<I> iClazz, Class<M> mClass) {
+		try {
+			if (instances.containsKey(iClazz)) {
+				M m = mClass.newInstance();
+				FimetLogger.debug(Manager.class,"Manager "+instances.get(iClazz)+" will be override by"+m);
+				instances.put(iClazz, m);
 			}
+			managers.put(iClazz, mClass.getName());
+		} catch(Exception e) {
+			FimetLogger.error(Manager.class,"Cannot set "+mClass+" as manager");
+			throw new FimetException("Cannot set "+mClass+" as manager");
 		}
 	}
-	public static <E extends T,T> T getExtension(Class<T> iClazz) {
-		return INSTANCE._getExtension(iClazz);
-	}
-	public static <E extends T,T> T getExtension(Class<T> iClazz, E defaultInstance) {
-		return INSTANCE._getExtension(iClazz, defaultInstance);
-	}
-	public static <E extends T,T> T getExtension(Class<T> iClazz, Class<E> defaultClass){
-		return INSTANCE._getExtension(iClazz, defaultClass);
+	public static <E extends T,T extends IExtension> List<T> getExtensions(Class<T> iClazz) {
+		return INSTANCE._getExtensions(iClazz);
 	}
 	@SuppressWarnings("unchecked")
 	private <T> T _getSingleton(Class<T> clazz) {
@@ -368,5 +388,8 @@ public final class Manager {
 	}
 	public static <T> T getSingleton(Class<T> clazz){
 		return INSTANCE._getSingleton(clazz);
+	}
+	public static IPreferenceStore getPreferenceStore() {
+		return INSTANCE.store;
 	}
 }

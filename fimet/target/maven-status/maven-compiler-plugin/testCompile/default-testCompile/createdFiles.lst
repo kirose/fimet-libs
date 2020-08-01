@@ -1,2 +1,8 @@
+com\fimet\IStoreManagerExt1.class
+com\fimet\IStoreManagerExt3.class
 com\fimet\core\FimetXmlTest.class
+com\fimet\IStoreManagerExt2.class
+com\fimet\core\utils\ManagerVisitor.class
+com\fimet\IStoreManagerExt.class
 com\fimet\core\UseCaseTest.class
+com\fimet\core\ManagerTest.class

@@ -2,6 +2,7 @@ package com.fimet.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -22,7 +23,7 @@ public final class ArrayUtils {
 		}
 		return out;
 	}
-	public static <I extends O,O> List<O> copyAs(List<I> original, Class<O> clazz) {
+	public static <I,O> List<O> copyAs(List<I> original, Class<O> clazz) {
 		if (original == null || original.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -31,5 +32,14 @@ public final class ArrayUtils {
 			out.add(clazz.cast(e));
 		}
 		return out;
+	}
+	public static <T> List<T> copyValuesAsList(Map<?, T> map) {
+		if (map!=null) {
+			List<T> copy = new ArrayList<>(map.size());
+			for (Map.Entry<?, T> e : map.entrySet()) {
+				copy.add(e.getValue());
+			}
+		}
+		return null;
 	}	
 }

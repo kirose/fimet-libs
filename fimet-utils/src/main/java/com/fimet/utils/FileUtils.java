@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.Queue;
 
 /**
  * 
@@ -16,6 +17,24 @@ import java.io.RandomAccessFile;
 public final class FileUtils {
 	private static final int SIZE_BUFFER = 512;
 	private FileUtils() {
+	}
+	public static byte[] readBytes(InputStream in) throws IOException {
+		byte[] bytes = new byte[512];
+		ByteBuilder bb = new ByteBuilder();
+		int ln;
+		while((ln = in.read(bytes)) > 0) {
+			bb.append(bytes, 0, ln);
+		}
+		return bb.getBytes();
+	}
+	public static String readString(InputStream in) throws IOException {
+		StringBuffer s = new StringBuffer();
+		byte[] bytes = new byte[512];
+		int ln;
+		while((ln = in.read(bytes)) > 0) {
+			s.append(new String(bytes, 0, ln));
+		}
+		return s.toString();
 	}
 	public static String readContents(File file) {
 		if (file == null || !file.exists() || file.isDirectory())
@@ -144,7 +163,7 @@ public final class FileUtils {
 		} finally {
 			close(reader);
 			close(writer);
-		}		
+		}
 	}
 	public static void deleteFiles(File file) {
 		if (file.isFile()) {
@@ -202,7 +221,16 @@ public final class FileUtils {
 			}
 		}
 	}
-	public static void write(FileInputStream from, OutputStream to, boolean closeFrom, boolean closeTo) {
+	public static void write(InputStream from, File to, boolean append, boolean closeFrom) {
+		if (from != null && to != null) {
+			try {
+				write(from, new FileOutputStream(to,append), closeFrom, true);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	public static void write(InputStream from, OutputStream to, boolean closeFrom, boolean closeTo) {
 		try {
 			byte[] bytes = new byte[1024];
 			int i = 0;
@@ -216,11 +244,87 @@ public final class FileUtils {
 			if (closeTo) close(to);
 		}
 	}
+	public static long writeAndCountLines(InputStream from, File to, boolean closeFrom) {
+		if (from != null && to != null) {
+			try {
+				return writeAndCountLines(from, new FileOutputStream(to), closeFrom, true);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return -1L;
+	}
+	public static long writeAndCountLines(InputStream from, OutputStream to, boolean closeFrom, boolean closeTo) {
+		try {
+			byte[] bytes = new byte[1024];
+			int i = 0;
+			long numOfLines = 0L;
+			while ((i = from.read(bytes))>0) {
+				for (int j = 0; j < i; j++) {
+					if (bytes[i] == (byte)10) {
+						numOfLines++;
+					}
+				}
+				to.write(bytes,0,i);
+			}
+			return numOfLines;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (closeFrom) close(from);
+			if (closeTo) close(to);
+		}
+	}
 	public static void close(java.io.Closeable closeable) {
 		if (closeable != null) {
 			try {
 				closeable.close();
 			} catch (IOException ex) {}
 		}		
+	}
+	public static void rcopy(File from, File to) {
+		rcopy(from, to, null);
+	}
+	public static void rcopy(File from, File to, String filter) {
+		if (filter!=null) {
+			filter = filter.toLowerCase();
+		}
+		if (from.isFile()) {
+			if (filter==null||from.getName().toLowerCase().endsWith(filter)) {
+				copy(from, to);
+			}
+		} else {
+			Queue<File> queue = new java.util.LinkedList<File>();
+			queue.add(from);
+			to.mkdirs();
+			while (!queue.isEmpty()) {
+				File dirFrom = queue.poll();
+				File[] files = dirFrom.listFiles();
+				if(files!=null&&files.length>0) {
+					makePathTo(from, to, dirFrom).mkdir();
+					for (File fileFrom : files) {
+						if (fileFrom.isDirectory()) {
+							queue.add(fileFrom);
+						} else if (filter == null || fileFrom.getName().toLowerCase().endsWith(filter)){
+							File fileTo = makePathTo(from, to, fileFrom);
+							copy(fileFrom, fileTo);
+						}
+					}
+				}
+			}
+		}
+	}
+	public static void rmove(File from, File to, String filter) {
+		rcopy(from, to, filter);
+		delete(from);
+	}
+	public static void rmove(File from, File to) {
+		rmove(from, to, null);
+	}
+	private static File makePathTo(File dirFrom, File dirTo, File pathFrom) {
+		if (pathFrom==dirFrom)
+			return dirTo;
+		String subpath = pathFrom.getAbsolutePath().substring(dirFrom.getAbsolutePath().length());
+		return new File(dirTo,subpath);
 	}
 }

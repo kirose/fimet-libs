@@ -1,12 +1,13 @@
 package com.fimet.parser.adapter;
 
+import com.fimet.AdapterManager;
 import com.fimet.parser.IAdapter;
 import com.fimet.parser.IByteArrayAdapter;
 import com.fimet.parser.IStreamAdapter;
 import com.fimet.parser.IStringAdapter;
 
 /**
- * Un Adapter es el encargado de generar la entrada (adaptar) correcta a un parseador  
+ * Un adaptedor para sockets  
  * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>
  *
  */

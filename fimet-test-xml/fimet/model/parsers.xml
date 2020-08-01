@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parsers>
+	<parser name="PNational" class="com.fimet.parser.mx.NationalParser" converter="None" fieldGroup="FNational" />
+</parsers>

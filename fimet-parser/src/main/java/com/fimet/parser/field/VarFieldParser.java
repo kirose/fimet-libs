@@ -36,7 +36,7 @@ public class VarFieldParser extends AbstractFieldParser {
 		this.parserLength = NumericParser.getParser(fieldFormat.getParserLength());
 	}
 	@Override
-	protected byte[] parseValue(IReader reader, IMessage message) {
+	public byte[] parseValue(IReader reader, IMessage message) {
 		int length = parserLength.parse(converterLength.convert(reader.read(this.length)));
 		byte[] bytes = reader.read(length);
 		if (bytes.length != length) {
@@ -49,7 +49,7 @@ public class VarFieldParser extends AbstractFieldParser {
 		return converterValue.convert(bytes);
 	}
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		int index = writer.length(); 
 		writer.move(this.length);
 
@@ -75,5 +75,8 @@ public class VarFieldParser extends AbstractFieldParser {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	public boolean isFixed() {
+		return false;
 	}
 }

@@ -23,13 +23,13 @@ public class FixedFieldParser extends AbstractFieldParser {
 		this.length = fieldFormat.getLength();
 	}
 	@Override
-	protected byte[] parseValue(IReader reader, IMessage message) {
+	public byte[] parseValue(IReader reader, IMessage message) {
 		byte[] value = reader.read(length);
 		value = converterValue.convert(value);
 		return value;
 	}
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		value = converterValue.deconvert(value);
 		writer.append(value);
 		if (value.length != length){
@@ -39,5 +39,8 @@ public class FixedFieldParser extends AbstractFieldParser {
 	}
 	public boolean isValidLength(String value) {
 		return converterValue.deconvert(value.getBytes()).length == length;
+	}
+	public boolean isFixed() {
+		return true;
 	}
 }

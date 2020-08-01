@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fimet>
+	<!-- The application properties -->
+	<properties>
+		<!-- The CompilerManager will use this path to get the SystemJavaCompiler -->
+		<property name="java.home" value="C:\Program Files\Java\jdk1.8.0_251\jre"/>
+		<property name="simulator.numberOfThreads" value="5"/>
+		<property name="simulatorModel.recompileModels" value="true"/>
+		<!-- If true Simulator Extensions previously compiled will be removed at startup -->
+		<property name="simulator.removeExtensions" value="true"/>
+		<!-- The max execution time in milliseconds -->
+		<property name="usecase.maxExecutionTime" value="9000"/>
+		<!-- EAGER or LAZY -->
+		<property name="fieldGroup.mode" value="EAGER"/>
+		<property name="logger.properties" value="fimet/log4j.properties"/>
+		<property name="parsers.path" value="fimet/model/parsers.xml"/>
+		<property name="fieldGroups.path" value="fimet/model/fieldGroups.xml"/>
+		<property name="simulators.path" value="fimet/model/simulators.xml"/>
+		<property name="simulatorModels.path" value="fimet/model/simulatorModels.xml"/>
+	</properties>
+	<!-- 
+		The application managers will be instantiated-singleton and managed by Manager (Container)
+		You can declare a new manager, override or extends an existing
+		
+		Example (New Functionality):
+		For IMyCustomManager extends IManager
+		and MyCustomManager implements IMyCustomManager
+		If you must declare
+		 
+		<manager name="com.fimet.IParserManager" class="com.fimet.MyCustomParserManager" autostart="true"/>
+
+		Example (Override Functionality):
+		For MyCustomParserManager implements IParserManager
+		If you must declare
+		 
+		<manager name="com.fimet.IParserManager" class="com.fimet.MyCustomParserManager" autostart="true"/>
+		
+		Example (Extend Functionality):
+		For IMyCustomParserManager extends IParserManager
+		and MyCustomParserManager implements IMyCustomParserManager
+		If you must declare in fimet.xml:
+		
+		<manager name="com.fimet.IMyCustomParserManager" class="com.fimet.MyCustomParserManager" autostart="true"/>
+		
+		it will produce two references to MyCustomParserManager instance in Manager (container)
+		IParserManager binded to MyCustomParserManager instance
+		and
+		IMyCustomParserManager binded to MyCustomParserManager instance
+	-->
+	<managers>
+		<manager name="com.fimet.ITimerManager" class="com.fimet.TimerManager" />
+		<manager name="com.fimet.IThreadManager" class="com.fimet.ThreadManager" />
+		<manager name="com.fimet.IEventManager" class="com.fimet.EventManager" />
+		<manager name="com.fimet.IClassLoaderManager" class="com.fimet.ClassLoaderManager" />
+		<manager name="com.fimet.ICompilerManager" class="com.fimet.CompilerManager" />
+		
+		<manager name="com.fimet.IAdapterManager" class="com.fimet.AdapterManager" autostart="true"/>
+		<manager name="com.fimet.IParserManager" class="com.fimet.ParserManager" autostart="true"/>
+		<manager name="com.fimet.IFieldGroupManager" class="com.fimet.FieldGroupManager" autostart="true"/>
+		<manager name="com.fimet.IExecutorManager" class="com.fimet.ExecutorManager"/>
+		<manager name="com.fimet.ISessionManager" class="com.fimet.SessionManager"/>
+		<manager name="com.fimet.ISocketManager" class="com.fimet.SocketManager"/>
+		<manager name="com.fimet.ISimulatorModelManager" class="com.fimet.SimulatorModelManager"/>
+		<manager name="com.fimet.ISimulatorManager" class="com.fimet.SimulatorManager"/>
+		<manager name="com.fimet.IStoreManagerExt" class="com.fimet.StoreManagerExt"/>
+		
+		<manager name="com.fimet.exe.IStressExecutor" class="com.fimet.exe.StressExecutor" />
+		<manager name="com.fimet.exe.IUseCaseExecutorExt" class="com.fimet.exe.UseCaseExecutorExt" />
+	</managers>
+	<extensions>
+		<extension name="com.fimet.event.IEventContributor" class="com.fimet.event.NetEventContributor" />
+		<extension name="com.fimet.event.IEventContributor" class="com.fimet.event.SimulatorEventContributor" />
+		<extension name="com.fimet.event.IEventContributor" class="com.fimet.event.ParserEventContributor" />
+	</extensions>
+</fimet>

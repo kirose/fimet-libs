@@ -18,7 +18,7 @@ public class TpvTokenVarFieldParser extends VarFieldParser {
 		return super.parse(reader, message);
 	}
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		writer.append(key);
 		int index = writer.length(); 
 		writer.move(length);

@@ -223,6 +223,49 @@ public final class StringUtils {
             return new String(padding).concat(str);
         }
     }
+    public static String rightPad(final String str, final int size, final char padChar) {
+        if (str == null) {
+            return null;
+        }
+        final int pads = size - str.length();
+        if (pads <= 0) {
+            return str; // returns original String when possible
+        }
+        if (pads > PAD_LIMIT) {
+            return rightPad(str, size, String.valueOf(padChar));
+        }
+        return str.concat(repeat(padChar, pads));
+    }
+    public static String rightPad(final String str, final int size, String padStr) {
+        if (str == null) {
+            return null;
+        }
+        if (isEmpty(padStr)) {
+            padStr = SPACE;
+        }
+        final int padLen = padStr.length();
+        final int strLen = str.length();
+        final int pads = size - strLen;
+        if (pads <= 0) {
+            return str; // returns original String when possible
+        }
+        if (padLen == 1 && pads <= PAD_LIMIT) {
+            return rightPad(str, size, padStr.charAt(0));
+        }
+
+        if (pads == padLen) {
+            return padStr.concat(str);
+        } else if (pads < padLen) {
+            return padStr.substring(0, pads).concat(str);
+        } else {
+            final char[] padding = new char[pads];
+            final char[] padChars = padStr.toCharArray();
+            for (int i = 0; i < pads; i++) {
+                padding[i] = padChars[i % padLen];
+            }
+            return str.concat(new String(padding));
+        }
+    }
     public static String rightTrim(String text, char ch) {
     	if (text == null || text.length() == 0) {
     		return text;
@@ -260,7 +303,7 @@ public final class StringUtils {
     }
     public static String maxLength(String s, int ln) {
     	if (s == null) {
-    		return "";
+    		return null;
     	} else if (s.length() <= ln) {
     		return s;
     	} else {
@@ -289,10 +332,10 @@ public final class StringUtils {
     	}
     	return "";
     }
-    public static String join(List<String> l, char separator) {
+    public static String join(List<?> l, char separator) {
     	if (l != null && !l.isEmpty()) {
         	StringBuilder sb = new StringBuilder();
-        	for (String s : l) {
+        	for (Object s : l) {
 				sb.append(s).append(separator);
 			}
         	sb.delete(sb.length()-1, sb.length());
@@ -300,10 +343,32 @@ public final class StringUtils {
     	}
     	return "";
     }
-    public static String join(List<String> l) {
+    public static String join(List<?> l) {
     	if (l != null && !l.isEmpty()) {
         	StringBuilder sb = new StringBuilder();
+        	for (Object s : l) {
+				sb.append(s).append(',');
+			}
+        	sb.delete(sb.length()-1, sb.length());
+        	return sb.toString();
+    	}
+    	return "";
+    }
+    public static String join(String[] l) {
+    	if (l != null && l.length>0) {
+        	StringBuilder sb = new StringBuilder();
         	for (String s : l) {
+				sb.append(s).append(',');
+			}
+        	sb.delete(sb.length()-1, sb.length());
+        	return sb.toString();
+    	}
+    	return "";
+    }
+    public static String join(Object[] l) {
+    	if (l != null && l.length>0) {
+        	StringBuilder sb = new StringBuilder();
+        	for (Object s : l) {
 				sb.append(s).append(',');
 			}
         	sb.delete(sb.length()-1, sb.length());
@@ -344,5 +409,11 @@ public final class StringUtils {
 	public static String randomLong(int digits) {
 		String fmt = String.format("%0"+digits+"d", Math.abs((long)random.nextLong()));
 		return fmt.length() > digits ? fmt.substring(0,digits) : fmt;
+	}
+	static final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+	public static String readableFileSize(long size) {
+	    if(size <= 0) return "0";
+	    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+	    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 }

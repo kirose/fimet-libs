@@ -23,7 +23,7 @@ public class LTrimFixedFieldParser extends FixedFieldParser {
 		this.length = fieldFormat.getLength();
 	}
 	@Override
-	protected byte[] parseValue(IReader reader, IMessage message) {
+	public byte[] parseValue(IReader reader, IMessage message) {
 		if (length % 2 == 0) {
 			byte[] value = reader.read(length);
 			value = converterValue.convert(value);
@@ -36,7 +36,7 @@ public class LTrimFixedFieldParser extends FixedFieldParser {
 		}
 	}
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		if (length % 2 == 0) {
 			value = converterValue.deconvert(value);
 			writer.append(value);

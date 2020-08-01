@@ -13,7 +13,7 @@ public class NatTokenVarFieldParser extends VarFieldParser {
 		super(fieldFormat);
 	}
 	@Override
-	protected byte[] parseValue(IReader reader, IMessage message) {
+	public byte[] parseValue(IReader reader, IMessage message) {
 		reader.assertChar('!');
 		reader.assertChar(' ');
 		reader.move(2);
@@ -23,12 +23,11 @@ public class NatTokenVarFieldParser extends VarFieldParser {
 		reader.assertChar(' '); 
 		byte[] value = reader.read(length);
 		value = converterValue.convert(value);
-		message.setValue(idField, value);
 		return value;
 	}
 
 	@Override
-	protected byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
+	public byte[] formatValue(IWriter writer, IMessage message, byte[] value) {
 		writer.append("! ");
 		writer.append(key);
 		int index = writer.length(); 

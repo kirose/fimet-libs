@@ -5,14 +5,15 @@ import java.util.List;
 
 import com.fimet.exe.SocketResult;
 import com.fimet.parser.MLI;
-import com.fimet.simulator.ESimulator;
+import com.fimet.simulator.ISimulator;
 import com.fimet.stress.IStress;
-import com.fimet.stress.IStressExecutorListener;
+import com.fimet.stress.IStressMonitor;
 import com.fimet.stress.creator.CartesianCreator;
 import com.fimet.stress.creator.FieldVariator;
 import com.fimet.stress.creator.PanVariator;
-import com.fimet.usecase.UseCase;
+import com.fimet.usecase.IUseCase;
 import com.fimet.utils.MessageBuilder;
+import com.fimet.utils.SimulatorBuilder;
 import com.fimet.utils.StressBuilder;
 import com.fimet.utils.UseCaseUtils;
 /**
@@ -20,21 +21,37 @@ import com.fimet.utils.UseCaseUtils;
  * @author Marco A. Salazar
  *
  */
-public class StressTest implements IStressExecutorListener {
+public class StressTest implements IStressMonitor {
 	public static void main(String[] args) throws Exception {
 		new StressTest().test();
 	}
 
 	private void test() {
-		// Simulator Parameters 
-		ESimulator socketAcq = new ESimulator("SAcq","National", "National", "127.0.0.1", 8583, false, MLI.EXCLUSIVE.getName());
-    	ESimulator socketIss = new ESimulator("SIss", "National", "National", "127.0.0.1", 8583, true, MLI.EXCLUSIVE.getName());
+		// Simulators
+		ISimulator acquirer = new SimulatorBuilder()
+			.name("SAcq")
+			.model("MNational")
+			.parser("PNational")
+			.address("127.0.0.1")
+			.port(8583)
+			.server(false)
+			.adapter(MLI.EXCLUSIVE)
+			.build();
+		ISimulator issuer = new SimulatorBuilder()
+			.name("SIss")
+			.model("MNational")
+			.parser("PNational")
+			.address("127.0.0.1")
+			.port(8583)
+			.server(true)
+			.adapter(MLI.EXCLUSIVE)
+			.build();
     	
     	// Create a stress file with a Cartesian Creator
-    	File stressFile0 = new CartesianCreator("stress/stress-0.txt")
+    	File stressFile0 = new CartesianCreator("fimet/stress/stress-0.txt")
 		.setMessage(
 			new MessageBuilder()
-			.parser("National")
+			.parser("PNational")
 			.adapter(MLI.EXCLUSIVE)
 	    	.mti("0200")
 	    	.header("ISO858300000")
@@ -52,10 +69,11 @@ public class StressTest implements IStressExecutorListener {
 		.create();
     	
     	// Create a stress file with a Cartesian Creator and use case
-    	UseCase uc1 = UseCaseUtils.fromPath("usecases/purchase-1.uc");
+    	IUseCase uc1 = UseCaseUtils.fromPath("fimet/usecases/purchase-1.uc");
     	
-    	File stressFile1 = new CartesianCreator("stress/stress-1.txt")
+    	File stressFile1 = new CartesianCreator("fimet/stress/stress-1.txt")
 		.setMessage(uc1.getMessage())
+		.adapter(uc1.getAcquirer().getSocket().getAdapter())
 		.addVariation("2", new PanVariator("123456").setRange(0, 10).variate())
 		.addVariation("3", new FieldVariator(2,'0').setRange(0, 4).append("0000").variate())
 		.addVariation("4", new FieldVariator(10,'0').setRange(0, 4).append("00").variate())
@@ -64,15 +82,15 @@ public class StressTest implements IStressExecutorListener {
     	
     	new StressBuilder("StressTest")
     	// cycle time until the file is fully read
-    	.setCycleTime(1000)
+    	.cycleTime(1000)
     	// number of messages injected per cycle
-    	.setMessagesPerCycle(10)
-    	.setExecutorListener(this)
+    	.messagesPerCycle(10)
+    	.monitor(this)
     	// For each stress file a thread-injector will be instantiated
-    	.addStressFile(socketAcq, stressFile0) 
+    	.addStressFile(acquirer, stressFile0) 
     	.addStressFile(uc1.getAcquirer(), stressFile1)
     	// if need connect some simulator or socket
-    	.connect(socketIss)
+    	.connect(issuer)
     	.connect(uc1)
     	.execute();		
 	}

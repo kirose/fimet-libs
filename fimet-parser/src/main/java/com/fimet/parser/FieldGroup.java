@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.fimet.Manager;
+import com.fimet.dao.FieldFormatXmlDAO;
 import com.fimet.dao.IFieldFormatDAO;
+import com.fimet.utils.CollectionUtils;
 import com.fimet.utils.IReader;
 import com.fimet.utils.IWriter;
 
@@ -23,7 +25,7 @@ public class FieldGroup implements IFieldGroup {
 	private FieldGroup parent;
 	private List<FieldGroup> children;
 	private IFieldLoader loader;
-	private IFieldFormatDAO dao = Manager.getExtension(IFieldFormatDAO.class, FieldFormatDAO.class);
+	private IFieldFormatDAO dao = Manager.get(IFieldFormatDAO.class, FieldFormatXmlDAO.class);
 	public FieldGroup(IEFieldGroup egroup) {
 		fields = new HashMap<String, IFieldParser>();
 		this.name = egroup.getName();
@@ -31,7 +33,7 @@ public class FieldGroup implements IFieldGroup {
 	}
 	@Override
 	public byte[] parse(int idField, IMessage message, IReader reader) {
-		return getFieldParser(""+idField).parse(reader, message);
+		return getFieldParser(String.valueOf(idField)).parse(reader, message);
 	}
 	@Override
 	public byte[] parse(String idField, IMessage message, IReader reader) {
@@ -43,17 +45,17 @@ public class FieldGroup implements IFieldGroup {
 	}
 	@Override
 	public void format(int idField, IMessage message, IWriter writer) {
-		getFieldParser(""+idField).format(writer, message);
+		getFieldParser(String.valueOf(idField)).format(writer, message);
 	}
 	@Override
 	public short[] getAddress(String idField) {
 		IFieldParser field = getFieldParser(idField);
 		return field!=null?field.getAddress():null;
 	}
-	void setParent(FieldGroup parent) {
+	public void setParent(FieldGroup parent) {
 		this.parent = parent;
 	}
-	FieldGroup getParent() {
+	public FieldGroup getParent() {
 		return parent;
 	}
 	public void addChild(FieldGroup child) {
@@ -127,7 +129,7 @@ public class FieldGroup implements IFieldGroup {
 		}
 		private void loadFields() {
 			fields.clear();
-			List<IEFieldFormat> formats = dao.getByGroup(name);// Own Fields
+			List<IEFieldFormat> formats = dao.findByGroup(name);// Own Fields
 			for (IEFieldFormat f : formats) {
 				loadFieldParser(f);
 			}
@@ -176,7 +178,7 @@ public class FieldGroup implements IFieldGroup {
 		}
 		private void loadFields() {
 			fields.clear();
-			List<IEFieldFormat> formats = dao.getByGroup(name);// Own Fields
+			List<IEFieldFormat> formats = dao.findByGroup(name);// Own Fields
 			for (IEFieldFormat f : formats) {
 				loadFieldParser(f);
 			}
@@ -199,5 +201,9 @@ public class FieldGroup implements IFieldGroup {
 				}
 			}
 		}
+	}
+	@Override
+	public List<IFieldGroup> getChildren() {
+		return CollectionUtils.cast(children, IFieldGroup.class);
 	}
 }
