@@ -165,4 +165,8 @@ public class ClassLoaderManager extends AbstractManager implements IClassLoaderM
 		reloadClassLoader();
 		return loadClass(className);
 	}
+	@Override
+	public String[] getLibraries() {
+		return classLoaderLib.getLibraries();
+	}
 }

@@ -1,6 +1,6 @@
 package com.fimet.event;
 
-import com.fimet.socket.ISocket;
+import com.fimet.net.ISocket;
 
 /**
  * 

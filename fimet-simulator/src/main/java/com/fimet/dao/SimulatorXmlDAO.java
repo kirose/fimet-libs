@@ -6,13 +6,11 @@ import java.util.List;
 import com.fimet.FimetException;
 import com.fimet.Manager;
 import com.fimet.dao.PersistenceException;
-import com.fimet.simulator.ESimulator;
-import com.fimet.simulator.IESimulator;
-import com.fimet.utils.CollectionUtils;
+import com.fimet.simulator.ESimulatorXml;
 import com.fimet.utils.XmlUtils;
 import com.fimet.xml.SimulatorsXml;
 
-public class SimulatorXmlDAO implements ISimulatorDAO {
+public class SimulatorXmlDAO implements ISimulatorDAO<ESimulatorXml> {
 	private File file;
 	public SimulatorXmlDAO() {
 		String path = Manager.getProperty("simulators.path","fimet/model/simulators.xml");
@@ -22,11 +20,11 @@ public class SimulatorXmlDAO implements ISimulatorDAO {
 		file = new File(path);
 	}
 	@Override
-	public IESimulator findByName(String name) {
+	public ESimulatorXml findByName(String name) {
 		if (file.exists()) {
 			SimulatorsXml simulatorsXml = XmlUtils.fromFile(file, SimulatorsXml.class);
-			List<ESimulator> simulators = simulatorsXml.getSimulators();
-			for (ESimulator s : simulators) {
+			List<ESimulatorXml> simulators = simulatorsXml.getSimulators();
+			for (ESimulatorXml s : simulators) {
 				if (name.equals(s.getName())) {
 					return validate(s);
 				}
@@ -35,23 +33,23 @@ public class SimulatorXmlDAO implements ISimulatorDAO {
 		return null;
 	}
 	@Override
-	public List<IESimulator> findAll() {
+	public List<ESimulatorXml> findAll() {
 		if (file.exists()) {
 			SimulatorsXml simulatorsXml = XmlUtils.fromFile(file, SimulatorsXml.class);
-			List<ESimulator> simulators = validate(simulatorsXml.getSimulators());
-			return CollectionUtils.cast(simulators, IESimulator.class);
+			List<ESimulatorXml> simulators = validate(simulatorsXml.getSimulators());
+			return simulators;
 		}
 		return null;
 	}
-	private List<ESimulator> validate(List<ESimulator> simulators) {
+	private List<ESimulatorXml> validate(List<ESimulatorXml> simulators) {
 		if (simulators != null) {
-			for (ESimulator s : simulators) {
+			for (ESimulatorXml s : simulators) {
 				validate(s);
 			}
 		}
 		return simulators;
 	}
-	private ESimulator validate(ESimulator s) {
+	private ESimulatorXml validate(ESimulatorXml s) {
 		if (s.getName() == null) 
 			throw new FimetException("name is null for simulator "+s+" in xml");
 		if (s.getModel() == null)
@@ -79,15 +77,15 @@ public class SimulatorXmlDAO implements ISimulatorDAO {
 		
 	}
 	@Override
-	public IESimulator insert(IESimulator simulator) {
+	public ESimulatorXml insert(ESimulatorXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESimulator update(IESimulator simulator) {
+	public ESimulatorXml update(ESimulatorXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESimulator delete(IESimulator simulator) {
+	public ESimulatorXml delete(ESimulatorXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 }

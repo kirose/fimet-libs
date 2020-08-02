@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.fimet.FimetException;
 import com.fimet.IFieldGroupManager;
 import com.fimet.Manager;
-import com.fimet.parser.EParser;
+import com.fimet.parser.EParserXml;
 import com.fimet.parser.IEParser;
 import com.fimet.parser.IFieldGroup;
 import com.fimet.parser.IParser;
@@ -15,12 +15,12 @@ import com.fimet.utils.converter.Converter;
 import com.fimet.utils.converter.IConverter;
 
 public class ParserBuilder {
-	private EParser entity;
+	private EParserXml entity;
 	private Class<?> parserClass;
 
 	public ParserBuilder() {
 		super();
-		entity= new EParser();
+		entity= new EParserXml();
 		entity.setFieldGroup("National");
 		entity.setConverter(Converter.NONE.toString());
 	}

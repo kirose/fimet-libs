@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -81,5 +82,33 @@ public class ClassLoaderLib extends ClassLoader {
 			return Class.forName(className);
 		}
 	}
-            
+	public String[] getLibraries() {
+		if (LIB_PATH.exists() && LIB_PATH.isDirectory()) {
+			Queue<File> queue = new ArrayDeque<File>();
+			queue.add(LIB_PATH);
+			File dir = null;
+			File[] jars;
+			List<String> libraries = new LinkedList<String>();
+			while (!queue.isEmpty()) {
+				dir = queue.poll();
+				jars = dir.listFiles();
+				if (jars != null && jars.length > 0) {
+					for (File file : jars) {
+						if (file.isDirectory()) {
+							queue.add(file);
+						} else if (file.getName().toLowerCase().endsWith(".jar")) {
+							String relative = FileUtils.makeRelativeTo(file, LIB_PATH);
+							libraries.add(relative.substring(0,relative.length()-4));
+						}
+					}
+				}
+			}
+			if (libraries.isEmpty()) {
+				return null;
+			} else {
+				return libraries.toArray(new String[libraries.size()]);
+			}
+		}
+		return null;
+	}
 }

@@ -39,6 +39,7 @@ public final class ArrayUtils {
 			for (Map.Entry<?, T> e : map.entrySet()) {
 				copy.add(e.getValue());
 			}
+			return copy;
 		}
 		return null;
 	}	

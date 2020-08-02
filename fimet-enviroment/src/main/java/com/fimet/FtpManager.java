@@ -9,9 +9,11 @@ import com.fimet.event.EnviromentEvent;
 import com.fimet.ftp.Ftp;
 import com.fimet.ftp.IEFtp;
 import com.fimet.ftp.IFtp;
+import com.fimet.net.IConnectable;
+import com.fimet.net.IConnectionListener;
 import com.fimet.utils.ArrayUtils;
 
-public class FtpManager implements IFtpManager {
+public class FtpManager implements IFtpManager, IConnectionListener {
 	private Map<String,IFtp> connections;
 	public FtpManager() {
 		reload(false);
@@ -35,7 +37,7 @@ public class FtpManager implements IFtpManager {
 		if (connections.containsKey(entity.getName())) {
 			return connect(entity.getName());
 		} else {
-			Ftp ftp = new Ftp(entity);
+			Ftp ftp = new Ftp(entity, this);
 			ftp.connect();
 			connections.put(entity.getName(), ftp);
 			return ftp;
@@ -68,6 +70,7 @@ public class FtpManager implements IFtpManager {
 	public void reload() {
 		reload(true);
 	}
+	@SuppressWarnings("unchecked")
 	private void reload(boolean fireEvent) {
 		if (connections!=null&&!connections.isEmpty()) {
 			for (Map.Entry<String, IFtp> e : connections.entrySet()) {
@@ -75,11 +78,10 @@ public class FtpManager implements IFtpManager {
 			}
 		}
 		connections = new ConcurrentHashMap<String,IFtp>();
-		IFtpDAO dao = Manager.get(IFtpDAO.class);
-		List<IEFtp> all = dao.findAll();
+		List<? extends IEFtp> all = Manager.get(IFtpDAO.class).findAll();
 		if (all != null && !all.isEmpty()) {
 			for (IEFtp e : all) {
-				connections.put(e.getName(), new Ftp(e));
+				connections.put(e.getName(), new Ftp(e, this));
 			}
 		}
 		if (fireEvent) {
@@ -107,10 +109,18 @@ public class FtpManager implements IFtpManager {
 		if (connections.containsKey(entity.getName())) {
 			return connections.get(entity.getName());
 		} else {
-			Ftp ftp = new Ftp(entity);
+			Ftp ftp = new Ftp(entity, this);
 			connections.put(entity.getName(), ftp);
 			return ftp;
 		}
 	}
-
+	@Override
+	public void onDisconnected(IConnectable connectable) {
+	}
+	@Override
+	public void onConnecting(IConnectable connectable) {
+	}
+	@Override
+	public void onConnected(IConnectable connectable) {
+	}
 }

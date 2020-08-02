@@ -2,11 +2,11 @@ package com.fimet;
 
 import java.util.List;
 
-import com.fimet.socket.IESocket;
-import com.fimet.socket.ISocket;
-import com.fimet.socket.ISocketListener;
-import com.fimet.socket.ISocketStore;
-import com.fimet.socket.SocketException;
+import com.fimet.net.IESocket;
+import com.fimet.net.ISocket;
+import com.fimet.net.ISocketListener;
+import com.fimet.net.ISocketStore;
+import com.fimet.net.SocketException;
 /**
  * 
  * @author <a href="mailto:marcoasb99@ciencias.unam.mx">Marco A. Salazar</a>

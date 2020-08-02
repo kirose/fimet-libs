@@ -4,13 +4,13 @@ import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
 import com.fimet.parser.IAdapter;
 import com.fimet.parser.IParser;
-import com.fimet.simulator.ESimulator;
+import com.fimet.simulator.ESimulatorXml;
 import com.fimet.simulator.ISimulator;
 
 public class SimulatorBuilder {
-	ESimulator entity;
+	ESimulatorXml entity;
 	public SimulatorBuilder() {
-		entity = new ESimulator();
+		entity = new ESimulatorXml();
 		entity.setAdapter("127.0.0.1");
 	}
 	public SimulatorBuilder name(String name) {

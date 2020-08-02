@@ -5,13 +5,11 @@ import java.util.List;
 
 import com.fimet.Manager;
 import com.fimet.dao.PersistenceException;
-import com.fimet.simulator.ESimulatorModel;
-import com.fimet.simulator.IESimulatorModel;
-import com.fimet.utils.CollectionUtils;
+import com.fimet.simulator.ESimulatorModelXml;
 import com.fimet.utils.XmlUtils;
 import com.fimet.xml.SimulatorModelsXml;
 
-public class SimulatorModelXmlDAO implements ISimulatorModelDAO {
+public class SimulatorModelXmlDAO implements ISimulatorModelDAO<ESimulatorModelXml> {
 	private File file;
 	public SimulatorModelXmlDAO() {
 		String path = Manager.getProperty("simulatorModels.path","fimet/model/simulatorModels.xml");
@@ -22,11 +20,11 @@ public class SimulatorModelXmlDAO implements ISimulatorModelDAO {
 	}
 
 	@Override
-	public IESimulatorModel findByName(String name) {
+	public ESimulatorModelXml findByName(String name) {
 		if (file.exists()) {
 			SimulatorModelsXml simulatorModelsXml = XmlUtils.fromFile(file, SimulatorModelsXml.class);
-			List<ESimulatorModel> models = simulatorModelsXml.getSimulatorModels();
-			for (ESimulatorModel m : models) {
+			List<ESimulatorModelXml> models = simulatorModelsXml.getSimulatorModels();
+			for (ESimulatorModelXml m : models) {
 				if (m.getName().equals(name)) {
 					return m;
 				}
@@ -36,37 +34,35 @@ public class SimulatorModelXmlDAO implements ISimulatorModelDAO {
 	}
 
 	@Override
-	public List<IESimulatorModel> findAll() {
+	public List<ESimulatorModelXml> findAll() {
 		if (file.exists()) {
 			SimulatorModelsXml simulatorModelsXml = XmlUtils.fromFile(file, SimulatorModelsXml.class);
-			List<ESimulatorModel> models = simulatorModelsXml.getSimulatorModels();
-			return CollectionUtils.cast(models, IESimulatorModel.class);
+			List<ESimulatorModelXml> models = simulatorModelsXml.getSimulatorModels();
+			return models;
 		}
 		return null;
 	}
 
 	@Override
 	public void start() {
-		
 	}
 
 	@Override
 	public void reload() {
-		
 	}
 
 	@Override
-	public IESimulatorModel insert(IESimulatorModel simulator) {
+	public ESimulatorModelXml insert(ESimulatorModelXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 
 	@Override
-	public IESimulatorModel update(IESimulatorModel simulator) {
+	public ESimulatorModelXml update(ESimulatorModelXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 
 	@Override
-	public IESimulatorModel delete(IESimulatorModel simulator) {
+	public ESimulatorModelXml delete(ESimulatorModelXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 

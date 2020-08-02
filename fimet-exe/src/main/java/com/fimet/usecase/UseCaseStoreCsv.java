@@ -12,9 +12,9 @@ import com.fimet.Paths;
 import com.fimet.assertions.IAssertionResult;
 import com.fimet.exe.Task;
 import com.fimet.exe.UseCaseResult;
+import com.fimet.net.ISocket;
 import com.fimet.parser.IMessage;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.ISocket;
 import com.fimet.stress.StressStoreCsv;
 
 public class UseCaseStoreCsv implements IUseCaseStore {

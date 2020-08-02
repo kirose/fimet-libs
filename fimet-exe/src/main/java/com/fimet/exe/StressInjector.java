@@ -10,8 +10,8 @@ import com.fimet.FimetLogger;
 import com.fimet.exe.stress.IInjector;
 import com.fimet.exe.stress.IInjectorListener;
 import com.fimet.exe.stress.NullInjectorListener;
+import com.fimet.net.ISocket;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.ISocket;
 import com.fimet.stress.Stress;
 
 public class StressInjector extends Thread implements IInjector {

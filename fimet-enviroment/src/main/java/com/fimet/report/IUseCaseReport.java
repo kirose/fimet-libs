@@ -7,5 +7,5 @@ import com.fimet.usecase.IRUseCase;
 
 public interface IUseCaseReport {
 	String getExtension();
-	File doReport(File output, List<IRUseCase> useCases);
+	File doReport(File output, List<? extends IRUseCase> useCases);
 }

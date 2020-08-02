@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <simulatorModels>
-	<model name="MVisa" class="com.fimet.test.SMVisa" />
+	<!-- Simulator Model by Java implementation -->
+	<model name="MVisa" class="com.fimet.simulator.model.SMVisa" />
+	<!-- Simulator Model by xml configuration -->
 	<model name="MNational" class="com.fimet.simulator.model.SMNational" path="fimet/model/simulators/MNational.xml"/>
 </simulatorModels>

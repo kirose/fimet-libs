@@ -5,10 +5,10 @@ import java.util.List;
 import com.fimet.IManager;
 import com.fimet.parser.IEFieldGroup;
 
-public interface IFieldGroupDAO extends IManager {
-	public IEFieldGroup findByName(String name);
-	public List<IEFieldGroup> findAll();
-	public IEFieldGroup insert(IEFieldGroup group);
-	public IEFieldGroup update(IEFieldGroup group);
-	public IEFieldGroup delete(IEFieldGroup group);
+public interface IFieldGroupDAO<T extends IEFieldGroup> extends IManager {
+	public T findByName(String name);
+	public List<T> findAll();
+	public T insert(T group);
+	public T update(T group);
+	public T delete(T group);
 }

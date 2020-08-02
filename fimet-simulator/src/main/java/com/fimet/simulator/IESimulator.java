@@ -1,6 +1,6 @@
 package com.fimet.simulator;
 
-import com.fimet.socket.IESocket;
+import com.fimet.net.IESocket;
 
 /**
  * 

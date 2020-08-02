@@ -16,7 +16,6 @@ com\fimet\simulator\field\IfHasSetEntryMode.class
 com\fimet\event\ISimulatorUpdated.class
 com\fimet\simulator\SimulatorField.class
 com\fimet\simulator\ISimulatorModel.class
-com\fimet\event\ISimulatorMessageDeleted.class
 com\fimet\simulator\field\IfHasSetPanLast4Digits.class
 com\fimet\simulator\field\IfHasSetRandom12N.class
 com\fimet\simulator\NullSimulatorListener.class
@@ -28,8 +27,8 @@ com\fimet\simulator\field\IfHasSetRandom6N.class
 com\fimet\simulator\NullSimulatorModel.class
 com\fimet\simulator\field\SetNewDateyyMMddhhmmss.class
 com\fimet\json\JSimulator.class
-com\fimet\simulator\ESimulator.class
 com\fimet\event\ISimulatorInserted.class
+com\fimet\simulator\ESimulatorXml.class
 com\fimet\event\ISimulatorConnecting.class
 com\fimet\ISimulatorManager.class
 com\fimet\utils\SimulatorUtils.class
@@ -44,9 +43,9 @@ com\fimet\dao\SimulatorModelXmlDAO.class
 com\fimet\event\ISimulatorConnected.class
 com\fimet\simulator\field\SetNewDateMMdd.class
 com\fimet\simulator\field\IfHasSetCorrectPanLastDigit.class
-com\fimet\simulator\ESimulatorMessage.class
 com\fimet\simulator\AbstractSimulatorExtension.class
 com\fimet\simulator\IESimulator.class
+com\fimet\simulator\ESimulatorMessageXml.class
 com\fimet\simulator\field\IfHasSetModuloExtranjero.class
 com\fimet\event\ISimulatorLoaded.class
 com\fimet\dao\ISimulatorDAO.class
@@ -55,7 +54,6 @@ com\fimet\simulator\ISimulatorField.class
 com\fimet\simulator\SimulatorThread.class
 com\fimet\dao\ISimulatorMessageDAO.class
 com\fimet\assertions\IAssertionMaker.class
-com\fimet\simulator\ESimulatorModel.class
 com\fimet\simulator\ISimulatorStore.class
 com\fimet\json\ISimulatorAdapter.class
 com\fimet\simulator\AbstractRandom.class
@@ -79,17 +77,15 @@ com\fimet\simulator\ISimulator.class
 com\fimet\simulator\field\SetRandom12AN.class
 com\fimet\event\ISimulatorRemoved.class
 com\fimet\xml\SimulatorModelsXml.class
-com\fimet\simulator\ValidationResult.class
 com\fimet\simulator\IESimulatorMessage.class
 com\fimet\SimulatorModelManager.class
 com\fimet\event\ISimulatorManagerReloaded.class
 com\fimet\SimulatorManager.class
-com\fimet\event\ISimulatorMessageUpdated.class
-com\fimet\event\ISimulatorMessageInserted.class
 com\fimet\simulator\field\IfHasSetNewDatehhmmss.class
 com\fimet\simulator\SimulatorModelWrapper.class
 com\fimet\dao\SimulatorXmlDAO.class
 com\fimet\simulator\SimulatorThread$OperationType.class
+com\fimet\simulator\ESimulatorModelXml.class
 com\fimet\simulator\field\IfHasSetAmount.class
 com\fimet\utils\SimulatorBuilder.class
 com\fimet\simulator\field\IfHasSetRandom6AN.class

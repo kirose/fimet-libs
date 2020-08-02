@@ -9,7 +9,8 @@ import com.fimet.FimetLogger;
 import com.fimet.IEventManager;
 import com.fimet.Manager;
 import com.fimet.event.EnviromentEvent;
-import com.fimet.socket.IConnectionListener;
+import com.fimet.net.IConnectionListener;
+import com.fimet.utils.Args;
 import com.fimet.utils.FileUtils;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -29,7 +30,14 @@ public class Ftp implements IFtp {
     private ChannelSftp channel = null;
     private Status status = Status.DISCONNECTED;
 	private IConnectionListener listener;
-	public Ftp(IEFtp entity) {
+	public Ftp(IEFtp entity, IConnectionListener listener) {
+		Args.notNull("Ftp Entity", entity);
+		Args.notNull("Ftp Entity Name", entity.getName());
+		Args.notNull("Ftp Entity User", entity.getUser());
+		Args.notNull("Ftp Entity Password", entity.getPassword());
+		Args.notNull("Ftp Entity Address", entity.getAddress());
+		Args.notNull("Ftp Connection Listener", listener);
+		this.listener = listener;
 		name = entity.getName();
 		try {
 	        JSch jsch = new JSch();
@@ -52,36 +60,44 @@ public class Ftp implements IFtp {
         session.setConfig(config);
 	}
 	public void connect() {
-        try {
-        	status = Status.CONNECTING;
-        	Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_CONNECTING, this, this);
-            FimetLogger.debug(Ftp.class,"Connecting to "+session.getHost()+" with "+session.getUserName());
-            session.connect(TIMEOUT);
-            FimetLogger.debug(Ftp.class,"Connected to "+session.getHost()+" with "+session.getUserName());
-            channel = (ChannelSftp)session.openChannel("sftp");
-            
-	        channel.connect();
-	        status = Status.CONNECTED;
-	        Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_CONNECTED, this, this);
-	        //channelSftp.cd(SFTPWORKINGDIR); // Change Directory on SFTP Server
-	    } catch (Exception ex) {
-	        disconnect();
-	        throw new FtpException(ex);
-	    }
+		if (status == Status.DISCONNECTED) {
+	        try {
+	        	status = Status.CONNECTING;
+	        	listener.onConnecting(this);
+	        	Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_CONNECTING, this, this);
+	            FimetLogger.debug(Ftp.class,"Connecting to "+session.getHost()+" with "+session.getUserName());
+	            session.connect(TIMEOUT);
+	            FimetLogger.debug(Ftp.class,"Connected to "+session.getHost()+" with "+session.getUserName());
+	            channel = (ChannelSftp)session.openChannel("sftp");
+	            
+		        channel.connect();
+		        status = Status.CONNECTED;
+		        listener.onConnected(this);
+		        Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_CONNECTED, this, this);
+		        //channelSftp.cd(SFTPWORKINGDIR); // Change Directory on SFTP Server
+		    } catch (Exception ex) {
+		        disconnect();
+		        throw new FtpException(ex);
+		    }
+		}
 	}
 	public void disconnect() {
-        if (channel != null)
-        	try { 
-        		channel.disconnect();
-        		channel = null;
-        	} catch (Exception ex) {}
-        if (session != null) {
-        	try {
-        		session.disconnect();
-        	} catch (Exception ex) {}
-        }
-        Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_DISCONNECTED, this, this);
-        FimetLogger.debug(Ftp.class,"Disconnected from "+name+" ("+session.getHost() + " " + session.getPort()+")");
+		if (status != Status.DISCONNECTED) {
+	        if (channel != null)
+	        	try { 
+	        		channel.disconnect();
+	        		channel = null;
+	        	} catch (Exception ex) {}
+	        if (session != null) {
+	        	try {
+	        		session.disconnect();
+	        	} catch (Exception ex) {}
+	        }
+	        status = Status.DISCONNECTED;
+	        listener.onDisconnected(this);
+	        Manager.get(IEventManager.class).fireEvent(EnviromentEvent.FTP_DISCONNECTED, this, this);
+	        FimetLogger.debug(Ftp.class,"Disconnected from "+name+" ("+session.getHost() + " " + session.getPort()+")");
+		}
 	}
 	@Override
 	public String execute(String command) throws FtpException {

@@ -14,10 +14,11 @@ import com.fimet.enviroment.IEEnviroment;
 import com.fimet.enviroment.IEnviroment;
 import com.fimet.event.EnviromentEvent;
 import com.fimet.event.IEnviromentUpdated;
-import com.fimet.utils.Args;
+import com.fimet.net.IConnectable;
+import com.fimet.net.IConnectionListener;
 import com.fimet.utils.ArrayUtils;
 
-public class EnviromentManager implements IEnviromentManager, IEnviromentUpdated {
+public class EnviromentManager implements IEnviromentManager, IEnviromentUpdated, IConnectionListener {
 
 	private IEnviroment active;
 	private Map<String, IEnviroment> enviroments;
@@ -50,34 +51,28 @@ public class EnviromentManager implements IEnviromentManager, IEnviromentUpdated
 
 	@Override
 	public void connect(IEnviroment enviroment) {
-		Args.notNull("Enviroment", enviroment);
-		if (enviroment.isDisconnected()) {
-			enviroment.connect();
-		}
-		active = enviroment;
+		enviroment.connect();
 	}
 	@Override
 	public void disconnect(IEnviroment enviroment) {
-		if (!enviroment.isDisconnected()) {
-			enviroment.disconnect();
-		}
-		active = null;
+		enviroment.disconnect();
 	}
 
 	@Override
 	public List<IEnviroment> getEnviroments() {
 		return ArrayUtils.copyValuesAsList(enviroments);
 	}
+	@SuppressWarnings("unchecked")
 	private void reload(boolean fireEvent) {
 		if (active!=null) {
 			active.disconnect();
 			active = null;
 		}
 		enviroments = new ConcurrentHashMap<String, IEnviroment>();
-		List<IEEnviroment> all = Manager.get(IEnviromentDAO.class).findAll();
+		List<? extends IEEnviroment> all = Manager.get(IEnviromentDAO.class).findAll();
 		if (all!=null) {
 			for (IEEnviroment e : all) {
-				enviroments.put(e.getName(), new Enviroment(e));
+				enviroments.put(e.getName(), new Enviroment(e, this));
 			}
 		}
 		if (fireEvent) {
@@ -103,9 +98,30 @@ public class EnviromentManager implements IEnviromentManager, IEnviromentUpdated
 		if (enviroments.containsKey(entity.getName())) {
 			return enviroments.get(entity.getName());
 		} else {
-			Enviroment enviroment = new Enviroment(entity);
+			Enviroment enviroment = new Enviroment(entity, this);
 			enviroments.put(entity.getName(), enviroment);
 			return enviroment;
+		}
+	}
+	@Override
+	public void onDisconnected(IConnectable connectable) {
+		if (active == connectable) {
+			active = null;
+		}
+	}
+	@Override
+	public void onConnecting(IConnectable connectable) {
+		if (active != null) {
+			active.disconnect();
+		}
+	}
+	@Override
+	public void onConnected(IConnectable connectable) {
+		if (connectable instanceof IEnviroment) {
+			if (active != null) {
+				active.disconnect();
+			}
+			active = (IEnviroment)connectable;
 		}
 	}
 }

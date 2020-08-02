@@ -7,24 +7,24 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fimet.simulator.ESimulator;
+import com.fimet.simulator.ESimulatorXml;
 
 @XmlRootElement(name="simulators")
 @XmlAccessorType(XmlAccessType.NONE)
 public class SimulatorsXml {
 	@XmlElement(name="simulator")
-	private List<ESimulator> simulators;
+	private List<ESimulatorXml> simulators;
 	public SimulatorsXml() {
 		super();
 	}
-	public SimulatorsXml(List<ESimulator> simulators) {
+	public SimulatorsXml(List<ESimulatorXml> simulators) {
 		super();
 		this.simulators = simulators;
 	}
-	public List<ESimulator> getSimulators() {
+	public List<ESimulatorXml> getSimulators() {
 		return simulators;
 	}
-	public void setSimulators(List<ESimulator> simulators) {
+	public void setSimulators(List<ESimulatorXml> simulators) {
 		this.simulators = simulators;
 	}
 }

@@ -7,16 +7,15 @@ import java.util.List;
 import com.fimet.FimetException;
 import com.fimet.Manager;
 import com.fimet.dao.IFieldFormatDAO;
-import com.fimet.parser.EFieldFormat;
-import com.fimet.parser.EFieldGroup;
+import com.fimet.parser.EFieldFormatXml;
+import com.fimet.parser.EFieldGroupXml;
 import com.fimet.parser.IEFieldFormat;
-import com.fimet.utils.CollectionUtils;
 import com.fimet.utils.XmlUtils;
 import com.fimet.utils.converter.Converter;
 import com.fimet.utils.parser.NumericParser;
 import com.fimet.xml.FieldGroupsXml;
 
-public class FieldFormatXmlDAO implements IFieldFormatDAO {
+public class FieldFormatXmlDAO implements IFieldFormatDAO<EFieldFormatXml> {
 	private File file;
 	public FieldFormatXmlDAO() {
 		String path = Manager.getProperty("fieldGroups.path","fimet/model/fieldGroups.xml");
@@ -27,23 +26,23 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 	}
 
 	@Override
-	public List<IEFieldFormat> findByGroup(String name) {
+	public List<EFieldFormatXml> findByGroup(String name) {
 		if (file.exists()) {
-			EFieldGroup group = getByName(name);
+			EFieldGroupXml group = getByName(name);
 			if (group.getPath()!=null) {
-				EFieldGroup g = XmlUtils.fromPath(group.getPath(), EFieldGroup.class);
-				List<EFieldFormat> list = treeToList(g.getFields());
+				EFieldGroupXml g = XmlUtils.fromPath(group.getPath(), EFieldGroupXml.class);
+				List<EFieldFormatXml> list = treeToList(g.getFields());
 				validate(g, list);
-				return CollectionUtils.cast(list, IEFieldFormat.class);
+				return list;
 			}
 		}
 		return null;
 	}
-	private EFieldGroup getByName(String name) {
+	private EFieldGroupXml getByName(String name) {
 		if (file.exists()) {
 			FieldGroupsXml groupsXml = XmlUtils.fromFile(file, FieldGroupsXml.class);
-			List<EFieldGroup> groups = groupsXml.getGroups();
-			for (EFieldGroup e : groups) {
+			List<EFieldGroupXml> groups = groupsXml.getGroups();
+			for (EFieldGroupXml e : groups) {
 				if (name.equals(e.getName())) {
 					return e;
 				}
@@ -52,14 +51,14 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 		return null;
 	}
 	@Override
-	public List<IEFieldFormat> findAll() {
+	public List<EFieldFormatXml> findAll() {
 		List<IEFieldFormat> all = new ArrayList<>();
 		FieldGroupsXml groupsXml = XmlUtils.fromFile(file, FieldGroupsXml.class);
-		List<EFieldGroup> groups = groupsXml.getGroups();
-		for (EFieldGroup g : groups) {
+		List<EFieldGroupXml> groups = groupsXml.getGroups();
+		for (EFieldGroupXml g : groups) {
 			if (g.getPath()!=null) {
-				EFieldGroup group = XmlUtils.fromPath(g.getPath(), EFieldGroup.class);
-				List<EFieldFormat> list = treeToList(group.getFields());
+				EFieldGroupXml group = XmlUtils.fromPath(g.getPath(), EFieldGroupXml.class);
+				List<EFieldFormatXml> list = treeToList(group.getFields());
 				validate(g, list);
 				for (IEFieldFormat f : list) {
 					all.add(f);
@@ -68,10 +67,10 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 		}
 		return null;
 	}
-	private List<EFieldFormat> treeToList(List<EFieldFormat> tree) {
-		List<EFieldFormat> list = new ArrayList<>(tree.size()+20);
+	private List<EFieldFormatXml> treeToList(List<EFieldFormatXml> tree) {
+		List<EFieldFormatXml> list = new ArrayList<>(tree.size()+20);
 		int i = 0;
-		for (EFieldFormat node : tree) {
+		for (EFieldFormatXml node : tree) {
 			node.setOrder(String.format("%03d", i++));
 			list.add(node);
 			if (node.getChildren() != null && !node.getChildren().isEmpty()) {
@@ -80,10 +79,10 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 		}
 		return list;
 	}
-	private void childrenToList(List<EFieldFormat> list, EFieldFormat parent, List<EFieldFormat> children) {
+	private void childrenToList(List<EFieldFormatXml> list, EFieldFormatXml parent, List<EFieldFormatXml> children) {
 		StringBuilder s = new StringBuilder();
 		int i = 0;
-		for (EFieldFormat node : children) {
+		for (EFieldFormatXml node : children) {
 			node.setOrder(parent.getOrder()+"."+String.format("%03d", i++));
 			s.append(getKey(node)).append(',');
 			node.setIdFieldParent(parent.getIdField());
@@ -95,7 +94,7 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 		s.delete(s.length()-1, s.length());
 		parent.setChilds(s.toString());
 	}
-	private String getKey(EFieldFormat node){
+	private String getKey(EFieldFormatXml node){
 		int index = node.getIdField().lastIndexOf('.');
 		if (index != -1) {
 			return node.getIdField().substring(index+1);
@@ -103,8 +102,8 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 			return node.getIdField();
 		}
 	}
-	private void validate(EFieldGroup g, List<EFieldFormat> list) {
-		for (EFieldFormat f : list) {
+	private void validate(EFieldGroupXml g, List<EFieldFormatXml> list) {
+		for (EFieldFormatXml f : list) {
 			f.setGroup(g.getName());
 			if (f.getIdField()==null)
 				throw new FimetException("id field is null for field "+f.getName()+", see group "+g.getName() + " path "+g.getPath());
@@ -132,17 +131,17 @@ public class FieldFormatXmlDAO implements IFieldFormatDAO {
 	}
 
 	@Override
-	public IEFieldFormat insert(IEFieldFormat parser) {
+	public EFieldFormatXml insert(EFieldFormatXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 
 	@Override
-	public IEFieldFormat update(IEFieldFormat parser) {
+	public EFieldFormatXml update(EFieldFormatXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 
 	@Override
-	public IEFieldFormat delete(IEFieldFormat parser) {
+	public EFieldFormatXml delete(EFieldFormatXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 }

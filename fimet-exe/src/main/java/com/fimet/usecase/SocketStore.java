@@ -7,8 +7,8 @@ import java.io.IOException;
 import com.fimet.FimetException;
 import com.fimet.FimetLogger;
 import com.fimet.exe.Task;
-import com.fimet.socket.ISocket;
-import com.fimet.socket.ISocketStore;
+import com.fimet.net.ISocket;
+import com.fimet.net.ISocketStore;
 import com.fimet.utils.JsonUtils;
 import com.fimet.utils.converter.Converter;
 

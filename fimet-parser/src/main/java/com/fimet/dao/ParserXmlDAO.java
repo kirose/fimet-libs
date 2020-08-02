@@ -6,14 +6,12 @@ import java.util.List;
 import com.fimet.FimetException;
 import com.fimet.Manager;
 import com.fimet.dao.IParserDAO;
-import com.fimet.parser.EParser;
-import com.fimet.parser.IEParser;
-import com.fimet.utils.CollectionUtils;
+import com.fimet.parser.EParserXml;
 import com.fimet.utils.XmlUtils;
 import com.fimet.utils.converter.Converter;
 import com.fimet.xml.ParsersXml;
 
-public class ParserXmlDAO implements IParserDAO {
+public class ParserXmlDAO implements IParserDAO<EParserXml> {
 	private File file;
 	public ParserXmlDAO() {
 		String path = Manager.getProperty("parsers.path","fimet/model/parsers.xml");
@@ -23,12 +21,12 @@ public class ParserXmlDAO implements IParserDAO {
 		file = new File(path);
 	}
 	@Override
-	public IEParser findByName(String name) {
+	public EParserXml findByName(String name) {
 		if (file.exists()) {
 			ParsersXml parsersXml = XmlUtils.fromFile(file, ParsersXml.class);
-			List<EParser> parsers = validate(parsersXml.getParsers());
+			List<EParserXml> parsers = validate(parsersXml.getParsers());
 			if (parsers != null) {
-				for (EParser p : parsers) {
+				for (EParserXml p : parsers) {
 					if (name.equals(p.getName())) {
 						return p;
 					}
@@ -38,17 +36,17 @@ public class ParserXmlDAO implements IParserDAO {
 		return null;
 	}
 	@Override
-	public List<IEParser> findAll() {
+	public List<EParserXml> findAll() {
 		if (file.exists()) {
 			ParsersXml parsersXml = XmlUtils.fromFile(file, ParsersXml.class);
-			List<EParser> parsers = validate(parsersXml.getParsers());
-			return CollectionUtils.cast(parsers,IEParser.class);
+			List<EParserXml> parsers = validate(parsersXml.getParsers());
+			return parsers;
 		}
 		return null;
 	}
-	private List<EParser> validate(List<EParser> parsers) {
+	private List<EParserXml> validate(List<EParserXml> parsers) {
 		if (parsers != null) {
-			for (EParser p : parsers) {
+			for (EParserXml p : parsers) {
 				if (p.getName() == null) 
 					throw new FimetException("Name is null for parser "+p);
 				if (p.getFieldGroup() == null) 
@@ -68,15 +66,15 @@ public class ParserXmlDAO implements IParserDAO {
 	public void reload() {
 	}
 	@Override
-	public IEParser insert(IEParser parser) {
+	public EParserXml insert(EParserXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IEParser update(IEParser parser) {
+	public EParserXml update(EParserXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IEParser delete(IEParser parser) {
+	public EParserXml delete(EParserXml parser) {
 		throw new RuntimeException("Not yet supported");
 	}
 }

@@ -2,7 +2,7 @@ package com.fimet.event;
 
 import java.util.List;
 
-import com.fimet.socket.ISocket;
+import com.fimet.net.ISocket;
 
 /**
  * 

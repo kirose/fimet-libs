@@ -3,12 +3,12 @@ package com.fimet.enviroment;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.fimet.IEnviromentManager;
 import com.fimet.IEventManager;
 import com.fimet.IPreferenceStore;
 import com.fimet.Manager;
 import com.fimet.event.EnviromentEvent;
-import com.fimet.socket.IConnectionListener;
+import com.fimet.net.IConnectionListener;
+import com.fimet.utils.Args;
 
 public class Enviroment implements IEnviroment {
 	private String name;
@@ -17,7 +17,12 @@ public class Enviroment implements IEnviroment {
 	private Status status;
 	private IConnectionListener listener;
 	private static IPreferenceStore store;
-	public Enviroment(IEEnviroment enviroment) {
+	public Enviroment(IEEnviroment enviroment, IConnectionListener listener) {
+		Args.notNull("Enviroment Entity", enviroment);
+		Args.notNull("Enviroment Entity Name", enviroment.getName());
+		Args.notNull("Enviroment Entity Type", enviroment.getType());
+		Args.notNull("Enviroment Connection Listener", listener);
+		this.listener = listener;
 		name = enviroment.getName();
 		properties = enviroment.getProperties();
 		type = enviroment.getType();
@@ -108,35 +113,28 @@ public class Enviroment implements IEnviroment {
 	public void connect() {
 		if (status == Status.DISCONNECTED) {
 			status = Status.CONNECTING;
+			listener.onConnecting(this);
 			Manager.get(IEventManager.class).fireEvent(EnviromentEvent.ENVIROMENT_CONNECTING, this, this);
-			IEnviromentManager enviromentManager = Manager.get(IEnviromentManager.class);
-			IEnviroment active = enviromentManager.getActive();
-			if (active != null) {
-				enviromentManager.disconnect(active);
-			}
 			if (properties!=null) {
 				for (Entry<String, String> e : properties.entrySet()) {
 					store.setValue(e.getKey(), e.getValue());
 				}
 			}
 			status = Status.CONNECTED;
+			listener.onConnected(this);
 			Manager.get(IEventManager.class).fireEvent(EnviromentEvent.ENVIROMENT_CONNECTED, this, this);
 		}
 	}
 	@Override
 	public void disconnect() {
 		if (status != Status.DISCONNECTED) {
-			IEnviromentManager enviromentManager = Manager.get(IEnviromentManager.class);
-			IEnviroment active = enviromentManager.getActive();
-			if (active != null) {
-				enviromentManager.disconnect(active);
-			}
 			if (properties!=null) {
 				for (Entry<String, String> e : properties.entrySet()) {
 					store.removePropery(e.getKey());
 				}
 			}
 			status = Status.DISCONNECTED;
+			listener.onDisconnected(this);
 			Manager.get(IEventManager.class).fireEvent(EnviromentEvent.ENVIROMENT_DISCONNECTED, this, this);
 		}
 	}

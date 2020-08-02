@@ -1,9 +1,9 @@
 package com.fimet.exe.usecase;
 
 import com.fimet.exe.Task;
+import com.fimet.net.ISocket;
 import com.fimet.parser.IMessage;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.ISocket;
 import com.fimet.usecase.IUseCase;
 import com.fimet.usecase.IUseCaseStore;
 

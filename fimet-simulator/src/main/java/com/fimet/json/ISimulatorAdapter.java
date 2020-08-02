@@ -7,23 +7,23 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
-import com.fimet.simulator.ESimulator;
+import com.fimet.net.ISocket;
+import com.fimet.simulator.ESimulatorXml;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.ISocket;
 
 public class ISimulatorAdapter extends TypeAdapter<ISimulator>{
 	protected final TypeAdapter<ISimulator> delegate;
-	private TypeAdapter<ESimulator> simulatorJsonAdapter;
+	private TypeAdapter<ESimulatorXml> simulatorJsonAdapter;
 	public ISimulatorAdapter(TypeAdapter<ISimulator> delegate) {
 		if (delegate == null) {
 			throw new NullPointerException("TypeAdapter delegate is null");
 		}
 		this.delegate = delegate;
-		this.simulatorJsonAdapter = JMessageAdapterFactory.GSON.getAdapter(ESimulator.class);
+		this.simulatorJsonAdapter = JMessageAdapterFactory.GSON.getAdapter(ESimulatorXml.class);
 	}
 	@Override
 	public ISimulator read(JsonReader in) throws IOException {
-		ESimulator json = simulatorJsonAdapter.read(in);
+		ESimulatorXml json = simulatorJsonAdapter.read(in);
 		return Manager.get(ISimulatorManager.class).getSimulator(json);
 	}
 	@Override

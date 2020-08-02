@@ -5,13 +5,11 @@ import java.util.List;
 
 import com.fimet.FimetException;
 import com.fimet.Manager;
-import com.fimet.socket.ESocket;
-import com.fimet.socket.IESocket;
-import com.fimet.utils.CollectionUtils;
+import com.fimet.net.ESocketXml;
 import com.fimet.utils.XmlUtils;
 import com.fimet.xml.SocketsXml;
 
-public class SocketXmlDAO  implements ISocketDAO {
+public class SocketXmlDAO implements ISocketDAO<ESocketXml> {
 	private File file;
 	public SocketXmlDAO() {
 		String path = Manager.getProperty("sockets.path","fimet/model/sockets.xml");
@@ -21,11 +19,11 @@ public class SocketXmlDAO  implements ISocketDAO {
 		file = new File(path);
 	}
 	@Override
-	public IESocket findByName(String name) {
+	public ESocketXml findByName(String name) {
 		if (file.exists()) {
 			SocketsXml socketsXml = XmlUtils.fromFile(file, SocketsXml.class);
-			List<ESocket> sockets = socketsXml.getSockets();
-			for (ESocket s : sockets) {
+			List<ESocketXml> sockets = socketsXml.getSockets();
+			for (ESocketXml s : sockets) {
 				if (name.equals(s.getName())) {
 					return validate(s);
 				}
@@ -34,23 +32,23 @@ public class SocketXmlDAO  implements ISocketDAO {
 		return null;
 	}
 	@Override
-	public List<IESocket> findAll() {
+	public List<ESocketXml> findAll() {
 		if (file.exists()) {
 			SocketsXml socketsXml = XmlUtils.fromFile(file, SocketsXml.class);
-			List<ESocket> sockets = validate(socketsXml.getSockets());
-			return CollectionUtils.cast(sockets, IESocket.class);
+			List<ESocketXml> sockets = validate(socketsXml.getSockets());
+			return sockets;
 		}
 		return null;
 	}
-	private List<ESocket> validate(List<ESocket> sockets) {
+	private List<ESocketXml> validate(List<ESocketXml> sockets) {
 		if (sockets != null) {
-			for (ESocket s : sockets) {
+			for (ESocketXml s : sockets) {
 				validate(s);
 			}
 		}
 		return sockets;
 	}
-	private ESocket validate(ESocket s) {
+	private ESocketXml validate(ESocketXml s) {
 		if (s.getAdapter() == null)
 			throw new FimetException("adapter is null for socket "+s.getName()+" in xml");
 		if (s.getPort() == null)
@@ -70,15 +68,15 @@ public class SocketXmlDAO  implements ISocketDAO {
 		
 	}
 	@Override
-	public IESocket insert(IESocket socket) {
+	public ESocketXml insert(ESocketXml socket) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESocket update(IESocket socket) {
+	public ESocketXml update(ESocketXml socket) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESocket delete(IESocket socket) {
+	public ESocketXml delete(ESocketXml socket) {
 		throw new RuntimeException("Not yet supported");
 	}
 }

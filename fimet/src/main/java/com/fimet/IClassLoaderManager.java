@@ -23,4 +23,5 @@ public interface IClassLoaderManager extends IManager {
 	public <I,E extends I> Class<E> forName(String className,Class<I> interfaz) throws ClassLoaderException;
 	public <I>I reloadAndInstantiate(String className, Class<I> interfaz) throws ClassLoaderException;
 	public <I>I loadAndInstantiate(String className, Class<I> interfaz) throws ClassLoaderException;
+	public String[] getLibraries();
 }

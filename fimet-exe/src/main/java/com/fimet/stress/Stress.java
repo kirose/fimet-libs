@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.fimet.exe.StressResult;
+import com.fimet.net.IConnectable;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.IConnectable;
 
 public class Stress implements IStress {
 	private String name;

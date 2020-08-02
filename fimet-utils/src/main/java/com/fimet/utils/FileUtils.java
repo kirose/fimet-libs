@@ -314,6 +314,27 @@ public final class FileUtils {
 			}
 		}
 	}
+	public static void rdeleteFiles(File from) {
+		if (from.isFile()) {
+			from.delete();
+		} else {
+			Queue<File> queue = new java.util.LinkedList<File>();
+			queue.add(from);
+			while (!queue.isEmpty()) {
+				File dirFrom = queue.poll();
+				File[] files = dirFrom.listFiles();
+				if(files!=null&&files.length>0) {
+					for (File file : files) {
+						if (file.isDirectory()) {
+							queue.add(file);
+						} else {
+							file.delete();
+						}
+					}
+				}
+			}
+		}
+	}
 	public static void rmove(File from, File to, String filter) {
 		rcopy(from, to, filter);
 		delete(from);
@@ -326,5 +347,14 @@ public final class FileUtils {
 			return dirTo;
 		String subpath = pathFrom.getAbsolutePath().substring(dirFrom.getAbsolutePath().length());
 		return new File(dirTo,subpath);
+	}
+	public static String makeRelativeTo(File path, File to) {
+		String absPath = path.getAbsolutePath();
+		String absPathTo = to.getAbsolutePath();
+		if (absPath.startsWith(absPathTo)) {
+			return absPath.substring(absPathTo.length());
+		} else {
+			throw new IllegalArgumentException(absPath+" cannot be relative to "+absPathTo);
+		}
 	}
 }

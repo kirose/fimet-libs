@@ -7,25 +7,25 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fimet.socket.ESocket;
+import com.fimet.net.ESocketXml;
 
 
 @XmlRootElement(name="sockets")
 @XmlAccessorType(XmlAccessType.NONE)
 public class SocketsXml {
 	@XmlElement(name="sockets")
-	private List<ESocket> sockets;
+	private List<ESocketXml> sockets;
 	public SocketsXml() {
 		super();
 	}
-	public SocketsXml(List<ESocket> sockets) {
+	public SocketsXml(List<ESocketXml> sockets) {
 		super();
 		this.sockets = sockets;
 	}
-	public List<ESocket> getSockets() {
+	public List<ESocketXml> getSockets() {
 		return sockets;
 	}
-	public void setSockets(List<ESocket> sockets) {
+	public void setSockets(List<ESocketXml> sockets) {
 		this.sockets = sockets;
 	}
 }

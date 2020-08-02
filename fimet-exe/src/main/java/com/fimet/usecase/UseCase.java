@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fimet.exe.UseCaseResult;
+import com.fimet.net.IConnectable;
 import com.fimet.parser.IMessage;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorExtension;
 import com.fimet.simulator.NullSimulatorExtension;
-import com.fimet.socket.IConnectable;
 import com.google.gson.annotations.Expose;
 
 public class UseCase implements IUseCase {

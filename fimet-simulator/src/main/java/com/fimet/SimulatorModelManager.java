@@ -25,7 +25,8 @@ import com.fimet.utils.SimulatorUtils;
 public class SimulatorModelManager implements ISimulatorModelManager {
 	private Map<String, SimulatorModelWrapper> mapNameSimulator = new HashMap<>();
 	private Map<String, Class<ISimulatorModel>> classes = new HashMap<>();
-	private ISimulatorModelDAO dao = Manager.get(ISimulatorModelDAO.class, SimulatorModelXmlDAO.class);
+	@SuppressWarnings("unchecked")
+	private ISimulatorModelDAO<? extends IESimulatorModel> dao = Manager.get(ISimulatorModelDAO.class, SimulatorModelXmlDAO.class);
 	public SimulatorModelManager() {
 		reload();
 		mapNameSimulator.put("None", new SimulatorModelWrapper(NullSimulatorModel.INSTANCE));
@@ -40,7 +41,7 @@ public class SimulatorModelManager implements ISimulatorModelManager {
 	private void loadClases() {
 		boolean recompileModels = Manager.getPropertyBoolean("simulatorModel.recompileModels",true);
 		IClassLoaderManager loaderManager = Manager.get(IClassLoaderManager.class);
-		List<IESimulatorModel> entities = dao.findAll();
+		List<? extends IESimulatorModel> entities = dao.findAll();
 		for (IESimulatorModel s : entities) {
 			Class<ISimulatorModel> clazz = null;
 			if (recompileModels || !loaderManager.wasInstalled(s.getClassModel())) {

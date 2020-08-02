@@ -7,24 +7,24 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fimet.parser.EParser;
+import com.fimet.parser.EParserXml;
 
 @XmlRootElement(name="parsers")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ParsersXml {
 	@XmlElement(name="parser")
-	private List<EParser> parsers;
+	private List<EParserXml> parsers;
 	public ParsersXml() {
 		super();
 	}
-	public ParsersXml(List<EParser> parsers) {
+	public ParsersXml(List<EParserXml> parsers) {
 		super();
 		this.parsers = parsers;
 	}
-	public List<EParser> getParsers() {
+	public List<EParserXml> getParsers() {
 		return parsers;
 	}
-	public void setParsers(List<EParser> parsers) {
+	public void setParsers(List<EParserXml> parsers) {
 		this.parsers = parsers;
 	}
 }

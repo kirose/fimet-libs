@@ -10,7 +10,7 @@ import com.fimet.usecase.IRUseCase;
 
 public class ReportManager implements IReportManager {
 
-	public File doUseCaseReport(File folderOutput, List<IRUseCase> useCases, String type) {
+	public File doUseCaseReport(File folderOutput, List<? extends IRUseCase> useCases, String type) {
 		IUseCaseReport report = newUseCaseReport(type);
 		String extension = report.getExtension();
 		File path = new File(folderOutput, "UseCaseReport."+extension);

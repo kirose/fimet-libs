@@ -2,7 +2,7 @@ package com.fimet.ftp;
 
 import java.io.File;
 
-import com.fimet.socket.IConnectable;
+import com.fimet.net.IConnectable;
 
 public interface IFtp extends IConnectable {
 	public String getName();

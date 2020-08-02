@@ -17,8 +17,8 @@ public class UseCaseBuilder {
 	public UseCaseBuilder(String name, IESimulator acquirer) {
 		this(name, simulatorManager.getSimulator(acquirer));
 	}
-	public UseCaseBuilder(String name, String idSimulator) {
-		this(name, simulatorManager.getSimulator(idSimulator));
+	public UseCaseBuilder(String name, String simulator) {
+		this(name, simulatorManager.getSimulator(simulator));
 	}
 	public UseCaseBuilder(String name, ISimulator simulator) {
 		useCase = new UseCase();

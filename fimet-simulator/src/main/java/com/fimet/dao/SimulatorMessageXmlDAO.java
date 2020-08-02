@@ -5,13 +5,12 @@ import java.util.List;
 
 import com.fimet.Manager;
 import com.fimet.dao.PersistenceException;
-import com.fimet.simulator.ESimulatorModel;
-import com.fimet.simulator.IESimulatorMessage;
-import com.fimet.utils.CollectionUtils;
+import com.fimet.simulator.ESimulatorMessageXml;
+import com.fimet.simulator.ESimulatorModelXml;
 import com.fimet.utils.XmlUtils;
 import com.fimet.xml.SimulatorModelsXml;
 
-public class SimulatorMessageXmlDAO implements ISimulatorMessageDAO {
+public class SimulatorMessageXmlDAO implements ISimulatorMessageDAO<ESimulatorMessageXml> {
 	private File file;
 	public SimulatorMessageXmlDAO() {
 		String path = Manager.getProperty("simulatorModels.path","fimet/model/simulatorModels.xml");
@@ -21,26 +20,26 @@ public class SimulatorMessageXmlDAO implements ISimulatorMessageDAO {
 		file = new File(path);
 	}
 	@Override
-	public List<IESimulatorMessage> findByModelName(String modelName) {
+	public List<ESimulatorMessageXml> findByModelName(String modelName) {
 		if (file.exists()) {
-			ESimulatorModel model = findModel(modelName);
+			ESimulatorModelXml model = findModel(modelName);
 			if (model != null) {
 				if (model.getMessages() != null) {
-					return CollectionUtils.cast(model.getMessages(), IESimulatorMessage.class);
+					return model.getMessages();
 				} else if (model.getPath() != null) {
-					model = XmlUtils.fromPath(model.getPath(), ESimulatorModel.class);
-					return CollectionUtils.cast(model.getMessages(), IESimulatorMessage.class);
+					model = XmlUtils.fromPath(model.getPath(), ESimulatorModelXml.class);
+					return model.getMessages();
 				}
 			}
 		}
 		return null;
 	}
-	public ESimulatorModel findModel(String modelName) {
+	public ESimulatorModelXml findModel(String modelName) {
 		if (file.exists()) {
 			SimulatorModelsXml simulatorModelsXml = XmlUtils.fromFile(file, SimulatorModelsXml.class);
-			List<ESimulatorModel> models = simulatorModelsXml.getSimulatorModels();
+			List<ESimulatorModelXml> models = simulatorModelsXml.getSimulatorModels();
 			if (models != null) {
-				for (ESimulatorModel m : models) {
+				for (ESimulatorModelXml m : models) {
 					if (m.getName().equals(modelName)) {
 						return m;
 					}
@@ -58,15 +57,15 @@ public class SimulatorMessageXmlDAO implements ISimulatorMessageDAO {
 		
 	}
 	@Override
-	public IESimulatorMessage insert(IESimulatorMessage simulator) {
+	public ESimulatorMessageXml insert(ESimulatorMessageXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESimulatorMessage update(IESimulatorMessage simulator) {
+	public ESimulatorMessageXml update(ESimulatorMessageXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 	@Override
-	public IESimulatorMessage delete(IESimulatorMessage simulator) {
+	public ESimulatorMessageXml delete(ESimulatorMessageXml simulator) {
 		throw new RuntimeException("Not yet supported");
 	}
 

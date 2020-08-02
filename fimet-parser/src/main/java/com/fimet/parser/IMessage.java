@@ -12,6 +12,7 @@ public interface IMessage extends Cloneable {
 	public static final String ADAPTER = "adapter";
 	public static final String HEADER = "header";
 	public static final String MTI = "mti";
+	public static final String BDK = "bdk";
 	
 	public IParser getParser();
 	public void setParser(IParser adapter);

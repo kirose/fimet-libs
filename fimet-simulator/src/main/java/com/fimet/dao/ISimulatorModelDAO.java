@@ -5,10 +5,10 @@ import java.util.List;
 import com.fimet.IManager;
 import com.fimet.simulator.IESimulatorModel;
 
-public interface ISimulatorModelDAO extends IManager {
-	public IESimulatorModel findByName(String name);
-	public List<IESimulatorModel> findAll();
-	public IESimulatorModel insert(IESimulatorModel simulator);
-	public IESimulatorModel update(IESimulatorModel simulator);
-	public IESimulatorModel delete(IESimulatorModel simulator);
+public interface ISimulatorModelDAO<T extends IESimulatorModel> extends IManager {
+	public T findByName(String name);
+	public List<T> findAll();
+	public T insert(T simulator);
+	public T update(T simulator);
+	public T delete(T simulator);
 }

@@ -5,10 +5,11 @@ import java.util.List;
 import com.fimet.IManager;
 import com.fimet.enviroment.IEEnviroment;
 
-public interface IEnviromentDAO extends IManager {
-	List<IEEnviroment> findAll();
-	IEEnviroment findByName(String name);
-	IEEnviroment insert(IEEnviroment enviroment);
-	IEEnviroment update(IEEnviroment enviroment);
-	IEEnviroment delete(IEEnviroment enviroment);
+public interface IEnviromentDAO<T extends IEEnviroment> extends IManager {
+	List<T> findAll();
+	T findByName(String name);
+	T insert(T enviroment);
+	T update(T enviroment);
+	T delete(T enviroment);
 }
+

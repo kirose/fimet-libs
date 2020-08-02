@@ -15,6 +15,13 @@ public class EventManager implements IEventManager {
 	private Map<Object, Integer> mapContributors = new HashMap<Object, Integer>();
 	private IEventContributor[] contributors;
 	public EventManager() {
+		reload();
+	}
+	@Override
+	public void start() {}
+
+	@Override
+	public void reload() {
 		List<IEventContributor> contributors = Manager.getExtensions(IEventContributor.class);
 		if (contributors!=null&&!contributors.isEmpty()) {
 			int indexContributor = 0;
@@ -31,11 +38,6 @@ public class EventManager implements IEventManager {
 			}
 		}
 	}
-	@Override
-	public void start() {}
-
-	@Override
-	public void reload() {}
 
 	@Override
 	public void fireEvent(Object type, Object source, Object ...params) {

@@ -2,7 +2,7 @@ package com.fimet.enviroment;
 
 import java.util.Map;
 
-import com.fimet.socket.IConnectable;
+import com.fimet.net.IConnectable;
 
 public interface IEnviroment extends IConnectable {
 	public String getName();

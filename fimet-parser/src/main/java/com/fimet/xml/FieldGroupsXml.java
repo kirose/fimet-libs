@@ -7,24 +7,24 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fimet.parser.EFieldGroup;
+import com.fimet.parser.EFieldGroupXml;
 
 @XmlRootElement(name="fieldGroups")
 @XmlAccessorType(XmlAccessType.NONE)
 public class FieldGroupsXml {
 	@XmlElement(name="group")
-	private List<EFieldGroup> groups;
+	private List<EFieldGroupXml> groups;
 	public FieldGroupsXml() {
 		super();
 	}
-	public FieldGroupsXml(List<EFieldGroup> groups) {
+	public FieldGroupsXml(List<EFieldGroupXml> groups) {
 		super();
 		this.groups = groups;
 	}
-	public List<EFieldGroup> getGroups() {
+	public List<EFieldGroupXml> getGroups() {
 		return groups;
 	}
-	public void setGroups(List<EFieldGroup> groups) {
+	public void setGroups(List<EFieldGroupXml> groups) {
 		this.groups = groups;
 	}
 }

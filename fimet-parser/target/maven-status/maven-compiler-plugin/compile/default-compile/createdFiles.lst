@@ -1,5 +1,4 @@
 com\fimet\event\IFieldGroupUpdated.class
-com\fimet\parser\EParser.class
 com\fimet\parser\IParser.class
 com\fimet\utils\MessageUtils.class
 com\fimet\parser\FieldGroup$Lazy.class
@@ -36,6 +35,7 @@ com\fimet\parser\IEFieldFormat.class
 com\fimet\parser\adapter\MliVisaExclusiveAdapter.class
 com\fimet\parser\mx\TpvParser.class
 com\fimet\parser\ParserException.class
+com\fimet\parser\EParserXml.class
 com\fimet\parser\field\visa\VisaTagVarFieldParser.class
 com\fimet\AdapterManager.class
 com\fimet\parser\adapter\RawcomAdapter.class
@@ -58,7 +58,6 @@ com\fimet\utils\ParserBuilder.class
 com\fimet\json\JMessageMap.class
 com\fimet\parser\adapter\MliInclusiveSimQueueAdapter.class
 com\fimet\parser\field\mx\NatTokensVarFieldParser.class
-com\fimet\parser\EFieldGroup.class
 com\fimet\parser\field\mc\MCTagsVarFieldParser.class
 com\fimet\parser\MessageFields$Leaf.class
 com\fimet\event\ParserEventContributor.class
@@ -77,6 +76,7 @@ com\fimet\xml\FieldGroupsXml.class
 com\fimet\parser\field\mx\NatTagFixedFieldParser.class
 com\fimet\dao\PersistenceException.class
 com\fimet\event\IParserLoaded.class
+com\fimet\parser\EFieldFormatXml.class
 com\fimet\FieldGroupManager.class
 com\fimet\parser\field\RTrimFixedFieldParser.class
 com\fimet\dao\FieldGroupXmlDAO.class
@@ -98,7 +98,6 @@ com\fimet\parser\field\tpv\TpvTags56VarFieldParser.class
 com\fimet\IAdapterManager.class
 com\fimet\json\JMessageAdapterFactory$2.class
 com\fimet\parser\field\tpv\TpvTokenQKVarFieldParser.class
-com\fimet\parser\EFieldFormat.class
 com\fimet\IParserManager.class
 com\fimet\parser\MessageFields$Node.class
 com\fimet\parser\FormatException.class
@@ -109,6 +108,7 @@ com\fimet\parser\mx\MasterCardParser.class
 com\fimet\parser\IFieldParser.class
 com\fimet\event\ParserEventContributor$1.class
 com\fimet\json\JMessageAdapterFactory$3.class
+com\fimet\parser\EFieldGroupXml.class
 com\fimet\parser\FieldGroup$IFieldLoader.class
 com\fimet\json\IMessageAdapter.class
 com\fimet\parser\field\visa\Visa126VarFieldParser.class

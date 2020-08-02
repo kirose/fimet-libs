@@ -20,7 +20,7 @@ public interface IReportManager extends IManager {
 	 * @param type is the extension of the report (UseCaseReport.type)
 	 * @return File report (UseCaseReport.type)
 	 */
-	File doUseCaseReport(File folderOutput, List<IRUseCase> useCases, String type);
+	File doUseCaseReport(File folderOutput, List<? extends IRUseCase> useCases, String type);
 	/**
 	 * 
 	 * @param idTask the task id associated

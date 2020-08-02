@@ -40,7 +40,7 @@ import com.fimet.usecase.IRUseCase;
 public class UseCaseReportXLSX implements IUseCaseReport {
 
 	private File path;
-	private List<IRUseCase> useCases;
+	private List<? extends IRUseCase> useCases;
 	private XSSFWorkbook workbook;
 	
 	private XSSFFont fontCorrectBold;
@@ -62,7 +62,7 @@ public class UseCaseReportXLSX implements IUseCaseReport {
 	
 	public UseCaseReportXLSX() {}
 
-	public File doReport(File output, List<IRUseCase> useCases) {
+	public File doReport(File output, List<? extends IRUseCase> useCases) {
 		this.path = output;
 		this.useCases = useCases;
 		workbook = new XSSFWorkbook();

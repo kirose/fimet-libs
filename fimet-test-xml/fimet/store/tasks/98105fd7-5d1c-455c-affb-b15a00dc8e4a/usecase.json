@@ -1,1 +1,0 @@
-{"name":"ReversalVisa","acquirer":"SVisa","responseCode":"00","authorizationCode":"      ","status":"COMPLETE","startTime":1596304769681,"executionTime":3,"properties":{},"simulators":[{"name":"SVisa","model":"Visa","address":"127.0.0.1","port":9128},{"name":"VisaIssuer","model":"MNational","address":"127.0.0.1","port":9128}]}

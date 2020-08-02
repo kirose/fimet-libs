@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fimet.FimetException;
 import com.fimet.simulator.IESimulator;
-import com.fimet.simulator.IESimulatorMessage;
 import com.fimet.simulator.IESimulatorModel;
 import com.fimet.simulator.ISimulator;
 
@@ -52,15 +51,6 @@ public class SimulatorEventContributor implements IEventContributor {
 			break;
 		case SIMULATOR_MODEL_DELETED:
 			((ISimulatorModelDeleted)listener).onSimulatorModelDeleted((IESimulatorModel)event.getParams()[0]);
-			break;
-		case SIMULATOR_MESSAGE_INSERTED:
-			((ISimulatorMessageInserted)listener).onSimulatorMessageInserted((IESimulatorMessage)event.getParams()[0]);
-			break;
-		case SIMULATOR_MESSAGE_UPDATED:
-			((ISimulatorMessageUpdated)listener).onSimulatorMessageUpdated((IESimulatorMessage)event.getParams()[0]);
-			break;
-		case SIMULATOR_MESSAGE_DELETED:
-			((ISimulatorMessageDeleted)listener).onSimulatorMessageDeleted((IESimulatorMessage)event.getParams()[0]);
 			break;
 		case SIMULATOR_MANAGER_RELOADED:
 			((ISimulatorManagerReloaded)listener).onSimulatorManagerReloaded((List<ISimulator>)event.getParams()[0]);

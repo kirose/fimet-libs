@@ -9,17 +9,17 @@ import com.fimet.ISimulatorModelManager;
 import com.fimet.ISocketManager;
 import com.fimet.Manager;
 import com.fimet.event.SimulatorEvent;
+import com.fimet.net.IConnectable;
+import com.fimet.net.IConnectionListener;
+import com.fimet.net.ISocket;
+import com.fimet.net.ISocketListener;
+import com.fimet.net.NullConnectionListener;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.IParser;
 import com.fimet.parser.Message;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.ISimulatorListener;
 import com.fimet.simulator.ISimulatorModel;
-import com.fimet.socket.IConnectable;
-import com.fimet.socket.IConnectionListener;
-import com.fimet.socket.ISocket;
-import com.fimet.socket.ISocketListener;
-import com.fimet.socket.NullConnectionListener;
 import com.fimet.utils.Args;
 
 /**

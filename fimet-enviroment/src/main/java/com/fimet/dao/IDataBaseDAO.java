@@ -6,6 +6,6 @@ import com.fimet.IManager;
 import com.fimet.database.IEDataBase;
 
 public interface IDataBaseDAO extends IManager {
-	IEDataBase findByName(String name);
-	List<IEDataBase> findAll();
+	<T extends IEDataBase> T findByName(String name);
+	List<? extends IEDataBase> findAll();
 }

@@ -1,6 +1,7 @@
 package com.fimet.socket;
 
-import com.fimet.socket.IMultiConnectable;
+import com.fimet.net.IConnectable;
+import com.fimet.net.IMultiConnectable;
 
 public class NullMultiConnectorListener implements IMultiConnectorListener {
 	public static final IMultiConnectorListener INSTANCE = new NullMultiConnectorListener();

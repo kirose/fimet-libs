@@ -5,6 +5,7 @@ import com.fimet.IExecutorManager;
 import com.fimet.Manager;
 import com.fimet.parser.MLI;
 import com.fimet.simulator.ISimulator;
+import com.fimet.simulator.extension.SimulatorExtension;
 import com.fimet.utils.SimulatorBuilder;
 import com.fimet.utils.UseCaseBuilder;
 /**
@@ -19,12 +20,13 @@ public class UseCaseTest {
 		new UseCaseTest().test();
 	}
 	private void test() {
-		// Execute all use cases in the folder fimet/usecases/
-		// Use cases execution is sequential
-		// See store/task/* for results execution
+		// Example 1
+		// Execute all use cases in the folder fimet/usecases/ sequentially
+		// See store/task/* for execution results
 		executorManager.executeUseCase("fimet/usecases/");
 
-		// Simulators
+		// Example 2
+		// Using UseCaseBuilder and SimulatorBuilder
 		ISimulator sAquirer = new SimulatorBuilder()
 			.name("Aquirer") // Use a unique name
 			.parser("PNational") // fimet/model/parsers.xml
@@ -43,6 +45,20 @@ public class UseCaseTest {
 			.server(true)
 			.adapter(MLI.EXCLUSIVE)
 			.build();
+
+		// Execute a use cases with UseCaseBuilder
+    	new UseCaseBuilder("Compra", sAquirer)
+	    	.addSimulator(sIssuer)
+	    	.mti("0200")
+	    	.header("ISO858300000")
+	    	.value(2, "1234567890123456")
+	    	.value(3, "000000")
+	    	.value(4, "000000012300")
+	    	.value(11, "123456")
+	    	// Simulator extensions are created automatically for files "uc"
+	    	.simulatorExtension(new SimulatorExtension())
+	    	.execute();
+
 		ISimulator sVisaIssuer = new SimulatorBuilder()
 			.name("VisaIssuer")
 			.parser("PNational")
@@ -52,39 +68,26 @@ public class UseCaseTest {
 			.server(true)
 			.adapter(MLI.EXCLUSIVE)
 			.build();
-
-		// Execute a use cases with UseCaseBuilder
-    	new UseCaseBuilder("Compra", sAquirer)
-    	.addSimulator(sIssuer)
-    	.mti("0200")
-    	.header("ISO858300000")
-    	.value(2, "1234567890123456")
-    	.value(3, "000000")
-    	.value(4, "000000012300")
-    	.value(11, "123456")
-    	// Simulator extensions are created automatically for files "uc"
-    	.simulatorExtension(new SimulatorExtension())
-    	.execute();
-
+    	
     	new UseCaseBuilder("PurchaseVisa", "SVisa")
-    	.addSimulator(sVisaIssuer)
-    	.mti("0200")
-    	.header("ISO858300000")
-    	.value(2, "1234567890123456")
-    	.value(3, "000000")
-    	.value(4, "000000012300")
-    	.value(11, "123456")
-    	.execute();
+	    	.addSimulator(sVisaIssuer)
+	    	.mti("0200")
+	    	.header("ISO858300000")
+	    	.value(2, "1234567890123456")
+	    	.value(3, "000000")
+	    	.value(4, "000000012300")
+	    	.value(11, "123456")
+	    	.execute();
 
     	new UseCaseBuilder("ReversalVisa", "SVisa")
-    	.addSimulator(sVisaIssuer)
-    	.authorization("PurchaseVisa")
-    	.mti("0420")
-    	.header("ISO858300000")
-    	.value(2, "1234567890123456")
-    	.value(3, "000000")
-    	.value(4, "000000012300")
-    	.value(11, "123456")
-    	.execute();	
+	    	.addSimulator(sVisaIssuer)
+	    	.authorization("PurchaseVisa")
+	    	.mti("0420")
+	    	.header("ISO858300000")
+	    	.value(2, "1234567890123456")
+	    	.value(3, "000000")
+	    	.value(4, "000000012300")
+	    	.value(11, "123456")
+	    	.execute();	
 	}
 }

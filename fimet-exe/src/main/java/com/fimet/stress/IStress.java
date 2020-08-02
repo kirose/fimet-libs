@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.Map;
 
 import com.fimet.exe.StressResult;
+import com.fimet.net.IMultiConnectable;
 import com.fimet.simulator.ISimulator;
-import com.fimet.socket.IMultiConnectable;
 
 public interface IStress extends IMultiConnectable {
 	public String getName();

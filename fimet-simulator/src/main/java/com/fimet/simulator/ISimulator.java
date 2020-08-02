@@ -1,9 +1,9 @@
 package com.fimet.simulator;
 
+import com.fimet.net.IConnectable;
+import com.fimet.net.ISocket;
 import com.fimet.parser.IMessage;
 import com.fimet.parser.IParser;
-import com.fimet.socket.IConnectable;
-import com.fimet.socket.ISocket;
 
 /**
  * 

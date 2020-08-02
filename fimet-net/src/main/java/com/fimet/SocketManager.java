@@ -12,15 +12,15 @@ import com.fimet.dao.ISocketDAO;
 import com.fimet.dao.SocketXmlDAO;
 import com.fimet.event.Event;
 import com.fimet.event.NetEvent;
-import com.fimet.socket.AdaptedSocket;
-import com.fimet.socket.AdaptedSocketClient;
-import com.fimet.socket.AdaptedSocketServer;
-import com.fimet.socket.IESocket;
-import com.fimet.socket.ISocket;
-import com.fimet.socket.ISocketListener;
-import com.fimet.socket.ISocketStore;
-import com.fimet.socket.NullSocketStore;
-import com.fimet.socket.SocketStoreWrapper;
+import com.fimet.net.AdaptedSocket;
+import com.fimet.net.AdaptedSocketClient;
+import com.fimet.net.AdaptedSocketServer;
+import com.fimet.net.IESocket;
+import com.fimet.net.ISocket;
+import com.fimet.net.ISocketListener;
+import com.fimet.net.ISocketStore;
+import com.fimet.net.NullSocketStore;
+import com.fimet.net.SocketStoreWrapper;
 import com.fimet.utils.ArrayUtils;
 
 public class SocketManager implements ISocketManager {

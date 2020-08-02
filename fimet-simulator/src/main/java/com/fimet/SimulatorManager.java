@@ -46,6 +46,7 @@ public class SimulatorManager extends AbstractManager implements ISimulatorManag
 	public void reload() {
 		reload(true);
 	}
+	@SuppressWarnings("unchecked")
 	private void reload(boolean fireEvent) {
 		boolean removeExtensions = Manager.getPropertyBoolean("simulator.removeExtensions",true);
 		if (removeExtensions) {
@@ -53,8 +54,7 @@ public class SimulatorManager extends AbstractManager implements ISimulatorManag
 			FileUtils.deleteFiles(path);
 		}
 		store.setWrapped(NullSimulatorStore.INSTANCE);
-		ISimulatorDAO dao = Manager.get(ISimulatorDAO.class,SimulatorXmlDAO.class);
-		List<IESimulator> entities = dao.findAll();
+		List<IESimulator> entities = Manager.get(ISimulatorDAO.class,SimulatorXmlDAO.class).findAll();
 		mapNameSimulator.clear();
 		if (entities!=null) {
 			for (IESimulator e : entities) {

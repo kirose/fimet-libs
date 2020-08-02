@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.fimet.socket.ISocket;
+import com.fimet.net.ISocket;
 import com.fimet.utils.StringUtils;
 
 public class SocketResult {

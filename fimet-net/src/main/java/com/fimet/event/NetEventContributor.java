@@ -3,8 +3,8 @@ package com.fimet.event;
 import java.util.List;
 
 import com.fimet.FimetException;
-import com.fimet.socket.IESocket;
-import com.fimet.socket.ISocket;
+import com.fimet.net.IESocket;
+import com.fimet.net.ISocket;
 
 public class NetEventContributor implements IEventContributor {
 

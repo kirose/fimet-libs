@@ -181,12 +181,13 @@ public final class SimulatorUtils {
 		}
 		return installClassSimulatorModel(simulator);
 	}
+	@SuppressWarnings("unchecked")
 	public static ClassModel classModelFromSimulatorModel(IESimulatorModel simulator) {
 		if (simulator.getClassModel() == null) {
 			throw new FimetException("Class name is null for simulator "+simulator.getName());
 		}
-		ISimulatorMessageDAO dao = Manager.get(ISimulatorMessageDAO.class, SimulatorMessageXmlDAO.class);
-		List<IESimulatorMessage> simulators = dao.findByModelName(simulator.getName());
+		ISimulatorMessageDAO<? extends IESimulatorMessage> dao = Manager.get(ISimulatorMessageDAO.class, SimulatorMessageXmlDAO.class);
+		List<? extends IESimulatorMessage> simulators = dao.findByModelName(simulator.getName());
 		String simpleClassName;
 		int index = simulator.getClassModel().lastIndexOf('.');
 		String packageName;

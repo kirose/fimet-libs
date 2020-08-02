@@ -6,10 +6,10 @@ import java.io.IOException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.fimet.net.ISocket;
 import com.fimet.parser.IMessage;
 import com.fimet.simulator.ISimulator;
 import com.fimet.simulator.NullSimulatorExtension;
-import com.fimet.socket.ISocket;
 import com.fimet.usecase.IUseCase;
 import com.fimet.utils.UseCaseUtils;
 
