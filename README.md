@@ -24,6 +24,8 @@ See stress example [here](https://github.com/kirose/fimet-libs/blob/master/fimet
 
 ## Documentation
 
+Check [wiki](https://github.com/kirose/fimet-libs/wiki)
+
 * UseCases
 * Stress
 * Sckets
