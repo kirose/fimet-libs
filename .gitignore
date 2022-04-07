@@ -1,0 +1,7 @@
+.metadata
+fimet-core/target/*
+fimet-exe/target/*
+fimet-net/target/*
+fimet-parser/target/*
+fimet-simulator/target/*
+fimet-utils/target/*
