@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulatorModels>
+	<!-- Simulator Model by Java implementation -->
+	<!--model name="MVisa" class="com.fimet.simulator.model.Visa" -->
+	<!-- Simulator Model by xml configuration -->
+	<model name="Banamex" class="com.fimet.simulator.model.Banamex" path="model/simulators/Banamex.xml"/>
+	<model name="Bancomer" class="com.fimet.simulator.model.Bancomer" path="model/simulators/Bancomer.xml"/>
+	<model name="EGCamara" class="com.fimet.simulator.model.EGCamara" path="model/simulators/EGCamara.xml"/>
+	<model name="MasterCard" class="com.fimet.simulator.model.MasterCard" path="model/simulators/MasterCard.xml"/>
+	<model name="National" class="com.fimet.simulator.model.National" path="model/simulators/National.xml"/>
+	<model name="Prosa" class="com.fimet.simulator.model.Prosa" path="model/simulators/Prosa.xml"/>
+	<model name="RiskCenterAcq" class="com.fimet.simulator.model.RiskCenterAcq" path="model/simulators/RiskCenterAcq.xml"/>
+	<model name="RiskCenterIss" class="com.fimet.simulator.model.RiskCenterIss" path="model/simulators/RiskCenterIss.xml"/>
+	<model name="TPV" class="com.fimet.simulator.model.TPV" path="model/simulators/TPV.xml"/>
+	<model name="Visa" class="com.fimet.simulator.model.Visa" path="model/simulators/Visa.xml"/>
+</simulatorModels>

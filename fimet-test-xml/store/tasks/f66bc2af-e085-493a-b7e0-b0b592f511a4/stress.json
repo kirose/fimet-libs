@@ -1,0 +1,2 @@
+{"name":"Oxxo","address":"127.0.0.1","port":7991,"cycleTime":1000,"cycles":64,"numOfApprovals":640,"numOfWrite":640,"numOfRead":640,"numOfInjec":640,"msgsInFile":640,"injectStartTime":1598588893780,"injectFinishTime":1598588956914}
+{"name":"SAcq","address":"127.0.0.1","port":8583,"cycleTime":1000,"cycles":188,"numOfApprovals":1875,"numOfWrite":1875,"numOfRead":1875,"numOfInjec":1875,"msgsInFile":1875,"injectStartTime":1598588893774,"injectFinishTime":1598589081220}

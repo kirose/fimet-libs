@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="Visa">
+	<message mti="0100" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0120" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0400" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0800" type="Response">
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0800" type="Request">
+		<add id="7" class="com.fimet.simulator.field.SetNewDateMMddhhmmss"/>
+		<add id="11" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="15" value="0903"/>
+		<add id="48" value="0111000122S00484"/>
+		<add id="70" value="301"/>
+	</message>
+
+	<message mti="0100" type="Response">
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>35</del>
+		<del>43</del>
+		<del>55</del>
+		<del>59</del>
+		<del>60</del>
+		<del>126</del>
+		<del>38</del>
+		<del>39</del>
+		<del>44</del>
+		<del>104</del>
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+		<add id="44" value="5"/>
+		<add id="62.1" value="A"/>
+		<add id="62.2" class="com.fimet.simulator.field.SetRandom15N"/>
+	</message>
+	<message mti="0120" type="Response">
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0400" type="Response">
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>43</del>
+		<del>60</del>
+		<del>59</del>
+		<del>38</del>
+		<add id="39" value="00"/>
+		<add id="62.1" value="A"/>
+	</message>
+</model>

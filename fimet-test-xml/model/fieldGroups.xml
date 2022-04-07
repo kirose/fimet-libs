@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fieldGroups>
+	<group name="National" path="model/fields/National.xml"/>
+	<group name="TPV" path="model/fields/TPV.xml"/>
+	<group name="Visa" path="model/fields/Visa.xml"/>
+	<group name="MasterCard" path="model/fields/MasterCard.xml"/>
+</fieldGroups>

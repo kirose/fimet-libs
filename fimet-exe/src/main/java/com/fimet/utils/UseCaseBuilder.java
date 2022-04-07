@@ -3,6 +3,7 @@ package com.fimet.utils;
 import com.fimet.IExecutorManager;
 import com.fimet.ISimulatorManager;
 import com.fimet.Manager;
+import com.fimet.exe.Task;
 import com.fimet.parser.Message;
 import com.fimet.simulator.IESimulator;
 import com.fimet.simulator.ISimulator;
@@ -78,8 +79,7 @@ public class UseCaseBuilder {
 	public UseCase build() {
 		return useCase;
 	}
-	public UseCaseBuilder execute() {
-		executorManager.execute(useCase);
-		return this;
+	public Task execute() {
+		return executorManager.execute(useCase);
 	}
 }

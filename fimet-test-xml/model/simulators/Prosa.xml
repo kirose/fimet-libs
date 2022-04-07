@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="Prosa">
+	<message mti="0100" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0200" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.5" class="com.fimet.simulator.field.IfHasSetEntryMode"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0220" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.5" class="com.fimet.simulator.field.IfHasSetEntryMode"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0221" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.5" class="com.fimet.simulator.field.IfHasSetEntryMode"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0420" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.5" class="com.fimet.simulator.field.IfHasSetEntryMode"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0421" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.10.track2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="63.EZ.5" class="com.fimet.simulator.field.IfHasSetEntryMode"/>
+		<add id="63.EZ.11" class="com.fimet.simulator.field.IfHasSetPanLast4Digits"/>
+	</message>
+	<message mti="0800" type="Response">
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0800" type="Request">
+		<add id="7" class="com.fimet.simulator.field.SetNewDateMMddhhmmss"/>
+		<add id="11" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="15" value="0903"/>
+		<add id="48" value="0111000122S00484"/>
+		<add id="70" value="301"/>
+	</message>
+
+	<message mti="0100" type="Response">
+		<del>18</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<del>63.Q1</del>
+		<del>63.B2</del>
+		<del>63.B3</del>
+		<del>63.B4</del>
+		<add id="15" class="com.fimet.simulator.field.SetNewDateMMdd"/>
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+		<add id="44" value="02 0"/>
+		<add id="63.C4" value="111111111111"/>
+	</message>
+	<message mti="0200" type="Response">
+		<del>18</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<del>63.Q1</del>
+		<del>63.B2</del>
+		<del>63.B3</del>
+		<del>63.B4</del>
+		<add id="15" class="com.fimet.simulator.field.SetNewDateMMdd"/>
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+		<add id="44" value="02 0"/>
+		<add id="63.C4" value="111111111111"/>
+	</message>
+	<message mti="0220" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>15</del>
+		<del>17</del>
+		<del>38</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0221" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>15</del>
+		<del>17</del>
+		<del>38</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0420" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>15</del>
+		<del>17</del>
+		<del>38</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0421" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>15</del>
+		<del>17</del>
+		<del>38</del>
+		<del>43</del>
+		<del>48</del>
+		<del>60</del>
+		<del>62</del>
+		<add id="39" value="00"/>
+	</message>
+</model>

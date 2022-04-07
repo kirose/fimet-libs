@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simulators>
+	<simulator name="Visa" model="Visa" parser="Visa" server="false" address="127.0.0.1" port="9021" adapter="Exclusive" />
+	<simulator name="MasterCard" model="MasterCard" parser="MasterCard" server="false" address="127.0.0.1" port="6003" adapter="Exclusive" />
+	<simulator name="TPV" model="TPV" parser="TPV" server="false" address="127.0.0.1" port="9047" adapter="Exclusive" />
+	<simulator name="MultiPay" model="National" parser="National" server="false" address="127.0.0.1" port="8189" adapter="Exclusive" />
+	<simulator name="MultiPayIss" model="National" parser="National" server="true" address="127.0.0.1" port="8189" adapter="Exclusive" />
+	<simulator name="7Eleven" model="National" parser="National" server="false" address="127.0.0.1" port="4091" adapter="Exclusive" />
+	<simulator name="7ElevenIss" model="National" parser="National" server="true" address="127.0.0.1" port="4091" adapter="Exclusive" />
+</simulators>

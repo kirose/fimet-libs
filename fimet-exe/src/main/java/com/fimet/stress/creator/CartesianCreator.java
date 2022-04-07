@@ -73,6 +73,9 @@ public class CartesianCreator implements IFileCreator {
 	@Override
 	public File create() {
 		FileOutputStream writer = null;
+		if (simulatorModel == null) {
+			throw new FimetException("SimulatorModel cannot be null");
+		}
 		if (adapter == null) {
 			throw new FimetException("Adapter cannot be null");
 		} else {

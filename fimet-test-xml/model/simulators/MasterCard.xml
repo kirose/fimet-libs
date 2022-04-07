@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="MasterCard">
+	<message mti="0100" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0120" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0400" type="Request">
+		<add id="2" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+		<add id="7" class="com.fimet.simulator.field.IfHasSetNewDateMMddhhmmss"/>
+		<add id="12" class="com.fimet.simulator.field.IfHasSetNewDatehhmmss"/>
+		<add id="13" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="15" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="16" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="17" class="com.fimet.simulator.field.IfHasSetNewDateMMdd"/>
+		<add id="35" class="com.fimet.simulator.field.IfHasSetCorrectPanLastDigit"/>
+	</message>
+	<message mti="0800" type="Response">
+		<add id="7" class="com.fimet.simulator.field.SetNewDateMMddhhmmss"/>
+		<add id="39" value="00"/>
+		<add id="63" value="MCCKJONGU"/>
+		<add id="94" value="0B0    "/>
+	</message>
+	<message mti="0800" type="Request">
+		<add id="2" value="07867"/>
+		<add id="7" class="com.fimet.simulator.field.SetNewDateMMddhhmmss"/>
+		<add id="11" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="33" value="007867"/>
+		<add id="70" value="270"/>
+		<add id="94" value="0B0    "/>
+	</message>
+
+	<message mti="0100" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>23</del>
+		<del>42</del>
+		<del>43</del>
+		<del>47</del>
+		<del>61</del>
+		<del>35</del>
+		<del>43</del>
+		<del>53</del>
+		<del>55</del>
+		<del>55.5F2A</del>
+		<del>55.95</del>
+		<del>55.9A</del>
+		<del>55.9F09</del>
+		<del>55.9F10</del>
+		<del>55.9F1A</del>
+		<del>55.9F1E</del>
+		<del>55.9F26</del>
+		<del>55.9F27</del>
+		<del>55.9F33</del>
+		<del>55.9F34</del>
+		<del>55.9F35</del>
+		<del>55.9F36</del>
+		<del>55.9F37</del>
+		<del>55.9F41</del>
+		<del>55.9F53</del>
+		<del>61</del>
+		<add id="15" class="com.fimet.simulator.field.SetNewDateMMdd"/>
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+		<add id="48" value="R26032178701P8801Y920309433540101M0216549138005211069003042005061150139059239080204"/>
+		<add id="63" value="MCWAHG1DW"/>
+		<add id="124" value="2020000009001150715491389999001300   000000BNMR    0000000000051V0                    19 0                    "/>
+	</message>
+	<message mti="0200" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>23</del>
+		<del>35</del>
+		<del>42</del>
+		<del>43</del>
+		<del>52</del>
+		<del>61</del>
+		<add id="15" class="com.fimet.simulator.field.SetNewDateMMdd"/>
+		<add id="38" class="com.fimet.simulator.field.SetRandom6N"/>
+		<add id="39" value="00"/>
+		<add id="63" class="com.fimet.simulator.field.SetRandom9N"/>
+	</message>
+	<message mti="0302" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>23</del>
+		<del>38</del>
+		<del>42</del>
+		<del>43</del>
+		<del>61</del>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0400" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>23</del>
+		<del>38</del>
+		<del>42</del>
+		<del>43</del>
+		<del>61</del>
+		<add id="39" value="00"/>
+	</message>
+	<message mti="0420" type="Response">
+		<del>12</del>
+		<del>13</del>
+		<del>14</del>
+		<del>18</del>
+		<del>22</del>
+		<del>28</del>
+		<del>38</del>
+		<del>42</del>
+		<del>43</del>
+		<del>60</del>
+		<del>61</del>
+		<del>90</del>
+		<add id="39" value="00"/>
+	</message>
+</model>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parsers>
+	<parser name="National" class="com.fimet.parser.mx.NationalParser" converter="None" fieldGroup="National" />
+	<parser name="TPV" class="com.fimet.parser.mx.TpvParser" converter="None" fieldGroup="TPV" />
+	<parser name="Visa" class="com.fimet.parser.mx.VisaParser" converter="AsciiToHex" fieldGroup="Visa" />
+	<parser name="MasterCard" class="com.fimet.parser.mx.MasterCardParser" converter="None" fieldGroup="MasterCard" />
+</parsers>

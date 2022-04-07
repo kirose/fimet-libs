@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.example.org/fimet"
+	xmlns:tns="http://www.example.org/fimet"
+	elementFormDefault="qualified">
+<!-- 
+ 	xmlns="http://www.example.org/fimet"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema"
+    xsi:schemaLocation="http://www.example.org/fimet.xsd"
+ -->
+    <element name="managers" type="tns:manager-list"></element>
+    
+    <element name="manager" type="tns:manager"></element>
+    
+    <complexType name="manager">
+    	<attribute name="id" type="tns:java-manager"></attribute>
+    	<attribute name="class" type="tns:java-manager"></attribute>
+    </complexType>
+
+    <complexType name="manager-list">
+    	<sequence>
+    		<element name="manager" type="tns:manager"></element>
+    	</sequence>
+    </complexType>
+
+
+    <simpleType name="java">
+    	<restriction base="string"></restriction>
+    </simpleType>
+
+    <element name="extensions" type="tns:extension-list"></element>
+
+    <element name="extension" type="tns:extension"></element>
+
+    <complexType name="extension-list">
+    	<sequence>
+    		<element name="extension" type="tns:extension"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="extension">
+    	<attribute name="id" type="tns:java"></attribute>
+    	<attribute name="class" type="tns:java"></attribute>
+    </complexType>
+
+    <simpleType name="java-manager">
+    	<restriction base="string"></restriction>
+    </simpleType>
+
+    <element name="properties" type="tns:property-list"></element>
+    
+    <element name="property" type="tns:property"></element>
+    
+    <complexType name="property">
+      	<attribute name="name" type="string"/>
+  		<attribute name="value" type="string"/>
+    </complexType>
+
+    <complexType name="property-list">
+    	<sequence>
+    		<element name="property" type="tns:property"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="simulators" type="tns:simulator-list"></element>
+    
+    <element name="simulator" type="tns:simulator"></element>
+    
+    <complexType name="simulator">
+  		<attribute name="id" type="string"/>
+  		<attribute name="model" type="string"/>
+  		<attribute name="parser" type="tns:java"/>
+  		<attribute name="server" type="string"/>
+  		<attribute name="address" type="string"/>
+  		<attribute name="port" type="int"/>
+  		<attribute name="adapter" type="string"/>
+    </complexType>
+    
+    <complexType name="simulator-model">
+      	<attribute name="id" type="string"/>
+  		<attribute name="class" type="string"/>
+    </complexType>
+    <complexType name="simulator-list">
+    	<sequence minOccurs="1">
+    		<element name="simulator" type="tns:simulator" maxOccurs="unbounded"/>
+    		<element name="model" type="tns:simulator-model" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+
+    <element name="parsers" type="tns:parser-list"></element>
+    
+    <complexType name="parser-list">
+    	<sequence minOccurs="1">
+    		<element name="parser" type="tns:parser" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+
+    <complexType name="parser">
+  		<attribute name="id" type="string"/>
+  		<attribute name="class" type="tns:java"/>
+  		<attribute name="converter" type="string"/>
+  		<attribute name="fieldsGroup" type="string"/>
+    </complexType>
+
+    <element name="fieldsGroups" type="tns:fieldsGroup-list"></element>
+    
+    <complexType name="fieldsGroup-list">
+    	<sequence minOccurs="1">
+    		<element name="fieldsGroup" type="tns:fieldsGroup" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="fieldsGroup">
+  		<attribute name="id" type="string"/>
+  		<attribute name="path" type="string"/>
+    </complexType>
+</schema>
